@@ -16,4 +16,9 @@
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8" PrivateAssets="All" />
   </ItemGroup>
 
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>bin\Debug\net8.0\ITC.API.xml</DocumentationFile>
+	</PropertyGroup>
+
 </Project>

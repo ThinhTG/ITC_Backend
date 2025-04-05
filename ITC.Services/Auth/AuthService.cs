@@ -55,7 +55,9 @@ namespace ITC.Services.Auth
 			{
 				UserName = registerDto.UserName,
 				Email = registerDto.Email,
-				// Add other required properties here
+				PhoneNumber = registerDto.PhoneNumber,
+				EmailConfirmed = true, // Set to true if you want to skip email confirmation
+				PhoneNumberConfirmed = true // Set to true if you want to skip phone number confirmation
 			};
 
 			var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -71,10 +73,20 @@ namespace ITC.Services.Auth
 				};
 			}
 
-			// Assign default role if needed
-			await _userManager.AddToRoleAsync(user, "Customer");
+			if (registerDto.Role.Equals("Customer"))
+			{
+				await _userManager.AddToRoleAsync(user, "Customer");
+			}else if (registerDto.Role.Equals("Talent"))
+            {
+				await _userManager.AddToRoleAsync(user, "Talent");
+			}
+			else
+			{
+				await _userManager.AddToRoleAsync(user, "Admin");
+			}
 
-			_logger.LogInformation("User {Email} registered successfully", registerDto.Email);
+
+            _logger.LogInformation("User {Email} registered successfully", registerDto.Email);
 
 			// Generate tokens
 			var accessToken = await _tokenService.GenerateToken(user);

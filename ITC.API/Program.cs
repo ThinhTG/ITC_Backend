@@ -58,9 +58,10 @@ namespace ITC.API
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+			app.UseAuthentication();
+			app.UseAuthorization();
 
-            app.MapControllers();
+			app.MapControllers();
 
             app.Run();
         }
