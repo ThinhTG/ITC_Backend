@@ -32,7 +32,10 @@ namespace ITC.API.SeedData
 				{
 					UserName = "admin@admin.com",
 					Email = "admin@admin.com",
-					FullName = "Admin User"
+					FullName = "Admin User",
+					Address = "82 admin address",
+					PhoneNumber = "1234567890",
+					PhoneNumberConfirmed = true,
 				};
 
 				var result = await userManager.CreateAsync(adminUser, "Test@123");
@@ -50,7 +53,11 @@ namespace ITC.API.SeedData
 				{
 					UserName = "customer@customer.com",
 					Email = "customer@customer.com",
-					FullName = "Customer User"
+					FullName = "Customer User",
+					Address = "82 customer address",
+					PhoneNumber = "0987654321",
+					PhoneNumberConfirmed = true,
+
 				};
 
 				var result = await userManager.CreateAsync(customerUser, "Test@123");
@@ -68,7 +75,10 @@ namespace ITC.API.SeedData
 				{
 					UserName = "talent@talent.com",
 					Email = "talent@talent.com",
-					FullName = "Talent User"
+					FullName = "Talent User",
+					Address = "82 talent address",
+					PhoneNumber = "1122334455",
+					PhoneNumberConfirmed = true,
 				};
 
 				var result = await userManager.CreateAsync(talentUser, "Test@123");

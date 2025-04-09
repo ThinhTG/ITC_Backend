@@ -89,16 +89,5 @@ namespace ITC.Repositories.ModelViews.UserModels
 
 			
 		}
-
-		public void Mapping(Profile profile)
-		{
-			profile.CreateMap<RegisterRequestModel, ApplicationUser>()
-				   .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Username))
-				   .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-				   .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-				   .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
-				   .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password)) // If Password is intended to be mapped
-				   .ReverseMap();
-		}
 	}
 }

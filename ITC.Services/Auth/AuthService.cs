@@ -1,15 +1,16 @@
-﻿using ITC.BusinessObject.Identity;
+﻿using AutoMapper;
+using Google.Apis.Auth;
+using ITC.BusinessObject.Identity;
+using ITC.BusinessObject.Request;
+using ITC.BusinessObject.Response;
 using ITC.Core.Base;
 using ITC.Services.DTOs;
 using ITC.Services.TokenService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ITC.Services.Auth
 {
@@ -19,12 +20,14 @@ namespace ITC.Services.Auth
 		private readonly ITokenService _tokenService;
 		private readonly ILogger<AuthService> _logger;
 		private readonly double _refreshTokenExpiryDays;
+		private readonly IMapper _mapper;
 
 		public AuthService(
 			UserManager<ApplicationUser> userManager,
 			ITokenService tokenService,
 			ILogger<AuthService> logger,
-			IConfiguration configuration)
+			IConfiguration configuration,
+			IMapper mapper)
 		{
 			_userManager = userManager;
 			_tokenService = tokenService;
@@ -32,6 +35,7 @@ namespace ITC.Services.Auth
 
 			var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
 			_refreshTokenExpiryDays = jwtSettings?.RefreshTokenExpirationDays ?? 7;
+			_mapper = mapper;
 		}
 
 		public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
@@ -42,7 +46,6 @@ namespace ITC.Services.Auth
 			var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
 			if (existingUser != null)
 			{
-				_logger.LogWarning("Registration failed: Email {Email} is already in use", registerDto.Email);
 				return new AuthResponseDto
 				{
 					Success = false,
@@ -56,8 +59,10 @@ namespace ITC.Services.Auth
 				UserName = registerDto.UserName,
 				Email = registerDto.Email,
 				PhoneNumber = registerDto.PhoneNumber,
-				EmailConfirmed = true, // Set to true if you want to skip email confirmation
-				PhoneNumberConfirmed = true // Set to true if you want to skip phone number confirmation
+				EmailConfirmed = true,
+				PhoneNumberConfirmed = true, 
+				FullName = registerDto.UserName,
+				Address = registerDto.Address
 			};
 
 			var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -84,19 +89,13 @@ namespace ITC.Services.Auth
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
 			}
-
-
-            _logger.LogInformation("User {Email} registered successfully", registerDto.Email);
-
 			// Generate tokens
 			var accessToken = await _tokenService.GenerateToken(user);
 			var refreshToken = _tokenService.GenerateRefreshToken();
-
 			// Save refresh token
 			user.RefreshToken = refreshToken;
 			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
-
 			return new AuthResponseDto
 			{
 				Success = true,
@@ -142,15 +141,15 @@ namespace ITC.Services.Auth
 			user.RefreshToken = refreshToken;
 			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
-
-			_logger.LogInformation("User {UserName} logged in successfully", loginDto.UserName);
+			var userRes = _mapper.Map<ApplicationUser, UserResponse>(user);
 
 			return new AuthResponseDto
 			{
 				Success = true,
 				AccessToken = accessToken,
 				RefreshToken = refreshToken,
-				Message = "Login successful"
+				Message = "Login successful",
+				User = userRes
 			};
 		}
 
@@ -233,8 +232,75 @@ namespace ITC.Services.Auth
 			var users = _userManager.Users.Where(u => u.RefreshToken == refreshToken).ToList();
 			if (!users.Any())
 				return null;
-
 			return users.First();
+		}
+
+		public async Task<UserResponse> LoginGoogle(GoogleLoginRequest request)
+		{
+			var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token)
+						  ?? throw new Exception("Invalid Google token.");
+
+			string email = payload.Email;
+			string name = payload.Name;
+			string googleId = payload.Subject;
+
+			var user = await _userManager.FindByEmailAsync(email);
+			if (user == null)
+			{
+				user = new ApplicationUser
+				{
+					Email = email,
+					UserName = googleId,
+					FullName = payload.Name ?? "Unknown",
+					Gender = "Not Specified",
+					PhoneNumber = "Unknown",
+					Address = "Not Provided",
+					CreatedTime = DateTime.UtcNow,
+					LastUpdatedTime = DateTime.UtcNow
+				};
+
+				var createResult = await _userManager.CreateAsync(user);
+				if (!createResult.Succeeded)
+				{
+					var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+					throw new Exception($"User creation failed: {errors}");
+				}
+				var roleResult = await _userManager.AddToRoleAsync(user, "User");
+				if (!roleResult.Succeeded)
+				{
+					var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+					_logger.LogError("Role assignment failed: {errors}", errors);
+					throw new Exception($"Role assignment failed: {errors}");
+				}
+			}
+
+			// Generate access token
+			var token = await _tokenService.GenerateToken(user);
+
+			// Generate refresh token
+			var refreshToken = _tokenService.GenerateRefreshToken();
+
+			// Hash the refresh token and store it in the database or override the existing refresh token
+			using var sha256 = SHA256.Create();
+			var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+			user.RefreshToken = Convert.ToBase64String(refreshTokenHash);
+			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
+
+
+			var updateResult = await _userManager.UpdateAsync(user);
+			if (!updateResult.Succeeded)
+			{
+				var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+				_logger.LogError("Failed to update user: {errors}", errors);
+				throw new Exception($"Failed to update user: {errors}");
+			}
+
+			var userResponse = _mapper.Map<ApplicationUser, UserResponse>(user);
+			userResponse.AccessToken = token;
+			userResponse.RefreshToken = refreshToken;
+			userResponse.Address = user.Address;
+
+			return userResponse;
 		}
 	}
 }

@@ -3,13 +3,13 @@ using AutoMapper;
 using ITC.API.DI;
 using ITC.API.SeedData;
 using ITC.BusinessObject.Identity;
-using ITC.Core.Mapping;
+using ITC.Mapping.Mapper;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ITC.API
 {
-    public class Program
+	public class Program
     {
         public static async Task Main(string[] args)
         {
@@ -25,11 +25,6 @@ namespace ITC.API
             // ??ng ký d?ch v? thông qua DI Installer
             builder.Services.InstallerServicesInAssembly(builder.Configuration);
             builder.Services.AddMemoryCache();
-
-			builder.Services.AddAutoMapper(typeof(MappingProfile));
-			// In Program.cs
-			var mapper = builder.Services.BuildServiceProvider().GetRequiredService<IMapper>();
-			mapper.ConfigurationProvider.AssertConfigurationIsValid();
 
 			var app = builder.Build();
 

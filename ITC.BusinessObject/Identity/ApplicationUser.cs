@@ -11,10 +11,10 @@ namespace ITC.BusinessObject.Identity
         /// </summary>
         public string? FullName { get; set; }
 
-        /// <summary>
-        /// Mật khẩu người dùng
-        /// </summary>
-        public string? Password { get; set; }
+		public string? AvatarUrl { get; set; }
+		public string? Gender { get; set; }
+
+		public string? Address { get; set; }
 
         /// <summary>
         /// Ngày tạo tài khoản

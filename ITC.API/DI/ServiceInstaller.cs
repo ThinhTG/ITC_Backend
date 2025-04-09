@@ -1,6 +1,7 @@
 ﻿using ITC.Repositories.Interface;
 using ITC.Repositories.Repository;
 using ITC.Services.Auth;
+using ITC.Services.JobService;
 using ITC.Services.TokenService;
 
 
@@ -14,7 +15,8 @@ namespace ITC.API.DI
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 			services.AddScoped<ITokenService, TokenService>();
-		
+            services.AddScoped<IJobService, JobService>();
+
 		}
     }
 }

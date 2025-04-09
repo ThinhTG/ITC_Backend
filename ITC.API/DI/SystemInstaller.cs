@@ -1,6 +1,6 @@
 ﻿using ITC.BusinessObject.Identity;
 using ITC.Core.Base;
-using ITC.Core.Mapping;
+using ITC.Mapping.Mapper;
 using ITC.Repositories.Base;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +12,7 @@ using System.Text;
 
 namespace ITC.API.DI
 {
-    public class SystemInstaller : IInstaller
+	public class SystemInstaller : IInstaller
     {
         public void InstallService(IServiceCollection services, IConfiguration configuration)
         {

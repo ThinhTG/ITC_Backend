@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ITC.Mapping\ITC.Mapping.csproj" />
     <ProjectReference Include="..\ITC.Services\ITC.Services.csproj" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8" PrivateAssets="All" />
   </ItemGroup>

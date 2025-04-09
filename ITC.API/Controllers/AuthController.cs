@@ -27,6 +27,11 @@ namespace ITC.API.Controllers
 			_userManager = userManager;
 		}
 
+		/// <summary>
+		/// Đăng kí tài khoản với thông tin người dùng ( Role = Admin,Customer,Talent )
+		/// </summary>
+		/// <param name="registerDto"></param>
+		/// <returns></returns>
 		[HttpPost("register")]
 		[AllowAnonymous]
 		public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
@@ -38,6 +43,12 @@ namespace ITC.API.Controllers
 			return Ok(result);
 		}
 
+
+		/// <summary>
+		/// Đăng nhập
+		/// </summary>
+		/// <param name="loginDto"></param>
+		/// <returns></returns>
 		[HttpPost("login")]
 		[AllowAnonymous]
 		public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -53,8 +64,14 @@ namespace ITC.API.Controllers
 			return Ok(result);
 		}
 
+
+		/// <summary>
+		/// Lấy thông tin người dùng hiện tại
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		[HttpGet("user/{id}")]
-		[Authorize(Policy = "UserPolicy")]
+		[Authorize]
 		public async Task<IActionResult> GetById(string id)
 		{
 			var user = await _userManager.FindByIdAsync(id);
@@ -104,6 +121,12 @@ namespace ITC.API.Controllers
 			return Ok(new { Message = "Token revoked successfully" });
 		}
 
+
+		/// <summary>
+		/// xóa cứng 1 tài khoản người dùng ( yêu cầu Role Admin )
+		/// </summary>
+		/// <param name="id">User Id</param>
+		/// <returns></returns>
 		[HttpDelete("user/{id}")]
 		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> Delete(string id)
@@ -118,102 +141,5 @@ namespace ITC.API.Controllers
 
 			return Ok(new { Message = "User deleted successfully" });
 		}
-
-		[HttpGet("confirm-email")]
-		[AllowAnonymous]
-		public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
-		{
-			if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
-				return BadRequest(new { Message = "Invalid email confirmation parameters" });
-
-			var user = await _userManager.FindByIdAsync(userId);
-			if (user == null)
-				return NotFound(new { Message = "User not found" });
-
-			token = System.Web.HttpUtility.UrlDecode(token);
-			var result = await _userManager.ConfirmEmailAsync(user, token);
-
-			if (result.Succeeded)
-				return Redirect("http://localhost:3000/welcome"); // Update with your frontend URL
-
-			return BadRequest(new { Message = "Email confirmation failed", Errors = result.Errors });
-		}
-
-		[HttpPost("resend-confirm-email")]
-		[AllowAnonymous]
-		public async Task<IActionResult> ResendConfirmEmail([FromBody] ResendEmailDto request)
-		{
-			if (string.IsNullOrWhiteSpace(request.Email))
-				return BadRequest(new { Message = "Email is required" });
-
-			var user = await _userManager.FindByEmailAsync(request.Email);
-			if (user == null)
-				return NotFound(new { Message = "User not found" });
-
-			if (user.EmailConfirmed)
-				return BadRequest(new { Message = "Email already confirmed" });
-
-			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-			// Here you would send the email with the token
-			// You'll need to implement an email service for this
-
-			return Ok(new { Message = "Confirmation email resent successfully" });
-		}
-
-		[HttpPost("forgot-password")]
-		[AllowAnonymous]
-		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
-		{
-			if (string.IsNullOrWhiteSpace(request.Email))
-				return BadRequest(new { Message = "Email is required" });
-
-			var user = await _userManager.FindByEmailAsync(request.Email);
-			if (user == null)
-				return Ok(new { Message = "If your email is registered, you will receive a password reset link" });
-
-			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-			// Here you would send the email with the token
-			// You'll need to implement an email service for this
-
-			return Ok(new { Message = "Password reset email sent successfully" });
-		}
-
-		[HttpPost("reset-password")]
-		[AllowAnonymous]
-		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request)
-		{
-			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
-
-			var user = await _userManager.FindByEmailAsync(request.Email);
-			if (user == null)
-				return BadRequest(new { Message = "User not found" });
-
-			var token = System.Web.HttpUtility.UrlDecode(request.Token);
-			var result = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
-
-			if (!result.Succeeded)
-				return BadRequest(new { Message = "Password reset failed", Errors = result.Errors });
-
-			return Ok(new { Message = "Password has been reset successfully" });
-		}
-
-		//[HttpPost("update-avatar")]
-		//[Authorize]
-		//public async Task<IActionResult> UpdateAvatar([FromBody] UpdateAvatarDto model)
-		//{
-		//	var user = await _userManager.FindByIdAsync(model.UserId);
-		//	if (user == null)
-		//		return NotFound(new { Message = "User not found" });
-
-		//	// Update avatar URL - assuming you have this property in your ApplicationUser class
-		//	user.AvatarUrl = model.AvatarUrl;
-
-		//	var result = await _userManager.UpdateAsync(user);
-		//	if (!result.Succeeded)
-		//		return BadRequest(new { Message = "Avatar update failed", Errors = result.Errors });
-
-		//	return Ok(new { Message = "Avatar updated successfully" });
-		//}
 	}
 }

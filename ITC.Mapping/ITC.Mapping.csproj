@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ITC.Repositories\ITC.Repositories.csproj" />
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+    <ProjectReference Include="..\ITC.BusinessObject\ITC.BusinessObject.csproj" />
+    <ProjectReference Include="..\ITC.Services\ITC.Services.csproj" />
   </ItemGroup>
 
 </Project>
