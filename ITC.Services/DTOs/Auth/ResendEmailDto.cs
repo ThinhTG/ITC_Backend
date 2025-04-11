@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ITC.Services.DTOs
+namespace ITC.Services.DTOs.Auth
 {
-	public class ForgotPasswordDto
-	{
-		[Required]
-		[EmailAddress]
-		public string Email { get; set; }
-	}
+    public class ResendEmailDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+    }
 }

@@ -4,7 +4,7 @@ using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
 using ITC.BusinessObject.Response;
 using ITC.Core.Base;
-using ITC.Services.DTOs;
+using ITC.Services.DTOs.Auth;
 using ITC.Services.TokenService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -14,7 +14,7 @@ using System.Text;
 
 namespace ITC.Services.Auth
 {
-	public class AuthService : IAuthService
+    public class AuthService : IAuthService
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ITokenService _tokenService;
@@ -89,8 +89,7 @@ namespace ITC.Services.Auth
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
 			}
-			// Generate tokens
-			var accessToken = await _tokenService.GenerateToken(user);
+			
 			var refreshToken = _tokenService.GenerateRefreshToken();
 			// Save refresh token
 			user.RefreshToken = refreshToken;
@@ -99,22 +98,18 @@ namespace ITC.Services.Auth
 			return new AuthResponseDto
 			{
 				Success = true,
-				AccessToken = accessToken,
-				RefreshToken = refreshToken,
 				Message = "User registered successfully"
 			};
 		}
 
 		public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
 		{
-			_logger.LogInformation("Login attempt for user: {UserName}", loginDto.UserName);
 
 			var user = await _userManager.FindByNameAsync(loginDto.UserName)
 					?? await _userManager.FindByEmailAsync(loginDto.UserName);
 
 			if (user == null)
 			{
-				_logger.LogWarning("Login failed: User {UserName} not found", loginDto.UserName);
 				return new AuthResponseDto
 				{
 					Success = false,

@@ -57,7 +57,8 @@ namespace ITC.Services.TokenService
             {
                 new Claim("UserName", user?.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email,user.Email),
-            };
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+			};
 
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));

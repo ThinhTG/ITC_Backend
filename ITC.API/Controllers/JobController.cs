@@ -27,6 +27,7 @@ namespace ITC.API.Controllers
 		/// <param name="dto"></param>
 		/// <returns></returns>
 		[HttpPost]
+		[Authorize(Roles = "Customer")]
 		public async Task<IActionResult> Create([FromBody] JobCreateDto dto)
 		{
 			var job = _mapper.Map<Job>(dto);

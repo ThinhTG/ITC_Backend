@@ -1,4 +1,4 @@
-﻿using ITC.BusinessObject.Identity;
+﻿ using ITC.BusinessObject.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,10 @@ namespace ITC.BusinessObject.Entities
 
 		public string Message { get; set; } = string.Empty;
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+		public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
+
+		public int Status { get; set; } = 0; // 0: pending, 1: accepted, 2: rejected
 	}
 
 }

@@ -1,4 +1,4 @@
-﻿using ITC.Services.DTOs;
+﻿using ITC.Services.DTOs.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ITC.Services.Auth
 {
-	public interface IAuthService
+    public interface IAuthService
 	{
 		Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto);
 		Task<AuthResponseDto> LoginAsync(LoginDto loginDto);

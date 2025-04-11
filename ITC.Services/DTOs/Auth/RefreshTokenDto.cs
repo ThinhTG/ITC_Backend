@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ITC.Services.DTOs
+namespace ITC.Services.DTOs.Auth
 {
-	public class RefreshTokenDto
-	{
-		[Required]
-		public string RefreshToken { get; set; }
-	}
+    public class RefreshTokenDto
+    {
+        [Required]
+        public string RefreshToken { get; set; }
+    }
 }

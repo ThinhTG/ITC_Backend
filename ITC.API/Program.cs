@@ -27,8 +27,17 @@ namespace ITC.API
             builder.Services.AddMemoryCache();
 
 			var app = builder.Build();
+			// C?u hình CORS
+			app.Use(async (context, next) =>
+			{
+				context.Response.Headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups";
+				await next();
+			});
 
-            var scope = app.Services.CreateScope();
+
+			app.UseCors("AllowAll");
+
+			var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
 
             try

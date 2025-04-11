@@ -1,6 +1,6 @@
 ﻿using ITC.BusinessObject.Identity;
 using ITC.Services.Auth;
-using ITC.Services.DTOs;
+using ITC.Services.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace ITC.API.Controllers
 {
-	[Route("api/auth")]
+    [Route("api/auth")]
 	[ApiController]
 	public class AuthController : ControllerBase
 	{

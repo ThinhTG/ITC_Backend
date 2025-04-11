@@ -31,5 +31,8 @@ namespace ITC.Repositories.Interface
         Task<IQueryable<T>> GetAllQueryableAsync();
         /////
         Task<List<T>> FindListAsync(Expression<Func<T, bool>> predicate);
-    }
+
+        Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
+
+	}
 }
