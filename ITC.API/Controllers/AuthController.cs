@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Identity;
+using ITC.BusinessObject.Request;
 using ITC.Services.Auth;
 using ITC.Services.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -140,6 +141,20 @@ namespace ITC.API.Controllers
 				return BadRequest(new { Message = "Delete failed", Errors = result.Errors });
 
 			return Ok(new { Message = "User deleted successfully" });
+		}
+
+
+
+		/// <summary>
+		/// Google Login
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost("google-login")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+		{
+			return Ok(await _authService.LoginGoogle(request));
 		}
 	}
 }

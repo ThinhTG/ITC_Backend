@@ -1,4 +1,6 @@
-﻿using ITC.Services.DTOs.Auth;
+﻿using ITC.BusinessObject.Request;
+using ITC.BusinessObject.Response;
+using ITC.Services.DTOs.Auth;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +15,8 @@ namespace ITC.Services.Auth
 		Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
 		Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
 		Task<bool> LogoutAsync(string userName);
+
+		Task<UserResponse> LoginGoogle(GoogleLoginRequest request);
+
 	}
 }

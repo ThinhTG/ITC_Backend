@@ -14,7 +14,7 @@ using System.Text;
 
 namespace ITC.Services.Auth
 {
-    public class AuthService : IAuthService
+	public class AuthService : IAuthService
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ITokenService _tokenService;
@@ -40,8 +40,6 @@ namespace ITC.Services.Auth
 
 		public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
 		{
-			_logger.LogInformation("Starting user registration process for {Email}", registerDto.Email);
-
 			// Check if user already exists
 			var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
 			if (existingUser != null)
@@ -60,7 +58,7 @@ namespace ITC.Services.Auth
 				Email = registerDto.Email,
 				PhoneNumber = registerDto.PhoneNumber,
 				EmailConfirmed = true,
-				PhoneNumberConfirmed = true, 
+				PhoneNumberConfirmed = true,
 				FullName = registerDto.UserName,
 				Address = registerDto.Address
 			};
@@ -81,15 +79,16 @@ namespace ITC.Services.Auth
 			if (registerDto.Role.Equals("Customer"))
 			{
 				await _userManager.AddToRoleAsync(user, "Customer");
-			}else if (registerDto.Role.Equals("Talent"))
-            {
+			}
+			else if (registerDto.Role.Equals("Talent"))
+			{
 				await _userManager.AddToRoleAsync(user, "Talent");
 			}
 			else
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
 			}
-			
+
 			var refreshToken = _tokenService.GenerateRefreshToken();
 			// Save refresh token
 			user.RefreshToken = refreshToken;

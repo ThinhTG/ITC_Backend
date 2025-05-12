@@ -13,4 +13,4 @@ namespace ITC.Repositories.Interface
 
 		Task<IDbContextTransaction> BeginTransactionAsync();
 	}
-}
+}   

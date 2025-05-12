@@ -10,12 +10,6 @@ namespace ITC.Services.JobService
 {
 	public interface IJobService
 	{
-		Task<IEnumerable<Job>> GetAllJobsAsync();
-		Task<Job?> GetJobByIdAsync(Guid id);
-		Task<Job> CreateJobAsync(Job job);
-		Task<Job> UpdateJobAsync(Job job);
-		Task<bool> DeleteJobAsync(Guid id);
-
-		Task<IEnumerable<Job>> GetJobsFilteredAsync(JobFilterDto filter);
+		Task<bool> PostJobAsync(CreateJobRequest jobDto, Guid customerId);
 	}
 }
