@@ -9,27 +9,32 @@ namespace ITC.BusinessObject.Entities
 {
 	public class Job
 	{
-		public Guid Id { get; set; } = Guid.NewGuid();
+		public Guid Id { get; set; }
+		public Guid CustomerId { get; set; } // Liên kết tới ApplicationUser (người đăng job)
 
-		public string Title { get; set; } = string.Empty;
+		public string FullName { get; set; }
+		public string Title { get; set; }
+		public string WorkType { get; set; }
+		public string TranslationLanguage { get; set; }
+		public string ExperienceRequirement { get; set; }
+		public string Education { get; set; }
+		public string TranslationForm { get; set; }
+		public string JobDescription { get; set; }
+		public string RelevantCertificates { get; set; }
 
-		public string Description { get; set; } = string.Empty;
+		public string ContactEmail { get; set; }
+		public string ContactPhone { get; set; }
+		public string WorkLocation { get; set; }
 
-		public string Location { get; set; } = string.Empty;
+		public string SalaryType { get; set; }
+		public decimal? SalaryAmount { get; set; }
 
-		public DateTime JobDate { get; set; }
+		public string? CompanyPdfPath { get; set; }
 
+		public int Status { get; set; } = 0; // Có thể định nghĩa enum sau
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-		/// <summary>
-		/// 0 = Pending, 1 = Approved, 2 = Rejected
-		/// </summary>
-		public int Status { get; set; } = 0;
-
-		public Guid CustomerId { get; set; }
-
-		public ApplicationUser? Customer { get; set; }
-
-		public ICollection<JobApplication>? Applications { get; set; }
+		public ApplicationUser Customer { get; set; }
+		public ICollection<JobApplication>? Applications { get; set; } = new List<JobApplication>();
 	}
 }

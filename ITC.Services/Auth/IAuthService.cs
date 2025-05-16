@@ -15,7 +15,5 @@ namespace ITC.Services.Auth
 		Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
 		Task<AuthResponseDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
 		Task<bool> LogoutAsync(string userName);
-		Task<UserResponse> LoginGoogle(GoogleLoginRequest request);
-
 	}
 }

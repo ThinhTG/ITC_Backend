@@ -8,8 +8,8 @@ namespace ITC.Services.DTOs.JobApply
 {
 	public class JobApplicationFilterDto
 	{
-		public int? Status { get; set; }
-		public DateTime? StartDate { get; set; }
-		public DateTime? EndDate { get; set; }
+		public string? Status { get; set; }
+		public DateTime? FromDate { get; set; }
+		public DateTime? ToDate { get; set; }
 	}
 }

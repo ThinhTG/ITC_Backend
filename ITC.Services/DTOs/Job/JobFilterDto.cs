@@ -9,7 +9,7 @@ namespace ITC.Services.DTOs
 	public class JobFilterDto
 	{
 		public string? Location { get; set; }
-		public int? Status { get; set; }
+		public string? Status { get; set; }
 		public DateTime? FromDate { get; set; }
 		public DateTime? ToDate { get; set; }
 

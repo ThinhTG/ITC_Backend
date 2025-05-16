@@ -12,7 +12,7 @@ namespace ITC.Mapping.Mapper
         {
             CreateMap<ApplicationUser, UserResponse>();
 			CreateMap<Job, JobDto>();
-			CreateMap<JobCreateDto, Job>();
+			CreateMap<CreateJobRequest, Job>();
 		}
     }
 }

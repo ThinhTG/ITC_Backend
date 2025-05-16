@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Google.Apis.Auth;
+using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
 using ITC.BusinessObject.Response;
 using ITC.Core.Base;
+using ITC.Repositories.Interface;
 using ITC.Services.DTOs.Auth;
 using ITC.Services.TokenService;
 using Microsoft.AspNetCore.Identity;
@@ -14,16 +16,18 @@ using System.Text;
 
 namespace ITC.Services.Auth
 {
-    public class AuthService : IAuthService
+	public class AuthService : IAuthService
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly ITokenService _tokenService;
 		private readonly ILogger<AuthService> _logger;
 		private readonly double _refreshTokenExpiryDays;
 		private readonly IMapper _mapper;
+		private readonly IWalletRepository _walletRepository;
 
 		public AuthService(
 			UserManager<ApplicationUser> userManager,
+			IWalletRepository walletRepository,
 			ITokenService tokenService,
 			ILogger<AuthService> logger,
 			IConfiguration configuration,
@@ -32,6 +36,7 @@ namespace ITC.Services.Auth
 			_userManager = userManager;
 			_tokenService = tokenService;
 			_logger = logger;
+			_walletRepository = walletRepository;
 
 			var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
 			_refreshTokenExpiryDays = jwtSettings?.RefreshTokenExpirationDays ?? 7;
@@ -40,8 +45,6 @@ namespace ITC.Services.Auth
 
 		public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
 		{
-			_logger.LogInformation("Starting user registration process for {Email}", registerDto.Email);
-
 			// Check if user already exists
 			var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
 			if (existingUser != null)
@@ -60,7 +63,7 @@ namespace ITC.Services.Auth
 				Email = registerDto.Email,
 				PhoneNumber = registerDto.PhoneNumber,
 				EmailConfirmed = true,
-				PhoneNumberConfirmed = true, 
+				PhoneNumberConfirmed = true,
 				FullName = registerDto.UserName,
 				Address = registerDto.Address
 			};
@@ -81,26 +84,41 @@ namespace ITC.Services.Auth
 			if (registerDto.Role.Equals("Customer"))
 			{
 				await _userManager.AddToRoleAsync(user, "Customer");
-			}else if (registerDto.Role.Equals("Talent"))
-            {
+			}
+			else if (registerDto.Role.Equals("Talent"))
+			{
 				await _userManager.AddToRoleAsync(user, "Talent");
 			}
 			else
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
 			}
-			
+
 			var refreshToken = _tokenService.GenerateRefreshToken();
 			// Save refresh token
 			user.RefreshToken = refreshToken;
 			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
+			await CreateWalletForUserAsync(user.Id);
 			return new AuthResponseDto
 			{
 				Success = true,
 				Message = "User registered successfully"
 			};
 		}
+
+
+		public async Task CreateWalletForUserAsync(Guid accountId)
+		{
+			var wallet = new Wallet
+			{
+				WalletId = Guid.NewGuid(),
+				AccountId = accountId,
+				Balance = 0
+			};
+			await _walletRepository.CreateWallet(wallet);
+		}
+
 
 		public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
 		{
