@@ -3,6 +3,7 @@ using ITC.Core.Base;
 using ITC.Repositories.Interface;
 using ITC.Repositories.Repository;
 using ITC.Services.DTOs;
+using ITC.Services.DTOs.Job;
 using Microsoft.Extensions.Options;
 
 
@@ -90,6 +91,36 @@ namespace ITC.Services.JobService
 				throw;
 			}
 		}
+
+		public async Task<List<JobResponseDto>> GetAllAvailableJobsAsync()
+		{
+			var jobs = await _jobRepo.GetAllAsync(); // hoặc dùng predicate: x => x.Status == 0
+
+			return jobs
+				.Where(j => j.Status == 0)
+				.OrderByDescending(j => j.CreatedAt)
+				.Select(j => new JobResponseDto
+				{
+					Id = j.Id,
+					FullName = j.FullName,
+					Title = j.Title,
+					WorkType = j.WorkType,
+					TranslationLanguage = j.TranslationLanguage,
+					JobDescription = j.JobDescription,
+					WorkLocation = j.WorkLocation,
+					SalaryType = j.SalaryType,
+					SalaryAmount = j.SalaryAmount,
+					CreatedAt = j.CreatedAt
+				})
+				.ToList();
+		}
+
+		public async Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId)
+		{
+			return await _jobRepo.GetJobsByCustomerIdAsync(customerId);
+		}
+
+
 
 	}
 }

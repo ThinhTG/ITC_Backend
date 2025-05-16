@@ -41,5 +41,31 @@ namespace ITC.API.Controllers
 			}
 		}
 
-	}
+		/// <summary>
+		/// Get All Job List
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		public async Task<IActionResult> GetAvailableJobs()
+		{
+			var jobs = await _jobService.GetAllAvailableJobsAsync();
+			return Ok(jobs);
+		}
+
+
+		[HttpGet("by-customer/{customerId}")]
+		public async Task<IActionResult> GetJobsByCustomer(Guid customerId)
+		{
+			var jobs = await _jobService.GetJobsByCustomerIdAsync(customerId);
+			if (jobs == null || !jobs.Any())
+			{
+				return NotFound("No jobs found for this customer.");
+			}
+
+			return Ok(jobs); // bạn có thể chuyển sang DTO nếu muốn
+		}
+
+
+
+	}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 }

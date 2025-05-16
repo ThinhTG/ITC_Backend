@@ -28,8 +28,11 @@
 			public virtual DbSet<ApplicationUserLogins> ApplicationUserLogins => Set<ApplicationUserLogins>();
 			public virtual DbSet<ApplicationRoleClaims> ApplicationRoleClaims => Set<ApplicationRoleClaims>();
 			public virtual DbSet<ApplicationUserTokens> ApplicationUserTokens => Set<ApplicationUserTokens>();
+			public virtual DbSet<Wallet> Wallets => Set<Wallet>();
 
-			public virtual DbSet<Job> Jobs => Set<Job>();
+		    public virtual DbSet<WalletTransaction> WalletTransaction => Set<WalletTransaction>();
+
+		public virtual DbSet<Job> Jobs => Set<Job>();
 			public virtual DbSet<JobApplication> JobApplications => Set<JobApplication>();
 
 

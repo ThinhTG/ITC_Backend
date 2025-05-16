@@ -1,6 +1,7 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,22 @@ namespace ITC.Repositories.Repository
 		{
 			await _context.Jobs.AddAsync(job);
 		}
+
+		public async Task<List<Job>> GetAllAsync()
+		{
+			return await _context.Set<Job>()
+				.AsNoTracking()
+				.ToListAsync();
+		}
+
+		public async Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId)
+		{
+			return await _context.Set<Job>()
+								 .Where(j => j.CustomerId == customerId)
+								 .OrderByDescending(j => j.CreatedAt)
+								 .ToListAsync();
+		}
+
 
 		public async Task SaveChangesAsync()
 		{

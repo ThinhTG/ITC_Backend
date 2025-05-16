@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Google.Apis.Auth;
+using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
 using ITC.BusinessObject.Response;
 using ITC.Core.Base;
+using ITC.Repositories.Interface;
 using ITC.Services.DTOs.Auth;
 using ITC.Services.TokenService;
 using Microsoft.AspNetCore.Identity;
@@ -21,9 +23,11 @@ namespace ITC.Services.Auth
 		private readonly ILogger<AuthService> _logger;
 		private readonly double _refreshTokenExpiryDays;
 		private readonly IMapper _mapper;
+		private readonly IWalletRepository _walletRepository;
 
 		public AuthService(
 			UserManager<ApplicationUser> userManager,
+			IWalletRepository walletRepository,
 			ITokenService tokenService,
 			ILogger<AuthService> logger,
 			IConfiguration configuration,
@@ -32,6 +36,7 @@ namespace ITC.Services.Auth
 			_userManager = userManager;
 			_tokenService = tokenService;
 			_logger = logger;
+			_walletRepository = walletRepository;
 
 			var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
 			_refreshTokenExpiryDays = jwtSettings?.RefreshTokenExpirationDays ?? 7;
@@ -94,12 +99,26 @@ namespace ITC.Services.Auth
 			user.RefreshToken = refreshToken;
 			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
+			await CreateWalletForUserAsync(user.Id);
 			return new AuthResponseDto
 			{
 				Success = true,
 				Message = "User registered successfully"
 			};
 		}
+
+
+		public async Task CreateWalletForUserAsync(Guid accountId)
+		{
+			var wallet = new Wallet
+			{
+				WalletId = Guid.NewGuid(),
+				AccountId = accountId,
+				Balance = 0
+			};
+			await _walletRepository.CreateWallet(wallet);
+		}
+
 
 		public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
 		{

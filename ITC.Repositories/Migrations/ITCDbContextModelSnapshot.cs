@@ -144,6 +144,61 @@ namespace ITC.Repositories.Migrations
                     b.ToTable("JobApplications");
                 });
 
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Wallet", b =>
+                {
+                    b.Property<Guid>("WalletId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("WalletId");
+
+                    b.ToTable("Wallet");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.WalletTransaction", b =>
+                {
+                    b.Property<Guid>("WalletTransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionBalance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WalletId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("WalletTransactionId");
+
+                    b.HasIndex("WalletId");
+
+                    b.ToTable("WalletTransaction");
+                });
+
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationRole", b =>
                 {
                     b.Property<Guid>("Id")
@@ -297,6 +352,9 @@ namespace ITC.Repositories.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<Guid?>("WalletId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -306,6 +364,8 @@ namespace ITC.Repositories.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("WalletId");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -455,6 +515,17 @@ namespace ITC.Repositories.Migrations
                     b.Navigation("Job");
                 });
 
+            modelBuilder.Entity("ITC.BusinessObject.Entities.WalletTransaction", b =>
+                {
+                    b.HasOne("ITC.BusinessObject.Entities.Wallet", "Wallet")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Wallet");
+                });
+
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationRoleClaims", b =>
                 {
                     b.HasOne("ITC.BusinessObject.Identity.ApplicationRole", null)
@@ -462,6 +533,13 @@ namespace ITC.Repositories.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationUser", b =>
+                {
+                    b.HasOne("ITC.BusinessObject.Entities.Wallet", null)
+                        .WithMany("ApplicationUser")
+                        .HasForeignKey("WalletId");
                 });
 
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationUserClaims", b =>
@@ -511,6 +589,13 @@ namespace ITC.Repositories.Migrations
             modelBuilder.Entity("ITC.BusinessObject.Entities.Job", b =>
                 {
                     b.Navigation("Applications");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Wallet", b =>
+                {
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationUser", b =>

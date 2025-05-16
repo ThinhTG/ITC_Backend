@@ -1,5 +1,6 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.Services.DTOs;
+using ITC.Services.DTOs.Job;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,10 @@ namespace ITC.Services.JobService
 	public interface IJobService
 	{
 		Task<bool> PostJobAsync(CreateJobRequest jobDto, Guid customerId);
+		
+		Task<List<JobResponseDto>> GetAllAvailableJobsAsync();
+
+		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
+
 	}
 }

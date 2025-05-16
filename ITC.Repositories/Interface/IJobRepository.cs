@@ -10,6 +10,11 @@ namespace ITC.Repositories.Interface
 	public interface IJobRepository
 	{
 		Task AddAsync(Job job);
+		Task<List<Job>> GetAllAsync();
+
+		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
+
+
 		Task SaveChangesAsync();
 	}
 }
