@@ -32,6 +32,10 @@ namespace ITC.BusinessObject.Identity
         /// </summary>
         public DateTimeOffset? DeletedTime { get; set; }
 
+
+		public int? orderCode { get; set; }
+
+
 		//public ICollection<JobListing> JobListings { get; set; } = new List<JobListing>();
 		//public ICollection<Application> Applications { get; set; } = new List<Application>();
 		//public ICollection<Booking> Bookings { get; set; } = new List<Booking>();

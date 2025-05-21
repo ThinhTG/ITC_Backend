@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITC.Repositories.Migrations
 {
     [DbContext(typeof(ITCDbContext))]
-    [Migration("20250416103430_Thinh")]
-    partial class Thinh
+    [Migration("20250521032450_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -145,6 +145,120 @@ namespace ITC.Repositories.Migrations
                     b.HasIndex("JobId");
 
                     b.ToTable("JobApplications");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Order", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("InterpreterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("OrderCode")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("PaymentConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("PlatformFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ServicePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("InterpreterId");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Wallet", b =>
+                {
+                    b.Property<Guid>("WalletId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("WalletId");
+
+                    b.ToTable("Wallet");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.WalletTransaction", b =>
+                {
+                    b.Property<Guid>("WalletTransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionBalance")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WalletId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("WalletTransactionId");
+
+                    b.HasIndex("WalletId");
+
+                    b.ToTable("WalletTransaction");
                 });
 
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationRole", b =>
@@ -300,6 +414,12 @@ namespace ITC.Repositories.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<Guid?>("WalletId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("orderCode")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -309,6 +429,8 @@ namespace ITC.Repositories.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("WalletId");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -458,6 +580,44 @@ namespace ITC.Repositories.Migrations
                     b.Navigation("Job");
                 });
 
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Order", b =>
+                {
+                    b.HasOne("ITC.BusinessObject.Identity.ApplicationUser", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ITC.BusinessObject.Identity.ApplicationUser", "Interpreter")
+                        .WithMany()
+                        .HasForeignKey("InterpreterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ITC.BusinessObject.Entities.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Interpreter");
+
+                    b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.WalletTransaction", b =>
+                {
+                    b.HasOne("ITC.BusinessObject.Entities.Wallet", "Wallet")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Wallet");
+                });
+
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationRoleClaims", b =>
                 {
                     b.HasOne("ITC.BusinessObject.Identity.ApplicationRole", null)
@@ -465,6 +625,13 @@ namespace ITC.Repositories.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationUser", b =>
+                {
+                    b.HasOne("ITC.BusinessObject.Entities.Wallet", null)
+                        .WithMany("ApplicationUser")
+                        .HasForeignKey("WalletId");
                 });
 
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationUserClaims", b =>
@@ -514,6 +681,13 @@ namespace ITC.Repositories.Migrations
             modelBuilder.Entity("ITC.BusinessObject.Entities.Job", b =>
                 {
                     b.Navigation("Applications");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Wallet", b =>
+                {
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationUser", b =>

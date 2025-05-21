@@ -144,6 +144,65 @@ namespace ITC.Repositories.Migrations
                     b.ToTable("JobApplications");
                 });
 
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Order", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("InterpreterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("OrderCode")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("PaymentConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("PlatformFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ServicePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("InterpreterId");
+
+                    b.HasIndex("JobId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("ITC.BusinessObject.Entities.Wallet", b =>
                 {
                     b.Property<Guid>("WalletId")
@@ -355,6 +414,9 @@ namespace ITC.Repositories.Migrations
                     b.Property<Guid?>("WalletId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("orderCode")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -509,6 +571,33 @@ namespace ITC.Repositories.Migrations
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Interpreter");
+
+                    b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Order", b =>
+                {
+                    b.HasOne("ITC.BusinessObject.Identity.ApplicationUser", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ITC.BusinessObject.Identity.ApplicationUser", "Interpreter")
+                        .WithMany()
+                        .HasForeignKey("InterpreterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ITC.BusinessObject.Entities.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Interpreter");
 

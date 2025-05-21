@@ -30,9 +30,11 @@
 			public virtual DbSet<ApplicationUserTokens> ApplicationUserTokens => Set<ApplicationUserTokens>();
 			public virtual DbSet<Wallet> Wallets => Set<Wallet>();
 
+	        public virtual DbSet<Order> Orders => Set<Order>();
+
 		    public virtual DbSet<WalletTransaction> WalletTransaction => Set<WalletTransaction>();
 
-		public virtual DbSet<Job> Jobs => Set<Job>();
+		    public virtual DbSet<Job> Jobs => Set<Job>();
 			public virtual DbSet<JobApplication> JobApplications => Set<JobApplication>();
 
 
@@ -75,6 +77,20 @@
 					.HasForeignKey(j => j.CustomerId)
 					.OnDelete(DeleteBehavior.Restrict);
 			});
+
+			modelBuilder.Entity<Order>()
+			.HasOne(o => o.Customer)
+			.WithMany()
+			.HasForeignKey(o => o.CustomerId)
+			.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<Order>()
+				.HasOne(o => o.Interpreter)
+				.WithMany()
+				.HasForeignKey(o => o.InterpreterId)
+				.OnDelete(DeleteBehavior.Restrict); // 👈 tránh lỗi cascade path
+
+
 
 
 		}
