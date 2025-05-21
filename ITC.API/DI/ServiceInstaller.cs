@@ -1,6 +1,7 @@
 ﻿using ITC.Repositories.Interface;
 using ITC.Repositories.Repository;
 using ITC.Services.Auth;
+using ITC.Services.JobApplyService;
 using ITC.Services.JobService;
 using ITC.Services.OrderService;
 using ITC.Services.TokenService;
@@ -25,7 +26,9 @@ namespace ITC.API.DI
 			services.AddScoped<IWalletTransactionService, WalletTransactionService>();
 			services.AddScoped<IOrderRepository, OrderRepository>();
 			services.AddScoped<IOrderService, OrderService>();
-		
+			services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+			services.AddScoped<IJobApplicationService, JobApplicationService>();
+
 
 		}
 	}

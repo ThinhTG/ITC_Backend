@@ -119,9 +119,6 @@ namespace ITC.Services.JobService
 		{
 			return await _jobRepo.GetJobsByCustomerIdAsync(customerId);
 		}
-
-
-
 	}
 }
 
