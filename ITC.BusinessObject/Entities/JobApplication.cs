@@ -21,7 +21,7 @@ namespace ITC.BusinessObject.Entities
 
 		public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
 
-		public int Status { get; set; } = 0; // 0: pending, 1: accepted, 2: rejected
+		public string Status { get; set; } // 0: pending, 1: accepted, 2: rejected
 	}
 
 }

@@ -1,5 +1,6 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.Services.DTOs;
+using ITC.Services.DTOs.Job;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,11 @@ namespace ITC.Services.JobService
 {
 	public interface IJobService
 	{
-		Task<IEnumerable<Job>> GetAllJobsAsync();
-		Task<Job?> GetJobByIdAsync(Guid id);
-		Task<Job> CreateJobAsync(Job job);
-		Task<Job> UpdateJobAsync(Job job);
-		Task<bool> DeleteJobAsync(Guid id);
+		Task<bool> PostJobAsync(CreateJobRequest jobDto, Guid customerId);
+		
+		Task<List<JobResponseDto>> GetAllAvailableJobsAsync();
 
-		Task<IEnumerable<Job>> GetJobsFilteredAsync(JobFilterDto filter);
+		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
+
 	}
 }
