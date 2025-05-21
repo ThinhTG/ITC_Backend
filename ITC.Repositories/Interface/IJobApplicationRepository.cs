@@ -7,14 +7,11 @@ using System.Threading.Tasks;
 
 namespace ITC.Repositories.Interface
 {
-	public interface IJobRepository
-	{
-		Task AddAsync(Job job);
-		Task<List<Job>> GetAllAsync();
-
-		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
-
-		Task<Job> GetJobByIdAsync(Guid jobId);
+    public interface IJobApplicationRepository
+    {
+		Task<bool> AlreadyAppliedAsync(Guid jobId, Guid interpreterId);
+		Task AddAsync(JobApplication application);
+		Task<List<JobApplication>> GetByJobIdAsync(Guid jobId);
 		Task SaveChangesAsync();
 	}
 }
