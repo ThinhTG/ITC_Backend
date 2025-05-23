@@ -23,6 +23,12 @@ namespace ITC.API.Controllers
 
 		}
 
+
+		/// <summary>
+		/// Tao Link PayOS thanh toan khi Sellect BPDV
+		/// </summary>
+		/// <param name="body"></param>
+		/// <returns></returns>
 		[HttpPost("createPayment")]
 		public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentLinkRequest body)
 		{
@@ -45,7 +51,11 @@ namespace ITC.API.Controllers
 			}
 		}
 
-
+		/// <summary>
+		/// Tao link PayOS nap tien vao vi
+		/// </summary>
+		/// <param name="body"></param>
+		/// <returns></returns>
 		[HttpPost("createDeposit")]
 		public async Task<IActionResult> CreateDeposit([FromBody] CreateDepositLinkRequest body)
 		{
@@ -74,7 +84,11 @@ namespace ITC.API.Controllers
 		}
 
 
-		// Lấy thông tin thanh toán theo orderCode
+		/// <summary>
+		/// Lấy thông tin thanh toán theo orderCode
+		/// </summary>
+		/// <param name="orderCode">Order Code duoc dung de xac thuc voi ben PayOS</param>
+		/// <returns></returns>
 		[HttpGet("{orderCode}")]
 		public async Task<IActionResult> GetPayment(int orderCode)
 		{

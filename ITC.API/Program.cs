@@ -4,6 +4,7 @@ using ITC.API.SeedData;
 using ITC.BusinessObject.Identity;
 using ITC.Core.Base;
 using Microsoft.AspNetCore.Identity;
+using Net.payOS;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ITC.API
@@ -18,6 +19,17 @@ namespace ITC.API
 			builder.Services.AddControllers();
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+
+
+			// PayOS  Config
+			IConfiguration configuration = new ConfigurationBuilder()
+		.AddJsonFile("appsettings.json")
+		.Build();
+			PayOS payOS = new PayOS(configuration["PaymentEnvironment:PAYOS_CLIENT_ID"] ?? throw new Exception("Cannot find payment environment"),
+								configuration["PaymentEnvironment:PAYOS_API_KEY"] ?? throw new Exception("Cannot find payment environment"),
+								configuration["PaymentEnvironment:PAYOS_CHECKSUM_KEY"] ?? throw new Exception("Cannot find payment environment"));
+			builder.Services.AddSingleton(payOS);
+
 
 			// Dependency Injection
 			builder.Services.InstallerServicesInAssembly(builder.Configuration);

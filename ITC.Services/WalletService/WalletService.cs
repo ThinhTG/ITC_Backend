@@ -1,5 +1,6 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.Repositories.Interface;
+using ITC.Services.PaymentService;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using TimeZoneConverter;
@@ -10,14 +11,15 @@ namespace ITC.Services.WalletService
 	{
 		private readonly IWalletRepository _walletRepository;
 		private readonly IWalletTransactionService _walletTransactionService;
-		//private readonly IPaymentService _paymentService;
+		private readonly IPaymentService _paymentService;
 		private readonly IConfiguration _configuration;
 
-		public WalletService(IWalletRepository walletRepository, IWalletTransactionService walletTransactionService, IConfiguration configuration)
+		public WalletService(IWalletRepository walletRepository, IWalletTransactionService walletTransactionService,IPaymentService paymentService, IConfiguration configuration)
 		{
 			_walletRepository = walletRepository;
 			_walletTransactionService = walletTransactionService;
 			_configuration = configuration;
+			_paymentService = paymentService;
 		}
 
 		public async Task<Wallet> CreateWallet(Wallet wallet)
@@ -58,12 +60,12 @@ namespace ITC.Services.WalletService
 			}
 
 			//check payment status
-			////var checkingPayment = await _paymentService.GetPaymentLinkInformationAsync(orderCode);
-			//if (checkingPayment.status == "PAID")
-			//{
-			//	wallet.Balance += amount;
-			//	await _walletRepository.UpdateWalletAsync(wallet);
-			//}
+			var checkingPayment = await _paymentService.GetPaymentLinkInformationAsync(orderCode);
+			if (checkingPayment.status == "PAID")
+			{
+				wallet.Balance += amount;
+				await _walletRepository.UpdateWalletAsync(wallet);
+			}
 
 			wallet.Balance += amount;
 

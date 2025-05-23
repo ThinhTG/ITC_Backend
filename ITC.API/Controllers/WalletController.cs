@@ -48,11 +48,11 @@ namespace ITC.API.Controllers
 		}
 
 		/// <summary>
-		/// Nạp Tiền
+		/// Nạp Tiền Vao vi 
 		/// </summary>
 		/// <param name="accountId"></param>
 		/// <param name="amount"></param>
-		/// <param name="orderCode"></param>
+		/// <param name="orderCode"> chay Api Create Link deposit de lay OrderCode</param>
 		/// <returns></returns>
 		[HttpPost("{accountId}/deposit")]
 		public async Task<IActionResult> AddMoney(Guid accountId, [FromQuery] decimal amount, int orderCode)
