@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ITC.BusinessObject.Entities;
+using ITC.Core.Contracts;
 using ITC.Services.DTOs;
 using ITC.Services.JobService;
 using Microsoft.AspNetCore.Authorization;
@@ -21,49 +22,39 @@ namespace ITC.API.Controllers
 			_jobService = jobService;
 		}
 
-		[HttpPost("post")]
-		public async Task<IActionResult> PostJob([FromForm] CreateJobRequest jobDto)
+		[HttpPost]
+		public async Task<IActionResult> PostJob([FromBody] CreateJobPostDto dto)
 		{
-			try
-			{
-				var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-				if (userId == null)
-					return Unauthorized();
-
-				var customerId = Guid.Parse(userId);
-
-				await _jobService.PostJobAsync(jobDto, customerId);
-				return Ok(new { success = true, message = "Job posted successfully!" });
-			}
-			catch (Exception ex)
-			{
-				return BadRequest(new { message = ex.Message });
-			}
+			var jobId = await _jobService.CreateJobAsync(dto);
+			return Ok(new { JobId = jobId });
 		}
 
 		/// <summary>
-		/// Get All Job List
+		/// Get All Job List ( cho BPDV view va Apply )
 		/// </summary>
+		/// <param name="search"></param>
+		/// <param name="page"></param>
+		/// <param name="pageSize"></param>
 		/// <returns></returns>
 		[HttpGet]
-		public async Task<IActionResult> GetAvailableJobs()
+		public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
 		{
-			var jobs = await _jobService.GetAllAvailableJobsAsync();
-			return Ok(jobs);
+			var result = await _jobService.GetAllJobsAsync(search, page, pageSize);
+			return Ok(result);
 		}
 
 
-		[HttpGet("by-customer/{customerId}")]
-		public async Task<IActionResult> GetJobsByCustomer(Guid customerId)
-		{
-			var jobs = await _jobService.GetJobsByCustomerIdAsync(customerId);
-			if (jobs == null || !jobs.Any())
-			{
-				return NotFound("No jobs found for this customer.");
-			}
+		//[HttpGet("by-customer/{customerId}")]
+		//public async Task<IActionResult> GetJobsByCustomer(Guid customerId)
+		//{
+		//	var jobs = await _jobService.GetJobsByCustomerIdAsync(customerId);
+		//	if (jobs == null || !jobs.Any())
+		//	{
+		//		return NotFound("No jobs found for this customer.");
+		//	}
 
-			return Ok(jobs); // bạn có thể chuyển sang DTO nếu muốn
-		}
+		//	return Ok(jobs); // bạn có thể chuyển sang DTO nếu muốn
+		//}
 
 
 

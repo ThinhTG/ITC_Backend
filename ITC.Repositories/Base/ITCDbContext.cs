@@ -63,20 +63,11 @@
 					.HasForeignKey(ur => ur.RoleId)
 					.OnDelete(DeleteBehavior.NoAction);
 
-			modelBuilder.Entity<Job>(entity =>
-			{
-				entity.HasKey(j => j.Id);
-				entity.Property(j => j.Title).IsRequired().HasMaxLength(255);
-				entity.Property(j => j.JobDescription).HasMaxLength(1000);
-				entity.Property(j => j.WorkLocation).HasMaxLength(255);
-				entity.Property(j => j.Status).HasDefaultValue(0);
-				entity.Property(j => j.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
-
-				entity.HasOne(j => j.Customer)
-					.WithMany()
-					.HasForeignKey(j => j.CustomerId)
-					.OnDelete(DeleteBehavior.Restrict);
-			});
+			modelBuilder.Entity<Job>()
+	.HasOne(j => j.Customer)
+	.WithMany()
+	.HasForeignKey(j => j.CustomerId)
+	.OnDelete(DeleteBehavior.Restrict);
 
 			modelBuilder.Entity<Order>()
 			.HasOne(o => o.Customer)

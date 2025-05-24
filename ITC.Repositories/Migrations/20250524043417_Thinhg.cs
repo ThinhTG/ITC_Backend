@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ITC.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Thinhg : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -137,23 +137,27 @@ namespace ITC.Repositories.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    WorkType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TranslationLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExperienceRequirement = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Education = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TranslationForm = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    JobDescription = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    RelevantCertificates = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WorkLocation = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    SalaryType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SalaryAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CompanyPdfPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
+                    JobTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TranslationType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SourceLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UploadFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    PlatformServiceFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    TotalFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyLogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkAddressLine = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkPostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
