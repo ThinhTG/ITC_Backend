@@ -248,6 +248,75 @@ namespace ITC.Services.Auth
 			return users.First();
 		}
 
+		//public async Task<UserResponse> LoginGoogle(GoogleLoginRequest request)
+		//{
+		//	var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token)
+		//				  ?? throw new Exception("Invalid Google token.");
+
+		//	string email = payload.Email;
+		//	string name = payload.Name;
+		//	string googleId = payload.Subject;
+
+		//	var user = await _userManager.FindByEmailAsync(email);
+		//	if (user == null)
+		//	{
+		//		user = new ApplicationUser
+		//		{
+		//			Email = email,
+		//			UserName = googleId,
+		//			FullName = payload.Name ?? "Unknown",
+		//			Gender = "Not Specified",
+		//			PhoneNumber = "Unknown",
+		//			Address = "Not Provided",
+		//			CreatedTime = DateTime.UtcNow,
+		//			LastUpdatedTime = DateTime.UtcNow
+		//		};
+
+		//		var createResult = await _userManager.CreateAsync(user);
+		//		if (!createResult.Succeeded)
+		//		{
+		//			var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+		//			throw new Exception($"User creation failed: {errors}");
+		//		}
+		//		var roleResult = await _userManager.AddToRoleAsync(user, "User");
+		//		if (!roleResult.Succeeded)
+		//		{
+		//			var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+		//			_logger.LogError("Role assignment failed: {errors}", errors);
+		//			throw new Exception($"Role assignment failed: {errors}");
+		//		}
+		//	}
+
+		//	// Generate access token
+		//	var token = await _tokenService.GenerateToken(user);
+
+		//	// Generate refresh token
+		//	var refreshToken = _tokenService.GenerateRefreshToken();
+
+		//	// Hash the refresh token and store it in the database or override the existing refresh token
+		//	using var sha256 = SHA256.Create();
+		//	var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+		//	user.RefreshToken = Convert.ToBase64String(refreshTokenHash);
+		//	user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
+
+
+		//	var updateResult = await _userManager.UpdateAsync(user);
+		//	if (!updateResult.Succeeded)
+		//	{
+		//		var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+		//		_logger.LogError("Failed to update user: {errors}", errors);
+		//		throw new Exception($"Failed to update user: {errors}");
+		//	}
+
+		//	var userResponse = _mapper.Map<ApplicationUser, UserResponse>(user);
+		//	userResponse.AccessToken = token;
+		//	userResponse.RefreshToken = refreshToken;
+		//	userResponse.Address = user.Address;
+
+		//	return userResponse;
+		//}
+
+
 		public async Task<UserResponse> LoginGoogle(GoogleLoginRequest request)
 		{
 			var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token)
@@ -258,63 +327,48 @@ namespace ITC.Services.Auth
 			string googleId = payload.Subject;
 
 			var user = await _userManager.FindByEmailAsync(email);
-			if (user == null)
+			if (user != null)
 			{
-				user = new ApplicationUser
+				// Email đã tồn tại
+				var roles = await _userManager.GetRolesAsync(user);
+				var token = await _tokenService.GenerateToken(user);
+				var refreshToken = _tokenService.GenerateRefreshToken();
+
+				using var sha256 = SHA256.Create();
+				var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+				user.RefreshToken = Convert.ToBase64String(refreshTokenHash);
+				user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
+
+				var updateResult = await _userManager.UpdateAsync(user);
+				if (!updateResult.Succeeded)
+				{
+					var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+					_logger.LogError("Failed to update user: {errors}", errors);
+					throw new Exception($"Failed to update user: {errors}");
+				}
+
+				var userResponse = _mapper.Map<ApplicationUser, UserResponse>(user);
+				userResponse.AccessToken = token;
+				userResponse.RefreshToken = refreshToken;
+				userResponse.Address = user.Address;
+
+				return userResponse;
+			}
+			else
+			{
+				// Email chưa tồn tại, yêu cầu nhập Role
+				var userResponse = new UserResponse
 				{
 					Email = email,
-					UserName = googleId,
-					FullName = payload.Name ?? "Unknown",
-					Gender = "Not Specified",
-					PhoneNumber = "Unknown",
-					Address = "Not Provided",
-					CreatedTime = DateTime.UtcNow,
-					LastUpdatedTime = DateTime.UtcNow
-				};
+					FullName = name,
+					Message = "Google account authenticated, but no role assigned yet. Please provide a role to complete registration."				};
 
-				var createResult = await _userManager.CreateAsync(user);
-				if (!createResult.Succeeded)
-				{
-					var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-					throw new Exception($"User creation failed: {errors}");
-				}
-				var roleResult = await _userManager.AddToRoleAsync(user, "User");
-				if (!roleResult.Succeeded)
-				{
-					var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-					_logger.LogError("Role assignment failed: {errors}", errors);
-					throw new Exception($"Role assignment failed: {errors}");
-				}
+				return userResponse;
 			}
-
-			// Generate access token
-			var token = await _tokenService.GenerateToken(user);
-
-			// Generate refresh token
-			var refreshToken = _tokenService.GenerateRefreshToken();
-
-			// Hash the refresh token and store it in the database or override the existing refresh token
-			using var sha256 = SHA256.Create();
-			var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
-			user.RefreshToken = Convert.ToBase64String(refreshTokenHash);
-			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
-
-
-			var updateResult = await _userManager.UpdateAsync(user);
-			if (!updateResult.Succeeded)
-			{
-				var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-				_logger.LogError("Failed to update user: {errors}", errors);
-				throw new Exception($"Failed to update user: {errors}");
-			}
-
-			var userResponse = _mapper.Map<ApplicationUser, UserResponse>(user);
-			userResponse.AccessToken = token;
-			userResponse.RefreshToken = refreshToken;
-			userResponse.Address = user.Address;
-
-			return userResponse;
 		}
+
+
+
 	}
 }
 

@@ -142,5 +142,23 @@ namespace ITC.API.Controllers
 
 			return Ok(new { Message = "User deleted successfully" });
 		}
+
+		[HttpPost("google-assign-role")]
+		public async Task<IActionResult> AssignRoleForGoogleUser(AssignRoleRequest request)
+		{
+			var user = await _userManager.FindByEmailAsync(request.Email);
+			if (user == null)
+				return BadRequest("User not found.");
+
+			var result = await _userManager.AddToRoleAsync(user, request.Role);
+			if (!result.Succeeded)
+			{
+				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+				return BadRequest($"Role assignment failed: {errors}");
+			}
+
+			return Ok("Role assigned successfully.");
+		}
+
 	}
 }

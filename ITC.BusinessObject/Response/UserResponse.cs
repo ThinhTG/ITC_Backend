@@ -20,6 +20,8 @@ namespace ITC.BusinessObject.Response
 		public string? RefreshToken { get; set; }
 		public string Address { get; set; }
 
+		public string? Message { get; set; } // Thêm thông điệp trả về
+
 
 	}
 
