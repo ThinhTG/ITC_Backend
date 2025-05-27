@@ -154,5 +154,33 @@ namespace ITC.API.Controllers
 			return Ok("Role assigned successfully.");
 		}
 
+		[HttpPut("user/update")]
+		[Authorize]
+		public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDto updateDto)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var user = await _userManager.FindByIdAsync(updateDto.Id);
+			if (user == null)
+				return NotFound(new { Message = "User not found" });
+
+			user.FullName = updateDto.FullName ?? user.FullName;
+			user.AvatarUrl = updateDto.AvatarUrl ?? user.AvatarUrl;
+			user.Gender = updateDto.Gender ?? user.Gender;
+			user.Address = updateDto.Address ?? user.Address;
+			user.LastUpdatedTime = DateTimeOffset.UtcNow;
+
+			var result = await _userManager.UpdateAsync(user);
+			if (!result.Succeeded)
+			{
+				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+				return BadRequest(new { Message = "Update failed", Errors = errors });
+			}
+
+			return Ok(new { Message = "User updated successfully" });
+		}
+
+
 	}
 }
