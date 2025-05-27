@@ -67,7 +67,7 @@ namespace ITC.API.Controllers
 
 
 		/// <summary>
-		/// Lấy thông tin người dùng hiện tại
+		/// Lấy thông tin người dùng ById
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
@@ -79,13 +79,7 @@ namespace ITC.API.Controllers
 			if (user == null)
 				return NotFound(new { Message = "User not found" });
 
-			return Ok(new
-			{
-				Id = user.Id,
-				UserName = user.UserName,
-				Email = user.Email,
-				// Add other properties you want to return
-			});
+			return Ok(user);
 		}
 
 		[HttpPost("refresh-token")]
