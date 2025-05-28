@@ -22,7 +22,16 @@ namespace ITC.Services.JobService
 			_uploadSettings = uploadSettings.Value;
 		}
 
-			public async Task<Guid> CreateJobAsync(CreateJobPostDto dto)
+
+		public async Task<Job?> GetJobDetailsByIdAsync(Guid jobId)
+		{
+			var job = await _jobRepo.GetJobByIdAsync(jobId);
+			if (job == null) return null;
+
+			return job;
+		}
+
+		public async Task<Guid> CreateJobAsync(CreateJobPostDto dto)
 			{
 				var job = new Job
 				{

@@ -53,7 +53,22 @@ namespace ITC.API.Controllers
 				return NotFound("No jobs found for this customer.");
 			}
 
-			return Ok(jobs); // bạn có thể chuyển sang DTO nếu muốn
+			return Ok(jobs); 
+		}
+
+		/// <summary>
+		/// Lấy Job Details theo Id 
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetJobById(Guid id)
+		{
+			var job = await _jobService.GetJobDetailsByIdAsync(id);
+			if (job == null)
+				return NotFound(new { message = "Job not found." });
+
+			return Ok(job);
 		}
 
 

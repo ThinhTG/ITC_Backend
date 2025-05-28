@@ -38,10 +38,11 @@ namespace ITC.Repositories.Repository
 				.ToListAsync();
 		}
 
-		public async Task<Job> GetJobByIdAsync(Guid jobId)
+		public async Task<Job?> GetJobByIdAsync(Guid jobId)
 		{
-			return await _context.Set<Job>()
-				.AsNoTracking()
+			return await _context.Jobs
+				.Include(j => j.Customer)
+				.Include(j => j.Applications)
 				.FirstOrDefaultAsync(j => j.Id == jobId);
 		}
 

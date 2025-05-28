@@ -17,6 +17,8 @@ namespace ITC.Services.JobService
 
 		//Task<List<JobResponseDto>> GetAllAvailableJobsAsync();
 
+		Task<Job?> GetJobDetailsByIdAsync(Guid jobId);
+
 		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
 
 		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(string? search, int pageIndex, int pageSize);
