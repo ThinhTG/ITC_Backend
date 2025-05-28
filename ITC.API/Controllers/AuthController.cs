@@ -181,6 +181,18 @@ namespace ITC.API.Controllers
 			return Ok(new { Message = "User updated successfully" });
 		}
 
+		/// <summary>
+		/// Google Login
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost("google-login")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+		{
+			return Ok(await _authService.LoginGoogle(request));
+		}
+
 
 	}
 }
