@@ -44,17 +44,17 @@ namespace ITC.API.Controllers
 		}
 
 
-		//[HttpGet("by-customer/{customerId}")]
-		//public async Task<IActionResult> GetJobsByCustomer(Guid customerId)
-		//{
-		//	var jobs = await _jobService.GetJobsByCustomerIdAsync(customerId);
-		//	if (jobs == null || !jobs.Any())
-		//	{
-		//		return NotFound("No jobs found for this customer.");
-		//	}
+		[HttpGet("by-customer/{customerId}")]
+		public async Task<IActionResult> GetJobsByCustomer(Guid customerId)
+		{
+			var jobs = await _jobService.GetJobsByCustomerIdAsync(customerId);
+			if (jobs == null || !jobs.Any())
+			{
+				return NotFound("No jobs found for this customer.");
+			}
 
-		//	return Ok(jobs); // bạn có thể chuyển sang DTO nếu muốn
-		//}
+			return Ok(jobs); // bạn có thể chuyển sang DTO nếu muốn
+		}
 
 
 

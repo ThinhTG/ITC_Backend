@@ -9,10 +9,6 @@ using ITC.Services.DTOs.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-
-
-
-
 namespace ITC.Services.JobService
 {
 	public class JobService : IJobService
@@ -65,7 +61,10 @@ namespace ITC.Services.JobService
 			return await _jobRepo.GetAllJobsAsync(search, pageIndex, pageSize);
 		}
 
-
+		public async Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId)
+		{
+			return await _jobRepo.GetJobsByCustomerIdAsync(customerId);
+		}
 	}
 
 	}
