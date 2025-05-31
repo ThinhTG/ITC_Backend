@@ -368,6 +368,66 @@ namespace ITC.Services.Auth
 		}
 
 
+		public async Task<AuthResponseDto> AssignRoleToGoogleUserAsync(string email, string role)
+		{
+			if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(role))
+			{
+				return new AuthResponseDto
+				{
+					Success = false,
+					Message = "Email and role are required."
+				};
+			}
+
+			var user = await _userManager.FindByEmailAsync(email);
+			if (user == null)
+			{
+				return new AuthResponseDto
+				{
+					Success = false,
+					Message = "User not found. Please log in with Google first."
+				};
+			}
+
+			// Gán role
+			var roleResult = await _userManager.AddToRoleAsync(user, role);
+			if (!roleResult.Succeeded)
+			{
+				var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+				_logger.LogError("Failed to assign role: {errors}", errors);
+				return new AuthResponseDto
+				{
+					Success = false,
+					Message = $"Failed to assign role: {errors}"
+				};
+			}
+
+			// Tạo access token và refresh token
+			var accessToken = await _tokenService.GenerateToken(user);
+			var refreshToken = _tokenService.GenerateRefreshToken();
+
+			// Lưu refresh token
+			user.RefreshToken = refreshToken;
+			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			await _userManager.UpdateAsync(user);
+
+			// Tạo ví cho user nếu chưa có (tuỳ trường hợp bạn có thể thêm check tồn tại)
+			await CreateWalletForUserAsync(user.Id);
+
+			var userResponse = _mapper.Map<ApplicationUser, UserResponse>(user);
+
+			return new AuthResponseDto
+			{
+				Success = true,
+				Message = "Role assigned and login successful.",
+				AccessToken = accessToken,
+				RefreshToken = refreshToken,
+				User = userResponse
+			};
+		}
+
+
+
 
 	}
 }

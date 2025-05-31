@@ -137,22 +137,22 @@ namespace ITC.API.Controllers
 			return Ok(new { Message = "User deleted successfully" });
 		}
 
-		[HttpPost("google-assign-role")]
-		public async Task<IActionResult> AssignRoleForGoogleUser(AssignRoleRequest request)
-		{
-			var user = await _userManager.FindByEmailAsync(request.Email);
-			if (user == null)
-				return BadRequest("User not found.");
+		//[HttpPost("google-assign-role")]
+		//public async Task<IActionResult> AssignRoleForGoogleUser(AssignRoleRequest request)
+		//{
+		//	var user = await _userManager.FindByEmailAsync(request.Email);
+		//	if (user == null)
+		//		return BadRequest("User not found.");
 
-			var result = await _userManager.AddToRoleAsync(user, request.Role);
-			if (!result.Succeeded)
-			{
-				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-				return BadRequest($"Role assignment failed: {errors}");
-			}
+		//	var result = await _userManager.AddToRoleAsync(user, request.Role);
+		//	if (!result.Succeeded)
+		//	{
+		//		var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+		//		return BadRequest($"Role assignment failed: {errors}");
+		//	}
 
-			return Ok("Role assigned successfully.");
-		}
+		//	return Ok("Role assigned successfully.");
+		//}
 
 		[HttpPut("user/update")]
 		[Authorize]
@@ -191,6 +191,19 @@ namespace ITC.API.Controllers
 		public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
 		{
 			return Ok(await _authService.LoginGoogle(request));
+		}
+
+		/// <summary>
+		/// Assign Role vào nếu login GG chưa có Role ( User chọn Role)
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost("google/assign-role")]
+		public async Task<IActionResult> AssignRoleToGoogleUser([FromBody] AssignRoleRequest request)
+		{
+			var result = await _authService.AssignRoleToGoogleUserAsync(request.Email, request.Role);
+			if (!result.Success) return BadRequest(result);
+			return Ok(result);
 		}
 
 
