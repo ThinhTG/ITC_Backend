@@ -356,16 +356,36 @@ namespace ITC.Services.Auth
 			}
 			else
 			{
-				// Email chưa tồn tại, yêu cầu nhập Role
+				// Email chưa tồn tại, tạo mới user với Role = null
+				var newUser = new ApplicationUser
+				{
+					UserName = googleId,
+					Email = email,
+					FullName = name,
+					EmailConfirmed = true,
+					RefreshToken = null,
+					RefreshTokenExpiryTime = null,
+				};
+
+				var createResult = await _userManager.CreateAsync(newUser);
+				if (!createResult.Succeeded)
+				{
+					var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+					_logger.LogError("Failed to create user: {errors}", errors);
+					throw new Exception($"Failed to create user: {errors}");
+				}
+
 				var userResponse = new UserResponse
 				{
 					Email = email,
 					FullName = name,
-					Message = "Google account authenticated, but no role assigned yet. Please provide a role to complete registration."				};
+					Message = "Google account authenticated and user created. Please provide a role to complete registration."
+				};
 
 				return userResponse;
 			}
 		}
+
 
 
 		public async Task<AuthResponseDto> AssignRoleToGoogleUserAsync(string email, string role)
