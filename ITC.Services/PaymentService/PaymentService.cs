@@ -8,6 +8,7 @@ using Net.payOS.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -102,6 +103,11 @@ namespace ITC.Services.PaymentService
 
 					case "CANCELLED":
 					case "PENDING":
+						account.orderCode = null;
+						await _accountSV.UpdateAsync(account);
+						break;
+					case "EXPIRED":
+						// Cho phép tạo link mới nếu hết hạn hoặc hủy
 						account.orderCode = null;
 						await _accountSV.UpdateAsync(account);
 						break;

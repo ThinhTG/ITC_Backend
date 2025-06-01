@@ -1,5 +1,6 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.Repositories.Interface;
+using ITC.Services.PaymentService;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 using TimeZoneConverter;
@@ -10,7 +11,7 @@ namespace ITC.Services.WalletService
 	{
 		private readonly IWalletRepository _walletRepository;
 		private readonly IWalletTransactionService _walletTransactionService;
-		//private readonly IPaymentService _paymentService;
+		private readonly IPaymentService _paymentService;
 		private readonly IConfiguration _configuration;
 
 		public WalletService(IWalletRepository walletRepository, IWalletTransactionService walletTransactionService, IConfiguration configuration)
@@ -57,13 +58,13 @@ namespace ITC.Services.WalletService
 				throw new Exception("Wallet not found");
 			}
 
-			//check payment status
-			////var checkingPayment = await _paymentService.GetPaymentLinkInformationAsync(orderCode);
-			//if (checkingPayment.status == "PAID")
-			//{
-			//	wallet.Balance += amount;
-			//	await _walletRepository.UpdateWalletAsync(wallet);
-			//}
+			
+			var checkingPayment = await _paymentService.GetPaymentLinkInformationAsync(orderCode);
+			if (checkingPayment.status == "PAID")
+			{
+				wallet.Balance += amount;
+				await _walletRepository.UpdateWalletAsync(wallet);
+			}
 
 			wallet.Balance += amount;
 

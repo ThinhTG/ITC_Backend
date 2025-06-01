@@ -15,8 +15,8 @@ namespace ITC.API
 		{
 			var builder = WebApplication.CreateBuilder(args);
 			IConfiguration configuration = new ConfigurationBuilder()
-	.AddJsonFile("appsettings.json")
-	.Build();
+        	.AddJsonFile("appsettings.json")
+				.Build();
 			PayOS payOS = new PayOS(configuration["PaymentEnvironment:PAYOS_CLIENT_ID"] ?? throw new Exception("Cannot find payment environment"),
 								configuration["PaymentEnvironment:PAYOS_API_KEY"] ?? throw new Exception("Cannot find payment environment"),
 								configuration["PaymentEnvironment:PAYOS_CHECKSUM_KEY"] ?? throw new Exception("Cannot find payment environment"));
