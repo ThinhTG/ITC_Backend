@@ -13,5 +13,9 @@ namespace ITC.Repositories.Interface
 		Task AddAsync(JobApplication application);
 		Task<List<JobApplication>> GetByJobIdAsync(Guid jobId);
 		Task SaveChangesAsync();
+
+		Task<List<JobApplication>> GetByInterpreterIdAsync(Guid interpreterId);
+
+
 	}
 }

@@ -50,6 +50,20 @@ namespace ITC.API.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
+
+
+		/// <summary>
+		/// get all Apply cua 1 interpreter 
+		/// </summary>
+		/// <param name="interpreterId"></param>
+		/// <returns></returns>
+		[HttpGet("interpreter/{interpreterId}")]
+		public async Task<IActionResult> GetApplicationsByInterpreter(Guid interpreterId)
+		{
+			var result = await _service.GetApplicationsByInterpreterId(interpreterId);
+			return Ok(result);
+		}
+
 	}
 
 }

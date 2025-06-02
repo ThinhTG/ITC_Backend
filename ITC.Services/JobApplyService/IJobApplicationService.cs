@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Request;
 using ITC.Services.DTOs.JobApply;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,9 @@ namespace ITC.Services.JobApplyService
 		Task ApplyAsync(JobApplicationDto dto);
 		Task<List<JobApplication>> GetApplicationsForJobAsync(Guid jobId);
 		Task SelectInterpreterAsync(Guid jobId, Guid InterpreterId);
+
+		Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId);
+
+
 	}
 }
