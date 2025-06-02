@@ -59,13 +59,14 @@ namespace ITC.Services.Auth
 			// Create new user
 			var user = new ApplicationUser
 			{
-				UserName = registerDto.UserName,
+				UserName = registerDto.Email,
 				Email = registerDto.Email,
 				PhoneNumber = registerDto.PhoneNumber,
 				EmailConfirmed = true,
 				PhoneNumberConfirmed = true,
 				FullName = registerDto.UserName,
-				Address = registerDto.Address
+				Address = registerDto.Address,
+				Gender = registerDto.Gender ?? "Not Specified"
 			};
 
 			var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -123,8 +124,7 @@ namespace ITC.Services.Auth
 		public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
 		{
 
-			var user = await _userManager.FindByNameAsync(loginDto.UserName)
-					?? await _userManager.FindByEmailAsync(loginDto.UserName);
+			var user = await _userManager.FindByEmailAsync(loginDto.UserName);
 
 			if (user == null)
 			{
