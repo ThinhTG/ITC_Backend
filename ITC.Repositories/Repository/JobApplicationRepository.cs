@@ -42,6 +42,17 @@ namespace ITC.Repositories.Repository
 		{
 			await _context.SaveChangesAsync();
 		}
+
+		public async Task<List<JobApplication>> GetByInterpreterIdAsync(Guid interpreterId)
+		{
+			return await _context.JobApplications
+				.Include(app => app.Job)
+				.Where(app => app.InterpreterId == interpreterId)
+				.OrderByDescending(app => app.CreatedAt)
+				.ToListAsync();
+		}
+
+
 	}
 
 }

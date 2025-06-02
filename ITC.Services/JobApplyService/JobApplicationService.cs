@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Request;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.JobApply;
@@ -60,6 +61,33 @@ namespace ITC.Services.JobApplyService
 
 			await _ApplyRepository.SaveChangesAsync();
 		}
+
+
+		public async Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId)
+		{
+			var applications = await _ApplyRepository.GetByInterpreterIdAsync(interpreterId);
+
+			return applications.Select(app => new JobApplicationCardDto
+			{
+				ApplicationId = app.Id,
+				JobTitle = app.Job?.JobTitle ?? "Unknown",
+				Price = app.Job?.HourlyRate != null ? $"${app.Job.HourlyRate / 1000}k" : "$0",
+				Status = ConvertStatus(app.Status),
+				CreatedDate = app.CreatedAt
+			}).ToList();
+		}
+
+		private string ConvertStatus(string status)
+		{
+			return status switch
+			{
+				"0" => "Pending",
+				"1" => "Accepted",
+				"2" => "Rejected",
+				_ => "Unknown"
+			};
+		}
+
 	}
 
 }
