@@ -41,8 +41,10 @@ namespace ITC.Repositories.Repository
 		public async Task<Job?> GetJobByIdAsync(Guid jobId)
 		{
 			return await _context.Jobs
+				.Include(j => j.Customer)
 				.FirstOrDefaultAsync(j => j.Id == jobId);
 		}
+
 
 		public async Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId)
 		{
