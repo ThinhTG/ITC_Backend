@@ -90,6 +90,18 @@ namespace ITC.Services.JobService
 		{
 			return await _jobRepo.GetJobsByCustomerIdAsync(customerId);
 		}
+
+		public async Task<bool> UpdateJobStatusAsync(Guid jobId, int newStatus)
+		{
+			var job = await _jobRepo.GetJobByIdAsync(jobId);
+			if (job == null)
+				return false;
+
+			job.Status = newStatus;
+
+			await _jobRepo.SaveChangesAsync();
+			return true;
+		}
 	}
 
 	}
