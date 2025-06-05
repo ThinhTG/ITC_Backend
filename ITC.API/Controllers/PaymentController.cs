@@ -46,6 +46,12 @@ namespace ITC.API.Controllers
 		}
 
 
+
+		/// <summary>
+		/// Tao Link Deposit vao vi tiền của khách hàng
+		/// </summary>
+		/// <param name="body"></param>
+		/// <returns></returns>
 		[HttpPost("createDeposit")]
 		public async Task<IActionResult> CreateDeposit([FromBody] CreateDepositLinkRequest body)
 		{
@@ -74,7 +80,11 @@ namespace ITC.API.Controllers
 		}
 
 
-		// Lấy thông tin thanh toán theo orderCode
+		/// <summary>
+		/// Lấy Thông tin thanh toán theo OrderCode
+		/// </summary>
+		/// <param name="orderCode"></param>
+		/// <returns></returns>
 		[HttpGet("{orderCode}")]
 		public async Task<IActionResult> GetPayment(int orderCode)
 		{
