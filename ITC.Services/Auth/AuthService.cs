@@ -5,6 +5,7 @@ using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
 using ITC.BusinessObject.Response;
 using ITC.Core.Base;
+using ITC.Core.Utils;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.Auth;
 using ITC.Services.Email;
@@ -463,6 +464,21 @@ namespace ITC.Services.Auth
 			if (user == null) return false;
 
 			var result = await _userManager.ConfirmEmailAsync(user, token);
+			return result.Succeeded;
+		}
+
+
+		public async Task<bool> UpdateBankAccountAsync(Guid userId, UpdateBankAccountRequest request)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user == null) return false;
+
+			user.BankAccountNumber = request.BankAccountNumber.Trim();
+			user.BankName = request.BankName.Trim();
+			user.BankAccountHolderName = request.BankAccountHolderName.Trim();
+			user.LastUpdatedTime = CoreHelper.SystemTimeNow;
+
+			var result = await _userManager.UpdateAsync(user);
 			return result.Succeeded;
 		}
 
