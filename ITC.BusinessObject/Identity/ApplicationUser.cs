@@ -52,5 +52,10 @@ namespace ITC.BusinessObject.Identity
             CreatedTime = CoreHelper.SystemTimeNow;
             LastUpdatedTime = CreatedTime;
         }
-    }
+
+		// Bank Account
+		public string? BankAccountNumber { get; set; } // So tài khoản ngân hàng
+		public string? BankName { get; set; } // Tên ngân hàng
+		public string? BankAccountHolderName { get; set; } // Tên người nhận trong ngân hàng 
+	}
 }

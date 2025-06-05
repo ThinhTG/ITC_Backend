@@ -20,5 +20,8 @@ namespace ITC.Services.Auth
 		Task<UserResponse> LoginGoogle(GoogleLoginRequest request);
 
 		Task<bool> ConfirmEmailAsync(string userId, string token);
-			}
+
+		Task<bool> UpdateBankAccountAsync(Guid userId, UpdateBankAccountRequest request);
+
+	}
 }

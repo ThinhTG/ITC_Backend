@@ -17,15 +17,18 @@ namespace ITC.API.Controllers
 		private readonly IAuthService _authService;
 		private readonly ILogger<AuthController> _logger;
 		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly IHttpContextAccessor _httpContextAccessor;
+
 
 		public AuthController(
 			IAuthService authService,
 			ILogger<AuthController> logger,
-			UserManager<ApplicationUser> userManager)
+			UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
 		{
 			_authService = authService;
 			_logger = logger;
 			_userManager = userManager;
+			_httpContextAccessor =httpContextAccessor;
 		}
 
 		/// <summary>
@@ -228,6 +231,23 @@ namespace ITC.API.Controllers
 			if (isConfirmed)
 				return Redirect("http://localhost:3000/welcome");   // deploy sửa lại
 			return BadRequest("Xác nhận email thất bại.");
+		}
+
+
+		[HttpPut("bank-account")]
+		public async Task<IActionResult> UpdateBankAccount([FromBody] UpdateBankAccountRequest request)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (userIdClaim == null) return Unauthorized();
+
+			var userId = Guid.Parse(userIdClaim);
+			var success = await _authService.UpdateBankAccountAsync(userId, request);
+
+			return success ? Ok(new { message = "Bank account updated successfully" })
+						   : BadRequest(new { message = "Failed to update bank account" });
 		}
 
 
