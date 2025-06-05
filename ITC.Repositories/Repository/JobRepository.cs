@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using ITC.BusinessObject.Request;
 
 namespace ITC.Repositories.Repository
 {
@@ -54,21 +55,44 @@ namespace ITC.Repositories.Repository
 								 .ToListAsync();
 		}
 
-		public async Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(string? search, int pageIndex, int pageSize)
+		public async Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams p)
 		{
-			var query = _context.Jobs.AsQueryable();
+			var query = _context.Jobs.AsNoTracking().AsQueryable();
 
-			if (!string.IsNullOrWhiteSpace(search))
+			/* ---------- Filter ---------- */
+			if (!string.IsNullOrWhiteSpace(p.Search))
 			{
-				search = search.ToLower();
+				var kw = p.Search.ToLower();
 				query = query.Where(j =>
-					j.JobTitle.ToLower().Contains(search) ||
-					j.CompanyName.ToLower().Contains(search) ||
-					j.TranslationType.ToLower().Contains(search));
+					EF.Functions.Like(j.JobTitle.ToLower(), $"%{kw}%") ||
+					EF.Functions.Like((j.CompanyName ?? string.Empty).ToLower(), $"%{kw}%") ||
+					EF.Functions.Like(j.TranslationType.ToLower(), $"%{kw}%"));
 			}
 
-			return await query.ToPagedListAsync<Job, JobDTO>(_mapper, pageIndex, pageSize);
+			if (!string.IsNullOrWhiteSpace(p.Location))
+				query = query.Where(j => j.WorkAddressLine == p.Location);
+
+			if (p.Categories?.Any() == true)
+				query = query.Where(j => p.Categories.Contains(j.TranslationType));
+
+			if (p.SourceLanguages?.Any() == true)
+				query = query.Where(j => p.SourceLanguages.Contains(j.SourceLanguage));
+
+			if (p.TargetLanguages?.Any() == true)
+				query = query.Where(j => p.TargetLanguages.Contains(j.TargetLanguage));
+
+			if (p.MinSalary.HasValue)
+				query = query.Where(j => j.HourlyRate >= p.MinSalary.Value);
+
+			if (p.MaxSalary.HasValue)
+				query = query.Where(j => j.HourlyRate <= p.MaxSalary.Value);
+
+			/* ---------- Paging + Mapping ---------- */
+			return await query
+				.OrderByDescending(j => j.CreatedAt)
+				.ToPagedListAsync<Job, JobDTO>(_mapper, p.PageIndex, p.PageSize);
 		}
+
 
 
 		public async Task SaveChangesAsync()

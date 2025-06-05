@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Request;
 using ITC.Core;
 using ITC.Core.Contracts;
 using System;
@@ -18,7 +19,7 @@ namespace ITC.Repositories.Interface
 
 		Task<Job?> GetJobByIdAsync(Guid jobId);
 
-		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(string? search, int pageIndex, int pageSize);
+		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams p);
 		Task SaveChangesAsync();
 	}
 }
