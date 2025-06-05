@@ -18,5 +18,7 @@ namespace ITC.Services.Auth
 		Task<AuthResponseDto> AssignRoleToGoogleUserAsync(string email, string role);
 
 		Task<UserResponse> LoginGoogle(GoogleLoginRequest request);
+
+		Task<bool> ConfirmEmailAsync(string userId, string token);
 			}
 }

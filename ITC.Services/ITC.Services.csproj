@@ -11,7 +11,9 @@
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
+		<PackageReference Include="MailKit" Version="4.12.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
+		<PackageReference Include="MimeKit" Version="4.12.0" />
 		<PackageReference Include="payOS" Version="1.0.9" />
 		<PackageReference Include="TimeZoneConverter" Version="7.0.0" />
 	</ItemGroup>
