@@ -1,4 +1,6 @@
-﻿using ITC.BusinessObject.Entities;
+﻿using AutoMapper;
+using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Request;
 using ITC.Core;
 using ITC.Core.Base;
 using ITC.Core.Contracts;
@@ -15,11 +17,13 @@ namespace ITC.Services.JobService
 	{
 		private readonly IJobRepository _jobRepo;
 		private readonly UploadSettings _uploadSettings;
+		private readonly IMapper _mapper;
 
-		public JobService(IJobRepository jobRepo, IOptions<UploadSettings> uploadSettings)
+		public JobService(IJobRepository jobRepo, IOptions<UploadSettings> uploadSettings, IMapper mapper)
 		{
 			_jobRepo = jobRepo;
 			_uploadSettings = uploadSettings.Value;
+			_mapper = mapper;
 		}
 
 
@@ -65,10 +69,22 @@ namespace ITC.Services.JobService
 				return job.Id;
 			}
 
-		public async Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(string? search, int pageIndex, int pageSize)
+		public async Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams filter)
 		{
-			return await _jobRepo.GetAllJobsAsync(search, pageIndex, pageSize);
+			// Lấy entity đã paging từ Repo
+			var pagedJobs = await _jobRepo.GetAllJobsAsync(filter); // BasePaginatedList<Job>
+
+
+			var dtoItems = _mapper.Map<IReadOnlyCollection<JobDTO>>(pagedJobs.Items);
+
+			return new BasePaginatedList<JobDTO>(
+				dtoItems,
+				pagedJobs.TotalItems,
+				pagedJobs.CurrentPage,
+				pagedJobs.PageSize);
+
 		}
+
 
 		public async Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId)
 		{

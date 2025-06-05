@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Request;
 using ITC.Core.Contracts;
 using ITC.Services.DTOs;
 using ITC.Services.JobService;
@@ -37,12 +38,11 @@ namespace ITC.API.Controllers
 		/// <param name="pageSize"></param>
 		/// <returns></returns>
 		[HttpGet]
-		public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+		public async Task<IActionResult> GetAll([FromQuery] JobFilterParams filter)
 		{
-			var result = await _jobService.GetAllJobsAsync(search, page, pageSize);
-			return Ok(result);
+			var result = await _jobService.GetAllJobsAsync(filter);
+			return Ok(result);                 
 		}
-
 
 		[HttpGet("by-customer/{customerId}")]
 		public async Task<IActionResult> GetJobsByCustomer(Guid customerId)

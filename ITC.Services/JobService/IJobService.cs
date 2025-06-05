@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Request;
 using ITC.Core;
 using ITC.Core.Contracts;
 using ITC.Services.DTOs;
@@ -21,7 +22,7 @@ namespace ITC.Services.JobService
 
 		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
 
-		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(string? search, int pageIndex, int pageSize);
+		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams filter);
 
 	}
 }

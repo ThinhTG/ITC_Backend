@@ -20,6 +20,7 @@ namespace ITC.BusinessObject.Entities
 		public string? Description { get; set; }
 		public string? UploadFileUrl { get; set; }
 
+
 		// Payment Info
 		public decimal? HourlyRate { get; set; }
 		public decimal? PlatformServiceFee { get; set; }

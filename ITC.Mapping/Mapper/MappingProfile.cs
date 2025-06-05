@@ -2,6 +2,7 @@
 using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Response;
+using ITC.Core;
 using ITC.Core.Contracts;
 using ITC.Services.DTOs;
 
@@ -14,6 +15,8 @@ namespace ITC.Mapping.Mapper
             CreateMap<ApplicationUser, UserResponse>();
 			CreateMap<Job, JobDTO>();
 			CreateMap<CreateJobRequest, Job>();
+	
+			CreateMap<BasePaginatedList<JobDTO>, BasePaginatedList<Job>>().ReverseMap();
 		}
     }
 }
