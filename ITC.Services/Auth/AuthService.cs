@@ -383,6 +383,8 @@ namespace ITC.Services.Auth
 					throw new Exception($"Failed to create user: {errors}");
 				}
 
+				await CreateWalletForUserAsync(newUser.Id);
+
 				var userResponse = new UserResponse
 				{
 					Email = email,
