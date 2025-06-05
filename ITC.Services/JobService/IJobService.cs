@@ -24,5 +24,8 @@ namespace ITC.Services.JobService
 
 		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams filter);
 
+		Task<bool> UpdateJobStatusAsync(Guid jobId, int newStatus);
+
+
 	}
 }

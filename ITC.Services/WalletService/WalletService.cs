@@ -133,7 +133,6 @@ namespace ITC.Services.WalletService
 				TransactionStatus = "Success",
 				TransactionDate = transactionDatetime.ToString(dateFormat, CultureInfo.InvariantCulture),
 				TransactionBalance = wallet.Balance.ToString(),
-				OrderId = orderId
 			};
 
 			await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "purchase", "success", transactionDatetime.ToString(dateFormat, CultureInfo.InvariantCulture), wallet.Balance, orderId);

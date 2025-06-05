@@ -45,14 +45,82 @@ namespace ITC.Services.Email
         }
 
 
-        public async Task SendConfirmationEmailAsync(ApplicationUser user, string token)
-        {
+		//     public async Task SendConfirmationEmailAsync(ApplicationUser user, string token)
+		//     {
+		//var encodedToken = Uri.EscapeDataString(token);
+		//         var confirmationLink = $"http://localhost:5000/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
+		//         var message = $"Vui lòng nhấp vào link để xác thực email: <a href='{confirmationLink}'>Xác nhận</a>";
+		//         await SendEmailAsync(user.Email, "Xác thực email", message);
+		//     }
+
+		public async Task SendConfirmationEmailAsync(ApplicationUser user, string token)
+		{
 			var encodedToken = Uri.EscapeDataString(token);
-            var confirmationLink = $"http://localhost:5000/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
-            var message = $"Vui lòng nhấp vào link để xác thực email: <a href='{confirmationLink}'>Xác nhận</a>";
-            await SendEmailAsync(user.Email, "Xác thực email", message);
-        }
-        public async Task ResendConfirmationEmailAsync(ApplicationUser user, string token)
+			var confirmationLink = $"http://localhost:5000/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
+
+			var message = $@"
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset='UTF-8'>
+        <style>
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f4f4f4;
+                padding: 20px;
+            }}
+            .email-container {{
+                max-width: 600px;
+                margin: auto;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                padding: 30px;
+            }}
+            h2 {{
+                color: #333;
+            }}
+            p {{
+                font-size: 16px;
+                color: #555;
+            }}
+            .button {{
+                display: inline-block;
+                padding: 12px 20px;
+                margin-top: 20px;
+                background-color: #007bff;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+            }}
+            .footer {{
+                margin-top: 30px;
+                font-size: 12px;
+                color: #888;
+                text-align: center;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class='email-container'>
+            <h2>Xác thực email của bạn</h2>
+            <p>Chào <strong>{user.FullName ?? user.Email}</strong>,</p>
+            <p>Cảm ơn bạn đã đăng ký tài khoản tại Inter Trans Connect. Vui lòng nhấn nút bên dưới để xác thực địa chỉ email của bạn:</p>
+            <a href='{confirmationLink}' class='button'>Xác nhận email</a>
+            <p>Nếu bạn không tạo tài khoản, bạn có thể bỏ qua email này.</p>
+            <div class='footer'>
+                &copy; 2025 Inter Trans Connect. All rights reserved.
+            </div>
+        </div>
+    </body>
+    </html>";
+
+			await SendEmailAsync(user.Email, "Xác thực email", message);
+		}
+
+
+		public async Task ResendConfirmationEmailAsync(ApplicationUser user, string token)
         {
             var encodedToken = Uri.EscapeDataString(token);
             var confirmationLink = $"https://railwaydeploysrc-production.up.railway.app/api/Auth/confirm-email?userId={user.Id}&token={encodedToken}";

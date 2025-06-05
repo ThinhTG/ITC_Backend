@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Identity;
+using ITC.Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,8 @@ namespace ITC.BusinessObject.Entities
 		public string? WorkPostalCode { get; set; }
 		public string? WorkCountry { get; set; }
 
-		public int Status { get; set; } = 0;
+		public int Status { get; set; } = (int)JobStatus.Open;
+
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 		public ApplicationUser Customer { get; set; }
