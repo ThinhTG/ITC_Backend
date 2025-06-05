@@ -14,11 +14,12 @@ namespace ITC.Services.WalletService
 		private readonly IPaymentService _paymentService;
 		private readonly IConfiguration _configuration;
 
-		public WalletService(IWalletRepository walletRepository, IWalletTransactionService walletTransactionService, IConfiguration configuration)
+		public WalletService(IWalletRepository walletRepository, IWalletTransactionService walletTransactionService, IConfiguration configuration, IPaymentService paymentService)
 		{
 			_walletRepository = walletRepository;
 			_walletTransactionService = walletTransactionService;
 			_configuration = configuration;
+			_paymentService = paymentService;
 		}
 
 		public async Task<Wallet> CreateWallet(Wallet wallet)
@@ -65,9 +66,6 @@ namespace ITC.Services.WalletService
 				wallet.Balance += amount;
 				await _walletRepository.UpdateWalletAsync(wallet);
 			}
-
-			wallet.Balance += amount;
-
 
 			if (!useUTC)
 			{

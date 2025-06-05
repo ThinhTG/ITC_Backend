@@ -206,6 +206,31 @@ namespace ITC.API.Controllers
 			return Ok(result);
 		}
 
+		//[HttpGet("confirm-email")]
+		//public async Task<IActionResult> ConfirmEmail(string userId, string token)
+		//{
+		//	var user = await _userManager.FindByIdAsync(userId);
+		//	if (user == null) return NotFound("Người dùng không tồn tại.");
+
+		//	var result = await _userManager.ConfirmEmailAsync(user, token);
+		//	if (result.Succeeded)
+		//		return Ok("Email đã được xác thực thành công.");
+
+		//	return BadRequest("Xác thực email thất bại.");
+		//}
+
+		[HttpGet("confirm-email")]
+		[HttpPost("confirm-email")]
+		[AllowAnonymous]
+		public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+		{
+			bool isConfirmed = await _authService.ConfirmEmailAsync(userId, token);
+			if (isConfirmed)
+				return Redirect("http://localhost:3000/welcome");   // deploy sửa lại
+			return BadRequest("Xác nhận email thất bại.");
+		}
+
+
 
 	}
 }

@@ -16,6 +16,12 @@ namespace ITC.API.Controllers
 			_service = service;
 		}
 
+
+		/// <summary>
+		/// Apply to a Job
+		/// </summary>
+		/// <param name="dto"></param>
+		/// <returns></returns>
 		[HttpPost]
 		public async Task<IActionResult> ApplyToJob([FromBody] JobApplicationDto dto)
 		{
@@ -30,6 +36,11 @@ namespace ITC.API.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Lay Toan Bo Apply cua 1 Job
+		/// </summary>
+		/// <param name="jobId"></param>
+		/// <returns></returns>
 		[HttpGet("{jobId}/applications")]
 		public async Task<IActionResult> GetApplications(Guid jobId)
 		{
@@ -37,8 +48,15 @@ namespace ITC.API.Controllers
 			return Ok(result);
 		}
 
+
+		/// <summary>
+		/// Chon BPD cho 1 Job
+		/// </summary>
+		/// <param name="jobId">Nhap JobID</param>
+		/// <param name="intrepreterId">Nhap ID của BPDV</param>
+		/// <returns></returns>
 		[HttpPost("{jobId}/select")]
-		public async Task<IActionResult> SelectInterpreter(Guid jobId, [FromBody] Guid intrepreterId)
+		public async Task<IActionResult> SelectInterpreter(Guid jobId,  Guid intrepreterId)
 		{
 			try
 			{

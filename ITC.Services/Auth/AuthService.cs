@@ -7,6 +7,7 @@ using ITC.BusinessObject.Response;
 using ITC.Core.Base;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.Auth;
+using ITC.Services.Email;
 using ITC.Services.TokenService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,7 @@ namespace ITC.Services.Auth
 		private readonly double _refreshTokenExpiryDays;
 		private readonly IMapper _mapper;
 		private readonly IWalletRepository _walletRepository;
+		private readonly IEmailService _emailService;
 
 		public AuthService(
 			UserManager<ApplicationUser> userManager,
@@ -31,12 +33,14 @@ namespace ITC.Services.Auth
 			ITokenService tokenService,
 			ILogger<AuthService> logger,
 			IConfiguration configuration,
+			IEmailService emailService,
 			IMapper mapper)
 		{
 			_userManager = userManager;
 			_tokenService = tokenService;
 			_logger = logger;
 			_walletRepository = walletRepository;
+			_emailService = emailService;
 
 			var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
 			_refreshTokenExpiryDays = jwtSettings?.RefreshTokenExpirationDays ?? 7;
@@ -62,7 +66,7 @@ namespace ITC.Services.Auth
 				UserName = registerDto.Email,
 				Email = registerDto.Email,
 				PhoneNumber = registerDto.PhoneNumber,
-				EmailConfirmed = true,
+				EmailConfirmed = false,
 				PhoneNumberConfirmed = true,
 				FullName = registerDto.UserName,
 				Address = registerDto.Address,
@@ -95,7 +99,10 @@ namespace ITC.Services.Auth
 				await _userManager.AddToRoleAsync(user, "Admin");
 			}
 
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
 			var refreshToken = _tokenService.GenerateRefreshToken();
+			await _emailService.SendConfirmationEmailAsync(user, token);
 			// Save refresh token
 			user.RefreshToken = refreshToken;
 			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
@@ -104,7 +111,7 @@ namespace ITC.Services.Auth
 			return new AuthResponseDto
 			{
 				Success = true,
-				Message = "User registered successfully"
+				Message = "Registration successful. Please check your email to confirm your account."
 			};
 		}
 
@@ -446,6 +453,18 @@ namespace ITC.Services.Auth
 			};
 		}
 
+
+		/// <summary>
+		/// Xác nhận email của người dùng dựa vào token và userId.
+		/// </summary>
+		public async Task<bool> ConfirmEmailAsync(string userId, string token)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null) return false;
+
+			var result = await _userManager.ConfirmEmailAsync(user, token);
+			return result.Succeeded;
+		}
 
 
 

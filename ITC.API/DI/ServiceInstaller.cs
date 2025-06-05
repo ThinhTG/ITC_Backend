@@ -1,6 +1,7 @@
 ﻿using ITC.Repositories.Interface;
 using ITC.Repositories.Repository;
 using ITC.Services.Auth;
+using ITC.Services.Email;
 using ITC.Services.JobApplyService;
 using ITC.Services.JobService;
 using ITC.Services.OrderService;
@@ -30,6 +31,7 @@ namespace ITC.API.DI
 			services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 			services.AddScoped<IJobApplicationService, JobApplicationService>();
 			services.AddScoped<IPaymentService, PaymentService>();
+			services.AddScoped<IEmailService, EmailService>();
 
 
 		}
