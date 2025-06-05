@@ -25,7 +25,7 @@ namespace ITC.API.DI
 
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy",
+                options.AddPolicy("AllowAll",
                     builder =>
                     {
                         builder.WithOrigins("*")
