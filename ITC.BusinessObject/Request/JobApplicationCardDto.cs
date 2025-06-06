@@ -12,6 +12,6 @@ namespace ITC.BusinessObject.Request
 		public string JobTitle { get; set; } = string.Empty;
 		public string Price { get; set; } = string.Empty;
 		public string Status { get; set; } = string.Empty; // "Pending", "Accepted", "Rejected"
-		public DateTime CreatedDate { get; set; }
+		public DateTimeOffset CreatedDate { get; set; }
 	}
 }

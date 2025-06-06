@@ -1,5 +1,6 @@
 ﻿using ITC.BusinessObject.Identity;
 using ITC.Core.Enum;
+using ITC.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace ITC.BusinessObject.Entities
 
 		public int Status { get; set; } = (int)JobStatus.Open;
 
-		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+		public DateTimeOffset CreatedAt { get; set; } = CoreHelper.SystemTimeNow;
 
 		public ApplicationUser Customer { get; set; }
 		public ICollection<JobApplication>? Applications { get; set; } = new List<JobApplication>();

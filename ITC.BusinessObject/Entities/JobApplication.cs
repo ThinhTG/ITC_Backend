@@ -1,4 +1,5 @@
 ﻿ using ITC.BusinessObject.Identity;
+using ITC.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,8 @@ namespace ITC.BusinessObject.Entities
 		public ApplicationUser? Interpreter { get; set; }
 
 		public string Message { get; set; } = string.Empty;
-		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-		public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
-
+		public DateTimeOffset CreatedAt { get; set; } = CoreHelper.SystemTimeNow;
+		public DateTimeOffset LastUpdatedAt { get; set; } = CoreHelper.SystemTimeNow;
 		public string Status { get; set; } // 0: pending, 1: accepted, 2: rejected
 	}
 
