@@ -43,6 +43,7 @@ namespace ITC.Repositories.Repository
 		{
 			return await _context.Jobs
 				.Include(j => j.Customer)
+				.Include(j => j.SelectedInterpreter) // Include selected interpreter if needed
 				.FirstOrDefaultAsync(j => j.Id == jobId);
 		}
 

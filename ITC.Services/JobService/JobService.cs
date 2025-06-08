@@ -71,19 +71,18 @@ namespace ITC.Services.JobService
 
 		public async Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams filter)
 		{
-			// Lấy entity đã paging từ Repo
-			var pagedJobs = await _jobRepo.GetAllJobsAsync(filter); // BasePaginatedList<Job>
+			var pagedJobs = await _jobRepo.GetAllJobsAsync(filter); // Trả về BasePaginatedList<Job>
 
-
-			var dtoItems = _mapper.Map<IReadOnlyCollection<JobDTO>>(pagedJobs.Items);
+			var dtoItems = _mapper.Map<List<JobDTO>>(pagedJobs.Items); // Map từ List<Job> sang List<JobDTO>
 
 			return new BasePaginatedList<JobDTO>(
 				dtoItems,
 				pagedJobs.TotalItems,
 				pagedJobs.CurrentPage,
-				pagedJobs.PageSize);
-
+				pagedJobs.PageSize
+			);
 		}
+
 
 
 		public async Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId)
