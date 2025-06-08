@@ -16,7 +16,7 @@ namespace ITC.Mapping.Mapper
 			CreateMap<Job, JobDTO>();
 			CreateMap<CreateJobRequest, Job>();
 	
-			CreateMap<BasePaginatedList<JobDTO>, BasePaginatedList<Job>>().ReverseMap();
+			//CreateMap<BasePaginatedList<JobDTO>, BasePaginatedList<Job>>().ReverseMap();
 		}
     }
 }

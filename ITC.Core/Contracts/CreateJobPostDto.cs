@@ -9,7 +9,7 @@ namespace ITC.Core.Contracts
 	public class CreateJobPostDto
 	{
 		public string JobTitle { get; set; }
-		public string TranslationType { get; set; }
+		public string TranslationType { get; set; }   // chọn  biên dịch, phiên dịch,...
 		public string SourceLanguage { get; set; }
 		public string TargetLanguage { get; set; }
 		public string? Description { get; set; }
@@ -31,6 +31,10 @@ namespace ITC.Core.Contracts
 		public string? WorkCity { get; set; }
 		public string? WorkPostalCode { get; set; }
 		public string? WorkCountry { get; set; }
+
+
+		public DateTimeOffset? Deadline { get; set; }         // For Translation
+		public DateTimeOffset? WorkingTime { get; set; }      // For Interpretation
 
 		public Guid CustomerId { get; set; }
 	}
