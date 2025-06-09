@@ -2,6 +2,7 @@
 using ITC.BusinessObject.Request;
 using ITC.Core;
 using ITC.Core.Contracts;
+using ITC.Repositories.PaggingItems;
 using ITC.Services.DTOs;
 using ITC.Services.DTOs.Job;
 using System;
@@ -22,7 +23,7 @@ namespace ITC.Services.JobService
 
 		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
 
-		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams filter);
+		Task<PaginatedList<JobDTO>> GetAllJobsAsync(JobFilterRequest request);
 
 		Task<bool> UpdateJobStatusAsync(Guid jobId, int newStatus);
 

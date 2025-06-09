@@ -5,6 +5,7 @@ using ITC.Core;
 using ITC.Core.Base;
 using ITC.Core.Contracts;
 using ITC.Repositories.Interface;
+using ITC.Repositories.PaggingItems;
 using ITC.Repositories.Repository;
 using ITC.Services.DTOs;
 using ITC.Services.DTOs.Job;
@@ -69,20 +70,10 @@ namespace ITC.Services.JobService
 				return job.Id;
 			}
 
-		public async Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams filter)
+		public async Task<PaginatedList<JobDTO>> GetAllJobsAsync(JobFilterRequest request)
 		{
-			var pagedJobs = await _jobRepo.GetAllJobsAsync(filter); // Trả về BasePaginatedList<Job>
-
-			var dtoItems = _mapper.Map<List<JobDTO>>(pagedJobs.Items); // Map từ List<Job> sang List<JobDTO>
-
-			return new BasePaginatedList<JobDTO>(
-				dtoItems,
-				pagedJobs.TotalItems,
-				pagedJobs.CurrentPage,
-				pagedJobs.PageSize
-			);
+			return await _jobRepo.GetFilteredJobsAsync(request);
 		}
-
 
 
 		public async Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId)

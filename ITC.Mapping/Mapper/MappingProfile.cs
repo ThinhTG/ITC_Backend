@@ -4,6 +4,7 @@ using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Response;
 using ITC.Core;
 using ITC.Core.Contracts;
+using ITC.Repositories.PaggingItems;
 using ITC.Services.DTOs;
 
 namespace ITC.Mapping.Mapper
@@ -13,10 +14,10 @@ namespace ITC.Mapping.Mapper
         public MappingProfile()
         {
             CreateMap<ApplicationUser, UserResponse>();
-			CreateMap<Job, JobDTO>();
+			CreateMap<Job, JobDTO>().ReverseMap();
 			CreateMap<CreateJobRequest, Job>();
-	
-			//CreateMap<BasePaginatedList<JobDTO>, BasePaginatedList<Job>>().ReverseMap();
+		//	CreateMap<List<Job>, List<JobDTO>>();
+		//	CreateMap<PaginatedList<JobDTO>, PaginatedList<Job>>().ReverseMap();
 		}
     }
 }

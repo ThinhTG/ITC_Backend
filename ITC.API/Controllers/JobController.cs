@@ -38,10 +38,10 @@ namespace ITC.API.Controllers
 		/// <param name="pageSize"></param>
 		/// <returns></returns>
 		[HttpGet]
-		public async Task<IActionResult> GetAll([FromQuery] JobFilterParams filter)
+		public async Task<IActionResult> SearchJobs([FromQuery]JobFilterRequest request)
 		{
-			var result = await _jobService.GetAllJobsAsync(filter);
-			return Ok(result);                 
+			var result = await _jobService.GetAllJobsAsync(request);
+			return Ok(result);
 		}
 
 		[HttpGet("by-customer/{customerId}")]

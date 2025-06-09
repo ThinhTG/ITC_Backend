@@ -60,7 +60,7 @@ namespace ITC.BusinessObject.Entities
 		public int Status { get; set; } = (int)JobStatus.Open;
 
 		public DateTimeOffset CreatedAt { get; set; } = CoreHelper.SystemTimeNow;
-
+		
 		public ApplicationUser Customer { get; set; }
 		public ICollection<JobApplication>? Applications { get; set; } = new List<JobApplication>();
 

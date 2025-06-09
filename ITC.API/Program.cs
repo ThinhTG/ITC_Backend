@@ -28,6 +28,9 @@ namespace ITC.API
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
+		
+
+
 			// Dependency Injection
 			builder.Services.InstallerServicesInAssembly(builder.Configuration);
 			builder.Services.AddSingleton<JwtSecurityTokenHandler>();

@@ -2,6 +2,7 @@
 using ITC.BusinessObject.Request;
 using ITC.Core;
 using ITC.Core.Contracts;
+using ITC.Repositories.PaggingItems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace ITC.Repositories.Interface
 
 		Task<Job?> GetJobByIdAsync(Guid jobId);
 
-		Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams p);
+		Task<PaginatedList<JobDTO>> GetFilteredJobsAsync(JobFilterRequest request);
 		Task SaveChangesAsync();
 	}
 }
