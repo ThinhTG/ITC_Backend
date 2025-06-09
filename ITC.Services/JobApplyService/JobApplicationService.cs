@@ -1,6 +1,7 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
+using ITC.Core.Enum;
 using ITC.Core.Hubs;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
@@ -108,14 +109,23 @@ namespace ITC.Services.JobApplyService
 			if (!applications.Any())
 				throw new Exception("No applications found");
 
+			// Cập nhật trạng thái từng application
 			foreach (var app in applications)
 			{
-				app.Status = app.InterpreterId == intreId ? "1" : "2";
+				app.Status = app.InterpreterId == intreId ? "1" : "2"; // vẫn giữ string nếu App.Status là string
 				app.LastUpdatedAt = DateTime.UtcNow;
 			}
 
+			// Lấy Job và cập nhật trạng thái
+			var job = await _jobRepository.GetJobByIdAsync(jobId);
+			if (job == null)
+				throw new Exception("Job not found");
+
+			job.Status = ((int)JobStatus.AwaitingPayment);
+
 			await _ApplyRepository.SaveChangesAsync();
 		}
+
 
 
 		public async Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId)
