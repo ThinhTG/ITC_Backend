@@ -23,4 +23,8 @@
     <ProjectReference Include="..\ITC.Core\ITC.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Notification\" />
+  </ItemGroup>
+
 </Project>

@@ -78,7 +78,23 @@ namespace ITC.API.DI
                 };
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = true;
-            });
+			    options.Events = new JwtBearerEvents
+			    {
+				OnMessageReceived = context =>
+				{
+					var accessToken = context.Request.Query["access_token"];
+					var path = context.HttpContext.Request.Path;
+
+					// ✅ Nếu là request đến SignalR thì lấy token từ query
+					if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notification"))
+					{
+						context.Token = accessToken;
+					}
+
+					return Task.CompletedTask;
+				}
+				};
+			});
 
 			// Register AutoMapper
 			services.AddAutoMapper(typeof(MappingProfile).Assembly);

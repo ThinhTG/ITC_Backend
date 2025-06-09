@@ -1,8 +1,12 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
+using ITC.Core.Hubs;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.JobApply;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,32 +19,83 @@ namespace ITC.Services.JobApplyService
 	{
 		private readonly IJobApplicationRepository _ApplyRepository;
 		private readonly IJobRepository _jobRepository;
+		private readonly IHubContext<NotificationHub> _hubContext;
+		private readonly UserManager<ApplicationUser> _userManager;
 
-		public JobApplicationService(IJobApplicationRepository repository, IJobRepository jobRepository)
+
+		public JobApplicationService(IJobApplicationRepository repository, IJobRepository jobRepository,UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext)
 		{
 			_ApplyRepository = repository;
 			_jobRepository = jobRepository;
+			_hubContext = hubContext;
+			_userManager = userManager;
+
 		}
+
+		//public async Task ApplyAsync(JobApplicationDto dto)
+		//{
+		//	var job = await _jobRepository.GetJobByIdAsync(dto.JobId);
+		//	if (job == null) throw new Exception("Job not found");
+
+		//	if (await _ApplyRepository.AlreadyAppliedAsync(dto.JobId, dto.InterpreterId))
+		//		throw new Exception("Already applied");
+
+		//	var application = new JobApplication
+		//	{
+		//		JobId = dto.JobId,
+		//		InterpreterId = dto.InterpreterId,
+		//		Message = dto.Message,
+		//		Status = "0"
+		//	};
+
+		//	await _ApplyRepository.AddAsync(application);
+		//	await _ApplyRepository.SaveChangesAsync();
+		//}
 
 		public async Task ApplyAsync(JobApplicationDto dto)
 		{
-			var job = await _jobRepository.GetJobByIdAsync(dto.JobId);
-			if (job == null) throw new Exception("Job not found");
+			// 1. Kiểm tra Job hợp lệ
+			var job = await _jobRepository.GetJobByIdAsync(dto.JobId)
+					   ?? throw new ArgumentException("Job not found");
 
+			// 2. Chặn apply trùng
 			if (await _ApplyRepository.AlreadyAppliedAsync(dto.JobId, dto.InterpreterId))
-				throw new Exception("Already applied");
+				throw new InvalidOperationException("Already applied");
 
+			// 3. Tạo bản ghi ứng tuyển
 			var application = new JobApplication
 			{
 				JobId = dto.JobId,
 				InterpreterId = dto.InterpreterId,
 				Message = dto.Message,
-				Status = "0"
+				Status = "0",            // Pending
+				CreatedAt = DateTime.UtcNow // nếu có trường
 			};
 
 			await _ApplyRepository.AddAsync(application);
 			await _ApplyRepository.SaveChangesAsync();
+
+			// 4. --- GỬI THÔNG BÁO REAL-TIME ---
+			// (a) Lấy thông tin interpreter (để hiện tên)
+			var interpreter = await _userManager.FindByIdAsync(dto.InterpreterId.ToString());
+
+			// (b) Payload gửi tới client
+			var payload = new
+			{
+				JobId = job.Id,
+				JobTitle = job.JobTitle,
+				InterpreterId = interpreter.Id,
+				InterpreterName = interpreter.FullName,
+				AppliedAt = DateTime.UtcNow
+			};
+
+			// (c) Gửi tới đúng customer (owner của Job)
+			await _hubContext.Clients                     //  from IHubContext<NotificationHub>
+							 .User(job.CustomerId.ToString())
+							 .SendAsync("JobApplied", payload);
+
 		}
+
 
 		public async Task<List<JobApplication>> GetApplicationsForJobAsync(Guid jobId)
 		{
