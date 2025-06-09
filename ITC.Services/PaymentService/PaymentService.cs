@@ -36,40 +36,9 @@ namespace ITC.Services.PaymentService
 			if (account == null)
 				throw new Exception("Account not found");
 
-			// Nếu đã có orderCode, kiểm tra trạng thái thanh toán
-			if (account.orderCode != null)
-			{
-				long existingOrderCode = long.Parse(account.orderCode.ToString());
-				var paymentStatus = await _payOS.getPaymentLinkInformation(existingOrderCode);
 
-				switch (paymentStatus.status)
-				{
-					case "PAID":
-						account.orderCode = null;
-						await _accountSV.UpdateAsync(account);
-						throw new Exception("Deposit has already been paid");
-
-					case "PROCESSING":
-						throw new Exception("Deposit is currently processing");
-
-					case "CANCELLED":
-					case "PENDING":
-						account.orderCode = null;
-						await _accountSV.UpdateAsync(account);
-						break;
-					case "EXPIRED":
-						// Cho phép tạo link mới nếu hết hạn hoặc hủy
-						account.orderCode = null;
-						await _accountSV.UpdateAsync(account);
-						break;
-
-					default:
-						throw new Exception($"Unhandled payment status: {paymentStatus.status}");
-				}
-			}
-
-			// Tạo dữ liệu thanh toán
-			var item = new ItemData(request.accountId, 1, request.price);
+				// Tạo dữ liệu thanh toán
+				var item = new ItemData(request.accountId, 1, request.price);
 			string description = $"Deposit {request.price}";
 			long expiredAt = DateTimeOffset.Now.AddMinutes(15).ToUnixTimeSeconds();
 

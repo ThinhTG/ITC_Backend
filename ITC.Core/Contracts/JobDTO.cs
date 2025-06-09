@@ -15,6 +15,6 @@ namespace ITC.Core.Contracts
 		public string TargetLanguage { get; set; } = string.Empty;
 		public string? CompanyName { get; set; }
 		public decimal? TotalFee { get; set; }
-		public DateTime CreatedAt { get; set; }
+		public DateTimeOffset CreatedAt { get; set; }
 	}
 }

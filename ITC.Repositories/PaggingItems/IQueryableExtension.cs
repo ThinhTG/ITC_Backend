@@ -23,24 +23,22 @@ namespace ITC.Repositories.PaggingItems
             return await Task.FromResult(new BasePaginatedList<TDestination>(mappedItems.ToList(), mappedItems.Count, 1, mappedItems.Count));
         }
 
-        public static async Task<BasePaginatedList<TDestination>> ToPagedListAsync<TSource, TDestination>(
-            this IQueryable<TSource> source,
-            IMapper mapper,
-            int pageIndex,
-            int pageSize)
-        {
-            int count = await source.CountAsync();
-            IEnumerable<TSource> items = await source
-                                        .Skip((pageIndex - 1) * pageSize)
-                                        .Take(pageSize)
-                                        .ToListAsync();
+		public static async Task<BasePaginatedList<TDestination>> ToPagedListAsync<TSource, TDestination>(
+	  this IQueryable<TSource> source,
+	  IMapper mapper,
+	  int pageIndex,
+	  int pageSize)
+		{
+			int count = await source.CountAsync();
 
-            // Mapping từ TSource sang TDestination
-            IList<TDestination> mappedItems = mapper.Map<IList<TDestination>>(items);
+			var projectedItems = await source
+				.ProjectTo<TDestination>(mapper.ConfigurationProvider)
+				.Skip((pageIndex - 1) * pageSize)
+				.Take(pageSize)
+				.ToListAsync();
 
-            // Trả về danh sách đã paging
-            return new BasePaginatedList<TDestination>(mappedItems.ToList(), count, pageIndex, pageSize);
-        }
+			return new BasePaginatedList<TDestination>(projectedItems, count, pageIndex, pageSize);
+		}
 
-    }
+	}
 }

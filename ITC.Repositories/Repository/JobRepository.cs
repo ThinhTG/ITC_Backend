@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using ITC.BusinessObject.Request;
 
+
 namespace ITC.Repositories.Repository
 {
 	public class JobRepository : IJobRepository
@@ -56,44 +57,46 @@ namespace ITC.Repositories.Repository
 								 .ToListAsync();
 		}
 
-		public async Task<BasePaginatedList<JobDTO>> GetAllJobsAsync(JobFilterParams p)
+		public async Task<PaginatedList<JobDTO>> GetFilteredJobsAsync(JobFilterRequest request)
 		{
-			var query = _context.Jobs.AsNoTracking().AsQueryable();
+			var query = _context.Jobs.AsQueryable();
 
-			/* ---------- Filter ---------- */
-			if (!string.IsNullOrWhiteSpace(p.Search))
-			{
-				var kw = p.Search.ToLower();
+			if (!string.IsNullOrWhiteSpace(request.JobTitle))
+				query = query.Where(j => j.JobTitle.Contains(request.JobTitle));
+
+			if (!string.IsNullOrWhiteSpace(request.Location))
 				query = query.Where(j =>
-					EF.Functions.Like(j.JobTitle.ToLower(), $"%{kw}%") ||
-					EF.Functions.Like((j.CompanyName ?? string.Empty).ToLower(), $"%{kw}%") ||
-					EF.Functions.Like(j.TranslationType.ToLower(), $"%{kw}%"));
-			}
+					(j.WorkCity != null && j.WorkCity.Contains(request.Location)) ||
+					(j.WorkCountry != null && j.WorkCountry.Contains(request.Location)) ||
+					(j.WorkAddressLine != null && j.WorkAddressLine.Contains(request.Location))
+				);
 
-			if (!string.IsNullOrWhiteSpace(p.Location))
-				query = query.Where(j => j.WorkAddressLine == p.Location);
+			if (request.Categories?.Any() == true)
+				query = query.Where(j => request.Categories.Contains(j.TranslationType));
 
-			if (p.Categories?.Any() == true)
-				query = query.Where(j => p.Categories.Contains(j.TranslationType));
+			if (request.SourceLanguages?.Any() == true)
+				query = query.Where(j => request.SourceLanguages.Contains(j.SourceLanguage));
 
-			if (p.SourceLanguages?.Any() == true)
-				query = query.Where(j => p.SourceLanguages.Contains(j.SourceLanguage));
+			if (request.TargetLanguages?.Any() == true)
+				query = query.Where(j => request.TargetLanguages.Contains(j.TargetLanguage));
 
-			if (p.TargetLanguages?.Any() == true)
-				query = query.Where(j => p.TargetLanguages.Contains(j.TargetLanguage));
+			if (request.MinSalary.HasValue)
+				query = query.Where(j => j.HourlyRate >= request.MinSalary.Value);
 
-			if (p.MinSalary.HasValue)
-				query = query.Where(j => j.HourlyRate >= p.MinSalary.Value);
+			if (request.MaxSalary.HasValue)
+				query = query.Where(j => j.HourlyRate <= request.MaxSalary.Value);
 
-			if (p.MaxSalary.HasValue)
-				query = query.Where(j => j.HourlyRate <= p.MaxSalary.Value);
+			query = query.OrderByDescending(j => j.CreatedAt);
 
-			/* ---------- Paging + Mapping ---------- */
-			return await query
-				.OrderByDescending(j => j.CreatedAt)
-				.ToPagedListAsync<Job, JobDTO>(_mapper, p.PageIndex, p.PageSize);
+			var PagingJobs = await PaginatedList<Job>.CreateAsync(query, request.PageIndex, request.PageSize);
+
+			var jobDtos = PagingJobs.Items
+				.Select(job => _mapper.Map<JobDTO>(job))
+				.ToList();
+
+				return new PaginatedList<JobDTO>
+				(jobDtos, PagingJobs.TotalCount, request.PageIndex, request.PageSize);
 		}
-
 
 
 		public async Task SaveChangesAsync()
