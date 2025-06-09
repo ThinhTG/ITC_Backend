@@ -3,6 +3,7 @@ using ITC.API.Middleware;
 using ITC.API.SeedData;
 using ITC.BusinessObject.Identity;
 using ITC.Core.Base;
+using ITC.Core.Hubs;
 using Microsoft.AspNetCore.Identity;
 using Net.payOS;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,7 +29,12 @@ namespace ITC.API
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
-		
+
+			// SignalR Config 
+			builder.Services.AddSignalR();
+
+
+
 
 
 			// Dependency Injection
@@ -86,6 +92,9 @@ namespace ITC.API
 					Console.WriteLine($"? Error seeding DB: {ex.Message}");
 				}
 			}
+
+			app.MapHub<NotificationHub>("/hubs/notification");
+
 
 			app.Run();
 		}
