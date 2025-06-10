@@ -28,7 +28,11 @@ namespace ITC.BusinessObject.Entities
 		public string TransactionDate { get; set; } = string.Empty;
 		[Required]
 		public string TransactionBalance { get; set; } = string.Empty;
+
+		public string? Description { get; set; } = string.Empty;
 		public int? OrderId { get; set; }
+
+		public DateTimeOffset CreateAt { get; set; } = DateTimeOffset.UtcNow;
 
 		public virtual Wallet? Wallet { get; set; }
 		//public virtual Order? Order { get; set; }

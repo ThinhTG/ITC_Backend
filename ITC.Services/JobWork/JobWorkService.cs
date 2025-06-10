@@ -1,4 +1,5 @@
-﻿using ITC.Core.Enum;
+﻿using ITC.BusinessObject.Entities;
+using ITC.Core.Enum;
 using ITC.Core.Hubs;
 using ITC.Repositories.Interface;
 using ITC.Services.WalletService;
@@ -16,15 +17,18 @@ namespace ITC.Services.JobWork
 		private readonly IJobRepository _jobRepo;
 		private readonly IWalletService _walletSvc;
 		private readonly IHubContext<NotificationHub> _hub;
+		private readonly IWalletTransactionRepository _walletTransactionRepo;
 
 		public JobWorkService(
 			IJobRepository jobRepo,
 			IWalletService walletSvc,
-			IHubContext<NotificationHub> hub)
+			IHubContext<NotificationHub> hub,
+			IWalletTransactionRepository walletTransactionRepository)
 		{
 			_jobRepo = jobRepo;
 			_walletSvc = walletSvc;
 			_hub = hub;
+			_walletTransactionRepo = walletTransactionRepository;
 		}
 
 		/// <summary>
@@ -63,40 +67,80 @@ namespace ITC.Services.JobWork
 				});
 		}
 
-		///// <summary>
-		///// Customer confirm -> tiền vào ví BPDV, job Completed.
-		///// </summary>
-		//public async Task ConfirmCompletionAsync(Guid jobId, Guid customerId)
-		//{
-		//	var job = await _jobRepo.GetJobByIdAsync(jobId)
-		//			  ?? throw new Exception("Job not found");
+		public async Task ConfirmCompletionAsync(Guid jobId, Guid customerId)
+		{
+			//  Lấy Job kèm JobApplies & những thông tin cần
+			var job = await _jobRepo.GetJobByIdAsync(jobId)
+					   ?? throw new Exception("Job not found");
 
-		//	if (job.CustomerId != customerId)
-		//		throw new UnauthorizedAccessException("Bạn không phải chủ job này");
+			if (job.CustomerId != customerId)
+				throw new UnauthorizedAccessException("Bạn không phải chủ job này");
 
-		//	if (job.Status != (int)JobStatus.Submitted)
-		//		throw new InvalidOperationException("Job chưa được BPDV nộp");
+			if (job.Status != (int)JobStatus.Submitted)
+				throw new InvalidOperationException("Job chưa ở trạng thái Submitted");
 
-		//	job.Status = (int)JobStatus.Completed;
-		//	job.IsPaidToInterpreter = true;
+			var wallet = await _walletSvc.GetWalletByAccountId(job.SelectedInterpreterId!.Value);
 
-		//	await _jobRepo.SaveChangesAsync();
+			//  Cập nhật trạng thái Job → Completed (5) + CompletedAt
+			job.Status = (int)JobStatus.Completed;
+			job.CompletedAt = DateTime.UtcNow;
+			job.IsPaidToInterpreter = true;
 
-		//	// Chuyển tiền vào ví BPDV (giả sử TotalFee = HourlyRate * giờ / serviceFee…)
-		//	if (job.TotalFee.HasValue && job.SelectedInterpreterId.HasValue)
-		//	{
-		//		await _walletSvc.UpdateUserWalletAsync(job.SelectedInterpreterId.Value, job.TotalFee.Value);
-		//	}
+			//  Đánh dấu JobApply của BPDV được chọn → Done (3)
+			var chosenApply = job.Applications
+								 .FirstOrDefault(a => a.InterpreterId == job.SelectedInterpreterId);
+			if (chosenApply != null)
+				chosenApply.Status = "Done";
 
-		//	// Thông báo cho BPDV
-		//	await _hub.Clients.User(job.SelectedInterpreterId!.Value.ToString())
-		//		.SendAsync("JobCompleted", new
-		//		{
-		//			JobId = job.Id,
-		//			JobTitle = job.JobTitle,
-		//			Paid = job.TotalFee
-		//		});
-		//}
+			//  Tính chênh lệch Deadline 
+			if (job.Deadline.HasValue)
+				job.CompletionOffsetMinutes =
+					(int)(job.CompletedAt!.Value - job.Deadline.Value).TotalMinutes; 
+
+			//  Ghi nhận giao dịch ví (WalletTransaction) + cộng tiền
+			if (job.TotalFee.HasValue && job.SelectedInterpreterId.HasValue)
+			{
+				var tx = new WalletTransaction
+				{
+					WalletTransactionId = Guid.NewGuid(),
+					Amount = job.HourlyRate.Value,
+					TransactionType = "Job Payment",  // Enum tuỳ bạn định nghĩa
+													  //JobId = job.Id,
+					CreateAt = DateTime.UtcNow,
+					Description = $"Thanh toán job \"{job.JobTitle}\""
+				};
+
+				await _walletTransactionRepo.AddWalletTransactionAsync(tx);   // tạo record
+
+				wallet.Balance += job.HourlyRate.Value;  // cộng tiền vào ví
+				await _walletSvc.UpdateUserWalletAsync(wallet);  // + tiền vào ví
+			}
+
+			await _jobRepo.SaveChangesAsync();   // tất cả thay đổi trong một transaction
+
+			//  Thông báo realtime qua SignalR cho BPDV
+			await _hub.Clients.User(job.SelectedInterpreterId!.Value.ToString())
+				.SendAsync("JobCompleted", new
+				{
+					JobId = job.Id,
+					JobTitle = job.JobTitle,
+					Paid = job.TotalFee,
+					OffsetMinute = job.CompletionOffsetMinutes      // cho biết sớm/trễ
+				});
+
+			//// (tuỳ ý) Thông báo cho Admin / Customer
+			//await _notificationSvc.CreateAsync(new Notification
+			//{
+			//	Id = Guid.NewGuid(),
+			//	UserId = job.SelectedInterpreterId!.Value,
+			//	Title = "Bạn đã nhận thanh toán",
+			//	Content = $"Khách hàng đã xác nhận hoàn thành job \"{job.JobTitle}\".",
+			//	CreatedAt = DateTime.UtcNow,
+			//	IsRead = false,
+			//	Link = $"/jobs/{job.Id}"
+			//});
+		}
+
 	}
 
 }

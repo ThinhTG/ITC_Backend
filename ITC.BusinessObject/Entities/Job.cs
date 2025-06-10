@@ -39,6 +39,8 @@ namespace ITC.BusinessObject.Entities
 		public string? ResultFileUrl { get; set; } // File kết quả do BPDV upload
 		public DateTime? CompletedAt { get; set; } // Ngày BPDV hoàn thành
 
+		public int? CompletionOffsetMinutes { get; set; }  // độ trễ công việc khi hoàn thành ( so sánh thời gian hoàn thành với Deadline)   // <0: sớm, >0: trễ
+
 		// Thanh toán
 		public decimal? HourlyRate { get; set; }
 		public decimal? PlatformServiceFee { get; set; }
