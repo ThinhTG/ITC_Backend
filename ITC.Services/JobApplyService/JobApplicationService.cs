@@ -112,7 +112,7 @@ namespace ITC.Services.JobApplyService
 			// Cập nhật trạng thái từng application
 			foreach (var app in applications)
 			{
-				app.Status = app.InterpreterId == intreId ? "1" : "2"; // vẫn giữ string nếu App.Status là string
+				app.Status = app.InterpreterId == intreId ? "1" : "2"; 
 				app.LastUpdatedAt = DateTime.UtcNow;
 			}
 
@@ -135,6 +135,7 @@ namespace ITC.Services.JobApplyService
 			return applications.Select(app => new JobApplicationCardDto
 			{
 				ApplicationId = app.Id,
+				JobId = app.JobId,
 				JobTitle = app.Job?.JobTitle ?? "Unknown",
 				Price = app.Job?.HourlyRate != null ? $"${app.Job.HourlyRate / 1000}k" : "$0",
 				Status = ConvertStatus(app.Status),

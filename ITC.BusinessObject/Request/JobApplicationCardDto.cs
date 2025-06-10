@@ -9,6 +9,7 @@ namespace ITC.BusinessObject.Request
 	public class JobApplicationCardDto
 	{
 		public Guid ApplicationId { get; set; }
+		public Guid JobId { get; set; }
 		public string JobTitle { get; set; } = string.Empty;
 		public string Price { get; set; } = string.Empty;
 		public string Status { get; set; } = string.Empty; // "Pending", "Accepted", "Rejected"
