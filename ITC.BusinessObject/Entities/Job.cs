@@ -28,16 +28,16 @@ namespace ITC.BusinessObject.Entities
 		public Guid? SelectedInterpreterId { get; set; }   // BPDV đã được chọn
 
 		//  THÔNG TIN DÀNH CHO PHIÊN DỊCH
-		public DateTime? WorkingTime { get; set; } // Thời gian làm việc cụ thể
+		public DateTimeOffset? WorkingTime { get; set; } // Thời gian làm việc cụ thể
 		public string? WorkAddressLine { get; set; }
 		public string? WorkCity { get; set; }
 		public string? WorkPostalCode { get; set; }
 		public string? WorkCountry { get; set; }
 
 		//  THÔNG TIN DÀNH CHO BIÊN DỊCH
-		public DateTime? Deadline { get; set; } // Thời hạn hoàn thành
+		public DateTimeOffset? Deadline { get; set; } // Thời hạn hoàn thành
 		public string? ResultFileUrl { get; set; } // File kết quả do BPDV upload
-		public DateTime? CompletedAt { get; set; } // Ngày BPDV hoàn thành
+		public DateTimeOffset? CompletedAt { get; set; } // Ngày BPDV hoàn thành
 
 		public int? CompletionOffsetMinutes { get; set; }  // độ trễ công việc khi hoàn thành ( so sánh thời gian hoàn thành với Deadline)   // <0: sớm, >0: trễ
 
