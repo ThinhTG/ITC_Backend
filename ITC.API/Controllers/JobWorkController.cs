@@ -34,5 +34,19 @@ namespace ITC.API.Controllers
 			return Ok(new { message = "Đã nộp kết quả, chờ khách xác nhận." });
 		}
 
+		/// <summary>
+		/// khách hàng xác nhận công việc đã hoàn thành và chuyển lương vào ví BPDV
+		/// </summary>
+		/// <param name="jobId">nhập Job Id</param>
+		/// <param name="interpreterId">Nhập BPDV Id</param>
+		/// <returns></returns>
+		[HttpPost("{jobId}/confirm-completion/{interpreterId}")]
+		[Authorize(Roles = "Customer")]
+		public async Task<IActionResult> ConfirmCompletion(Guid jobId, Guid interpreterId)
+		{
+			await _svc.ConfirmCompletionAsync(jobId, interpreterId);
+			return Ok(new { message = "Đã đánh dấu hoàn thành công việc." });
+		}
+
 	}
 }

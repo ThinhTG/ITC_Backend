@@ -20,7 +20,7 @@ namespace ITC.BusinessObject.Entities
 		public string Message { get; set; } = string.Empty;
 		public DateTimeOffset CreatedAt { get; set; } = CoreHelper.SystemTimeNow;
 		public DateTimeOffset LastUpdatedAt { get; set; } = CoreHelper.SystemTimeNow;
-		public string Status { get; set; } // 0: pending, 1: accepted, 2: rejected
+		public string Status { get; set; } // 0: pending, 1: accepted, 2: rejected 3: Done
 	}
 
 }
