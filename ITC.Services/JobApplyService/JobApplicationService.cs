@@ -138,6 +138,7 @@ namespace ITC.Services.JobApplyService
 				JobTitle = app.Job?.JobTitle ?? "Unknown",
 				Price = app.Job?.HourlyRate != null ? $"${app.Job.HourlyRate / 1000}k" : "$0",
 				Status = ConvertStatus(app.Status),
+				DeadLine = app.Job?.Deadline,
 				CreatedDate = app.CreatedAt
 			}).ToList();
 		}
