@@ -61,7 +61,8 @@ namespace ITC.Services.JobService
 					WorkPostalCode = dto.WorkPostalCode,
 					WorkCountry = dto.WorkCountry,
 					CustomerId = dto.CustomerId,
-					CreatedAt = DateTime.UtcNow
+					CreatedAt = DateTimeOffset.UtcNow,
+					Deadline = dto.Deadline
 				};
 
 				await _jobRepo.AddAsync(job);
