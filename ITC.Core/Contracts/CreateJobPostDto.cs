@@ -17,7 +17,7 @@ namespace ITC.Core.Contracts
 
 		public decimal? HourlyRate { get; set; }
 		public decimal? PlatformServiceFee { get; set; }
-		public decimal? TotalFee { get; set; }
+		public decimal TotalFee { get; set; }
 
 		public string? CompanyName { get; set; }
 		public string? CompanyDescription { get; set; }

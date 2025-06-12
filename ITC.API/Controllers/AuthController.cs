@@ -3,14 +3,13 @@ using ITC.BusinessObject.Request;
 using ITC.Services.Auth;
 using ITC.Services.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace ITC.API.Controllers
 {
-    [Route("api/auth")]
+	[Route("api/auth")]
 	[ApiController]
 	public class AuthController : ControllerBase
 	{
@@ -47,6 +46,22 @@ namespace ITC.API.Controllers
 			return Ok(result);
 		}
 
+
+		/// <summary>
+		/// Đăng kí tài khoản với thông tin người dùng ( Role = Admin,Customer,Talent )
+		/// </summary>
+		/// <param name="registerDto"></param>
+		/// <returns></returns>
+		[HttpPost("register")]
+		[AllowAnonymous]
+		public async Task<IActionResult> RegisterMB([FromBody] RegisterDto registerDto)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
+
+			var result = await _authService.RegisterMBAsync(registerDto);
+			return Ok(result);
+		}
 
 		/// <summary>
 		/// Đăng nhập

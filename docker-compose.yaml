@@ -1,0 +1,42 @@
+
+services:
+  dbthinh:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: always
+    ports:
+      - "1444:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_PID=Express
+    networks:
+      - thinh-network
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+ 
+  backend:
+    build:
+      dockerfile: ITC.API/Dockerfile
+    ports:
+      - "8083:8080"
+    depends_on:
+      - dbthinh
+    networks:
+      - thinh-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+volumes:
+  sqlserver_data:
+
+networks:
+  thinh-network:
+    name: thinh-network
+    external: true
+
+
+
+
+
+
+

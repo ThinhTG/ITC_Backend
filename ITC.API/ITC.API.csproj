@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ITC.BusinessObject\ITC.BusinessObject.csproj" />
     <ProjectReference Include="..\ITC.Mapping\ITC.Mapping.csproj" />
     <ProjectReference Include="..\ITC.Services\ITC.Services.csproj" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8" PrivateAssets="All" />
@@ -20,6 +22,8 @@
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<DocumentationFile>bin\Debug\net8.0\ITC.API.xml</DocumentationFile>
+		<UserSecretsId>13208e2e-df23-44f5-a93a-f97b6b86efed</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	</PropertyGroup>
 
 </Project>

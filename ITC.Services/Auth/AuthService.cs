@@ -129,6 +129,74 @@ namespace ITC.Services.Auth
 		}
 
 
+		public async Task<AuthResponseDto> RegisterMBAsync(RegisterDto registerDto)
+		{
+			// Check if user already exists
+			var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+			if (existingUser != null)
+			{
+				return new AuthResponseDto
+				{
+					Success = false,
+					Message = "Email is already in use."
+				};
+			}
+
+			// Create new user
+			var user = new ApplicationUser
+			{
+				UserName = registerDto.Email,
+				Email = registerDto.Email,
+				PhoneNumber = registerDto.PhoneNumber,
+				EmailConfirmed = true,
+				PhoneNumberConfirmed = true,
+				FullName = registerDto.UserName,
+				Address = registerDto.Address,
+				Gender = registerDto.Gender ?? "Not Specified"
+			};
+
+			var result = await _userManager.CreateAsync(user, registerDto.Password);
+
+			if (!result.Succeeded)
+			{
+				var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+				_logger.LogWarning("Registration failed for {Email}: {Errors}", registerDto.Email, errors);
+				return new AuthResponseDto
+				{
+					Success = false,
+					Message = $"Registration failed: {errors}"
+				};
+			}
+
+			if (registerDto.Role.Equals("Customer"))
+			{
+				await _userManager.AddToRoleAsync(user, "Customer");
+			}
+			else if (registerDto.Role.Equals("Talent"))
+			{
+				await _userManager.AddToRoleAsync(user, "Talent");
+			}
+			else
+			{
+				await _userManager.AddToRoleAsync(user, "Admin");
+			}
+
+			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+			var refreshToken = _tokenService.GenerateRefreshToken();
+			// Save refresh token
+			user.RefreshToken = refreshToken;
+			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			await _userManager.UpdateAsync(user);
+			await CreateWalletForUserAsync(user.Id);
+			return new AuthResponseDto
+			{
+				Success = true,
+				Message = "Registration successful. Please check your email to confirm your account."
+			};
+		}
+
+
 		public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
 		{
 

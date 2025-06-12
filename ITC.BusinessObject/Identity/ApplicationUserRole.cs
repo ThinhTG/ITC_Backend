@@ -22,5 +22,7 @@ namespace ITC.BusinessObject.Identity
         }
 
 		public virtual ApplicationUser User { get; set; }
+
+		public virtual ApplicationRole Role { get; set; }
 	}
 }
