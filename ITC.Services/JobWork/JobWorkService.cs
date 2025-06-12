@@ -98,7 +98,7 @@ namespace ITC.Services.JobWork
 					(int)(job.CompletedAt!.Value - job.Deadline.Value).TotalMinutes; 
 
 			//  Ghi nhận giao dịch ví (WalletTransaction) + cộng tiền
-			if (job.TotalFee.HasValue && job.SelectedInterpreterId.HasValue)
+			if (job.TotalFee > 0 && job.SelectedInterpreterId.HasValue)
 			{
 				var tx = new WalletTransaction
 				{

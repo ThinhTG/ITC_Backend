@@ -23,5 +23,7 @@ namespace ITC.Services.Auth
 
 		Task<bool> UpdateBankAccountAsync(Guid userId, UpdateBankAccountRequest request);
 
+		Task<AuthResponseDto> RegisterMBAsync(RegisterDto registerDto);
+
 	}
 }

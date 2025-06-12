@@ -44,7 +44,7 @@ namespace ITC.BusinessObject.Entities
 		// Thanh toán
 		public decimal? HourlyRate { get; set; }
 		public decimal? PlatformServiceFee { get; set; }
-		public decimal? TotalFee { get; set; }
+		public decimal TotalFee { get; set; }
 
 		// Thanh toán ví - true khi đã chuyển tiền cho BPDV
 		public bool IsPaidToInterpreter { get; set; } = false;
