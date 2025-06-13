@@ -17,8 +17,8 @@
 			 ApplicationUserTokens>
 		{
 			public ITCDbContext(DbContextOptions<ITCDbContext> options) : base(options) {
-			this.Database.Migrate();    
-			}
+			this.Database.Migrate();
+		}
 
 			// user
 			public virtual DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
@@ -50,16 +50,25 @@
 				}
 
 				modelBuilder.Entity<ApplicationUserRole>()
-		.HasOne(ur => ur.User)
-		.WithMany(u => u.UserRoles)
-		.HasForeignKey(ur => ur.UserId)
-		.OnDelete(DeleteBehavior.Cascade);
+					.HasOne(ur => ur.User)
+					.WithMany(u => u.UserRoles)
+					.HasForeignKey(ur => ur.UserId)
+					.OnDelete(DeleteBehavior.Cascade);
 
-				modelBuilder.Entity<ApplicationUserRole>()
-					.HasOne<ApplicationRole>()
+			modelBuilder.Entity<ApplicationUserRole>(b =>
+			{
+				b.HasKey(ur => new { ur.UserId, ur.RoleId }); // ✅ Define composite key
+
+				b.HasOne(ur => ur.User)
+					.WithMany(u => u.UserRoles)
+					.HasForeignKey(ur => ur.UserId)
+					.OnDelete(DeleteBehavior.Cascade);
+
+				b.HasOne(ur => ur.Role)
 					.WithMany()
 					.HasForeignKey(ur => ur.RoleId)
 					.OnDelete(DeleteBehavior.NoAction);
+			});
 
 			modelBuilder.Entity<Job>()
 	.HasOne(j => j.Customer)

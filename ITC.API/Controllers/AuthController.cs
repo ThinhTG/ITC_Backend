@@ -52,7 +52,7 @@ namespace ITC.API.Controllers
 		/// </summary>
 		/// <param name="registerDto"></param>
 		/// <returns></returns>
-		[HttpPost("register")]
+		[HttpPost("registermb")]
 		[AllowAnonymous]
 		public async Task<IActionResult> RegisterMB([FromBody] RegisterDto registerDto)
 		{

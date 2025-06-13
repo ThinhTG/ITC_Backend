@@ -1,4 +1,4 @@
-
+version: '3.8'
 services:
   dbthinh:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -13,8 +13,11 @@ services:
       - thinh-network
     volumes:
       - sqlserver_data:/var/opt/mssql
- 
+
   backend:
+    container_name: thinh-itc-backend
+    image: thinh584/itc_backend:latest
+    restart: always
     build:
       dockerfile: ITC.API/Dockerfile
     ports:
@@ -25,6 +28,8 @@ services:
       - thinh-network
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=dbthinh;Database=InterTransConnectDB;User Id=sa;Password=YourStrong!Passw0rd;Encrypt=true;TrustServerCertificate=true;
+      
 
 volumes:
   sqlserver_data:
