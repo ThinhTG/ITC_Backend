@@ -1,4 +1,5 @@
-﻿using ITC.Core.Utils;
+﻿using ITC.BusinessObject.Entities;
+using ITC.Core.Utils;
 using Microsoft.AspNetCore.Identity;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -36,10 +37,6 @@ namespace ITC.BusinessObject.Identity
 		public int? orderCode { get; set; }
 
 
-		//public ICollection<JobListing> JobListings { get; set; } = new List<JobListing>();
-		//public ICollection<Application> Applications { get; set; } = new List<Application>();
-		//public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
-		//public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
 		public string? RefreshToken { get; set; }
 		public DateTime? RefreshTokenExpiryTime { get; set; }
@@ -57,5 +54,9 @@ namespace ITC.BusinessObject.Identity
 		public string? BankAccountNumber { get; set; } // So tài khoản ngân hàng
 		public string? BankName { get; set; } // Tên ngân hàng
 		public string? BankAccountHolderName { get; set; } // Tên người nhận trong ngân hàng 
+
+
+		public virtual TranslatorCertificate? TranslatorCertificate { get; set; }
+
 	}
 }
