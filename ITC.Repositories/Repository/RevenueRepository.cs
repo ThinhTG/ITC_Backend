@@ -42,11 +42,11 @@ namespace ITC.Repositories.Repository
 		//		}).ToListAsync();
 		//}
 
-		public async Task<int> GetTotalCustomersAsync()
-		{
-			return await _context.Users
-	        .CountAsync(u => u.UserRoles.Any(r => r.Role.Name == "Customer"));
-		}
+		//public async Task<int> GetTotalCustomersAsync()
+		//{
+		//	return await _context.Users
+	 //       .CountAsync(u => u.UserRoles.Any(r => r.Role.Name == "Customer"));
+		//}
 
 		public async Task<int> GetTotalJobPostsAsync()
 		{

@@ -23,7 +23,7 @@ namespace ITC.Services.Revenue
 			{
 				TotalServiceFee = await _revenueRepository.GetTotalServiceFeeAsync(),
 				//PackageRevenues = await _revenueRepository.GetPackageRevenueAsync(),
-				TotalCustomers = await _revenueRepository.GetTotalCustomersAsync(),
+				//TotalCustomers = await _revenueRepository.GetTotalCustomersAsync(),
 				TotalJobPosts = await _revenueRepository.GetTotalJobPostsAsync(),
 				//	TopBPVs = await _revenueRepository.GetTopBookedBPVsAsync(3)
 			};
