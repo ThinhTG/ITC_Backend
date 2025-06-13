@@ -41,6 +41,8 @@ namespace ITC.API.DI
 			services.AddScoped<IUserSubscriptionRepository, UserSubscriptionRepository>();
 			services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
 			services.AddScoped<IUserSubscriptionService, UserSubscriptionService>();
+			services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
+
 
 
 

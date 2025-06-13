@@ -6,6 +6,7 @@ using ITC.Core;
 using ITC.Core.Contracts;
 using ITC.Repositories.PaggingItems;
 using ITC.Services.DTOs;
+using ITC.Services.DTOs.subplan;
 
 namespace ITC.Mapping.Mapper
 {
@@ -20,6 +21,8 @@ namespace ITC.Mapping.Mapper
 			//	CreateMap<PaginatedList<JobDTO>, PaginatedList<Job>>().ReverseMap();
 			CreateMap<TranslatorCertificate, TranslatorCertificateDto>();
 			CreateMap<TranslatorCertificateCreateUpdateDto, TranslatorCertificate>();
+
+			CreateMap<SubscriptionPlan, SubscriptionPlanDto>().ReverseMap();
 		}
     }
 }

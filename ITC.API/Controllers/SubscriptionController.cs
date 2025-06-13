@@ -22,6 +22,12 @@ namespace ITC.API.Controllers
 			_userManager = userManager;
 		}
 
+
+		/// <summary>
+		/// Đăng ký gói subscription cho người dùng hiện tại.
+		/// </summary>
+		/// <param name="request"></param>
+		/// <returns></returns>
 		[HttpPost("subscribe")]
 		[Authorize]
 		public async Task<IActionResult> Subscribe([FromBody] SubscriptionRequestDto request)
@@ -31,6 +37,11 @@ namespace ITC.API.Controllers
 			return Ok(result);
 		}
 
+
+		/// <summary>
+		/// Lấy gói đăng ký hiện tại của người dùng.
+		/// </summary>
+		/// <returns></returns>
 		[HttpGet("current")]
 		[Authorize]
 		public async Task<IActionResult> GetCurrent()
