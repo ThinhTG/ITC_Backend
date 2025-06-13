@@ -4,6 +4,7 @@ using ITC.API.SeedData;
 using ITC.BusinessObject.Identity;
 using ITC.Core.Base;
 using ITC.Core.Hubs;
+using ITC.Services.User;
 using Microsoft.AspNetCore.Identity;
 using Net.payOS;
 using System.IdentityModel.Tokens.Jwt;
@@ -43,6 +44,7 @@ namespace ITC.API
 			builder.Services.AddMemoryCache();
 			builder.Services.Configure<UploadSettings>(
 				builder.Configuration.GetSection("UploadSettings"));
+			builder.Services.AddScoped<IUserService, UserService>();
 
 			// ? Add CORS
 			builder.Services.AddCors(options =>

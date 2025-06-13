@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.Core.Contracts;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,31 @@ namespace ITC.Repositories.Repository
 		public async Task SaveChangesAsync()
 		{
 			await _context.SaveChangesAsync();
+		}
+
+
+		public async Task<SubscriptionStatusDto> GetUserSubscriptionStatusAsync(Guid userId)
+		{
+			var subscription = await _context.UserSubscriptions
+				.Include(x => x.SubscriptionPlan)
+				.Where(x => x.UserId == userId && x.IsActive && x.ExpiredAt > DateTime.UtcNow)
+				.OrderByDescending(x => x.SubscribedAt)
+				.FirstOrDefaultAsync();
+
+			if (subscription == null)
+			{
+				return new SubscriptionStatusDto
+				{
+					IsActive = false
+				};
+			}
+
+			return new SubscriptionStatusDto
+			{
+				IsActive = true,
+				ExpiredAt = subscription.ExpiredAt,
+				PlanName = subscription.SubscriptionPlan.Name
+			};
 		}
 	}
 

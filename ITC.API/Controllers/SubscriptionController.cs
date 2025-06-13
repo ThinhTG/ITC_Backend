@@ -51,6 +51,22 @@ namespace ITC.API.Controllers
 			if (result == null) return NotFound("Chưa có gói đăng ký");
 			return Ok(result);
 		}
+
+
+
+		/// <summary>
+		/// check status của subscription của người dùng hiện tại.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet("check-status")]
+		[Authorize]
+		public async Task<IActionResult> CheckSubscriptionStatus()
+		{
+			var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+			var result = await _subscriptionService.CheckUserSubscriptionStatusAsync(userId);
+			return Ok(result);
+		}
+
 	}
 
 }

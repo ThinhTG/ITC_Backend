@@ -453,12 +453,21 @@ namespace ITC.Services.Auth
 
 				await CreateWalletForUserAsync(newUser.Id);
 
-				var userResponse = new UserResponse
-				{
-					Email = email,
-					FullName = name,
-					Message = "Google account authenticated and user created. Please provide a role to complete registration."
-				};
+				// Generate token + refresh token for newly created user
+				var token = await _tokenService.GenerateToken(newUser);
+				var refreshToken = _tokenService.GenerateRefreshToken();
+
+				using var sha256 = SHA256.Create();
+				var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
+				newUser.RefreshToken = Convert.ToBase64String(refreshTokenHash);
+				newUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
+				await _userManager.UpdateAsync(newUser);
+
+				var userResponse = _mapper.Map<ApplicationUser, UserResponse>(newUser);
+				userResponse.AccessToken = token;
+				userResponse.RefreshToken = refreshToken;
+				userResponse.Address = newUser.Address;
+				userResponse.Message = "Google account authenticated and user created.";
 
 				return userResponse;
 			}
