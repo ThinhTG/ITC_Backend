@@ -36,6 +36,10 @@
 			public virtual DbSet<JobApplication> JobApplications => Set<JobApplication>();
 		public virtual DbSet<TranslatorCertificate> TranslatorCertificates => Set<TranslatorCertificate>();
 
+		public virtual DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+
+		public virtual DbSet<UserSubscription> UserSubscriptions => Set<UserSubscription>();
+
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 			{
@@ -82,7 +86,22 @@
 		.HasOne(a => a.TranslatorCertificate)
 		.WithOne(t => t.User)
 		.HasForeignKey<TranslatorCertificate>(t => t.ApplicationUserId)
-		.OnDelete(DeleteBehavior.Cascade); 
+		.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<SubscriptionPlan>().HasKey(sp => sp.Id);
+			modelBuilder.Entity<UserSubscription>().HasKey(us => us.Id);
+
+			modelBuilder.Entity<UserSubscription>()
+				.HasOne(us => us.User)
+				.WithMany()
+				.HasForeignKey(us => us.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<UserSubscription>()
+				.HasOne(us => us.SubscriptionPlan)
+				.WithMany(sp => sp.UserSubscriptions)
+				.HasForeignKey(us => us.SubscriptionPlanId)
+				.OnDelete(DeleteBehavior.Cascade);
 
 
 
