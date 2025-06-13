@@ -16,8 +16,10 @@ namespace ITC.Mapping.Mapper
             CreateMap<ApplicationUser, UserResponse>();
 			CreateMap<Job, JobDTO>().ReverseMap();
 			CreateMap<CreateJobRequest, Job>();
-		//	CreateMap<List<Job>, List<JobDTO>>();
-		//	CreateMap<PaginatedList<JobDTO>, PaginatedList<Job>>().ReverseMap();
+			//	CreateMap<List<Job>, List<JobDTO>>();
+			//	CreateMap<PaginatedList<JobDTO>, PaginatedList<Job>>().ReverseMap();
+			CreateMap<TranslatorCertificate, TranslatorCertificateDto>();
+			CreateMap<TranslatorCertificateCreateUpdateDto, TranslatorCertificate>();
 		}
     }
 }

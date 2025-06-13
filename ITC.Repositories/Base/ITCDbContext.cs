@@ -34,9 +34,10 @@
 
 		    public virtual DbSet<Job> Jobs => Set<Job>();
 			public virtual DbSet<JobApplication> JobApplications => Set<JobApplication>();
+		public virtual DbSet<TranslatorCertificate> TranslatorCertificates => Set<TranslatorCertificate>();
 
 
-			protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
 			{
 				base.OnModelCreating(modelBuilder);
 
@@ -57,7 +58,7 @@
 
 			modelBuilder.Entity<ApplicationUserRole>(b =>
 			{
-				b.HasKey(ur => new { ur.UserId, ur.RoleId }); // ✅ Define composite key
+				b.HasKey(ur => new { ur.UserId, ur.RoleId }); 
 
 				b.HasOne(ur => ur.User)
 					.WithMany(u => u.UserRoles)
@@ -76,7 +77,15 @@
 	.HasForeignKey(j => j.CustomerId)
 	.OnDelete(DeleteBehavior.Restrict);
 
-	
+
+			modelBuilder.Entity<ApplicationUser>()
+		.HasOne(a => a.TranslatorCertificate)
+		.WithOne(t => t.User)
+		.HasForeignKey<TranslatorCertificate>(t => t.ApplicationUserId)
+		.OnDelete(DeleteBehavior.Cascade); 
+
+
+
 
 
 

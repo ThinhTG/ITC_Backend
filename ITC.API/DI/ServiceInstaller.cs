@@ -1,6 +1,7 @@
 ﻿using ITC.Repositories.Interface;
 using ITC.Repositories.Repository;
 using ITC.Services.Auth;
+using ITC.Services.Certificate;
 using ITC.Services.Email;
 using ITC.Services.JobApplyService;
 using ITC.Services.JobService;
@@ -34,6 +35,8 @@ namespace ITC.API.DI
 			services.AddScoped<IJobWorkService, JobWorkService>();
 			services.AddScoped<IRevenueRepository, RevenueRepository>();
 			services.AddScoped<IRevenueService, RevenueService>();
+			services.AddScoped<ITranslatorCertificateRepository, TranslatorCertificateRepository>();
+			services.AddScoped<ITranslatorCertificateService, TranslatorCertificateService>();
 
 
 		}
