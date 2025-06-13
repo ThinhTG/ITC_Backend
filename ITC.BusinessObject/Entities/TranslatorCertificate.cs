@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace ITC.BusinessObject.Entities
 {
@@ -15,6 +16,7 @@ namespace ITC.BusinessObject.Entities
 		public Guid ApplicationUserId { get; set; } // Là khóa chính & khóa ngoại
 
 		[ForeignKey(nameof(ApplicationUserId))]
+		[JsonIgnore]
 		public virtual ApplicationUser? User { get; set; }
 
 		public string? Title { get; set; }
