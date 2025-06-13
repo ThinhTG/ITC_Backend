@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.Core.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace ITC.Repositories.Interface
 		Task<UserSubscription?> GetActiveSubscriptionAsync(Guid userId);
 		Task AddAsync(UserSubscription subscription);
 		Task SaveChangesAsync();
+
+		Task<SubscriptionStatusDto> GetUserSubscriptionStatusAsync(Guid userId);
 	}
 
 

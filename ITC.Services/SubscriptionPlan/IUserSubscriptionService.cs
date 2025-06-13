@@ -11,6 +11,9 @@ namespace ITC.Services.SubscriptionPlan
 	{
 		Task<SubscriptionResponseDto> SubscribeAsync(Guid userId, Guid planId);
 		Task<SubscriptionResponseDto?> GetCurrentSubscriptionAsync(Guid userId);
+
+		Task<SubscriptionStatusDto> CheckUserSubscriptionStatusAsync(Guid userId);
+
 	}
 
 }

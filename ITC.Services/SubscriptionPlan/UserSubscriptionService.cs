@@ -1,6 +1,7 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.Core.Contracts;
 using ITC.Repositories.Interface;
+using ITC.Repositories.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,12 @@ namespace ITC.Services.SubscriptionPlan
 				ExpiredAt = sub.ExpiredAt,
 				IsActive = sub.IsActive
 			};
+		}
+
+
+		public async Task<SubscriptionStatusDto> CheckUserSubscriptionStatusAsync(Guid userId)
+		{
+			return await _subscriptionRepo.GetUserSubscriptionStatusAsync(userId);
 		}
 	}
 

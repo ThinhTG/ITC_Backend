@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ITC.Core.Contracts;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.subplan;
 using System;
@@ -31,6 +32,9 @@ namespace ITC.Services.SubscriptionPlan
 			var plan = await _subscriptionPlanRepository.GetByIdAsync(id);
 			return plan == null ? null : _mapper.Map<SubscriptionPlanDto>(plan);
 		}
+
+
+
 	}
 
 }
