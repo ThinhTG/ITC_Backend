@@ -5,6 +5,7 @@ using ITC.Services.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace ITC.API.Controllers
@@ -94,10 +95,13 @@ namespace ITC.API.Controllers
 		public async Task<IActionResult> GetById(string id)
 		{
 			var user = await _userManager.FindByIdAsync(id);
+			var userWithCert = await _userManager.Users
+			 .Include(u => u.TranslatorCertificate)
+			.FirstOrDefaultAsync(u => u.Id == user.Id);
 			if (user == null)
 				return NotFound(new { Message = "User not found" });
 
-			return Ok(user);
+			return Ok(userWithCert);
 		}
 
 		[HttpPost("refresh-token")]
@@ -145,6 +149,8 @@ namespace ITC.API.Controllers
 		public async Task<IActionResult> Delete(string id)
 		{
 			var user = await _userManager.FindByIdAsync(id);
+
+			
 			if (user == null)
 				return NotFound(new { Message = "User not found" });
 
