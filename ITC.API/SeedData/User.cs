@@ -1,5 +1,8 @@
-﻿using ITC.BusinessObject.Identity;
+﻿using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Identity;
+using ITC.Repositories.Base;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ITC.API.SeedData
 {
@@ -87,6 +90,51 @@ namespace ITC.API.SeedData
 					await userManager.AddToRoleAsync(talentUser, "Talent");
 				}
 			}
+
+
+			using (var scope = serviceProvider.CreateScope())
+			{
+				var context = scope.ServiceProvider.GetRequiredService<ITCDbContext>();
+
+				if (!await context.SubscriptionPlans.AnyAsync())
+				{
+					var plans = new List<SubscriptionPlan>
+		{
+			new SubscriptionPlan
+{
+				 Id = Guid.NewGuid(),
+				  Name = "PartnerShip",
+					Price = 99000,
+					Description = "Increase visibility in search results and appear highlighted.",
+				 DurationInDays = 30,
+					CreatedAt = DateTime.UtcNow
+},
+new SubscriptionPlan
+{
+	Id = Guid.NewGuid(),
+	Name = "Advance",
+	Price = 199000,
+	Description = "Higher priority in recommendations and more prominent display than PartnerShip.",
+	DurationInDays = 30,
+	CreatedAt = DateTime.UtcNow
+},
+new SubscriptionPlan
+{
+	Id = Guid.NewGuid(),
+	Name = "Premium",
+	Price = 299000,
+	Description = "Unlock all premium features: top visibility, AI-based suggestions, and advanced filters.",
+	DurationInDays = 30,
+	CreatedAt = DateTime.UtcNow
+}
+
+		};
+
+					await context.SubscriptionPlans.AddRangeAsync(plans);
+					await context.SaveChangesAsync();
+				}
+			}
+
 		}
 	}
 }

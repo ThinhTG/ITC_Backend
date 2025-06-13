@@ -8,6 +8,7 @@ using ITC.Services.JobService;
 using ITC.Services.JobWork;
 using ITC.Services.PaymentService;
 using ITC.Services.Revenue;
+using ITC.Services.SubscriptionPlan;
 using ITC.Services.TokenService;
 using ITC.Services.WalletService;
 
@@ -37,6 +38,10 @@ namespace ITC.API.DI
 			services.AddScoped<IRevenueService, RevenueService>();
 			services.AddScoped<ITranslatorCertificateRepository, TranslatorCertificateRepository>();
 			services.AddScoped<ITranslatorCertificateService, TranslatorCertificateService>();
+			services.AddScoped<IUserSubscriptionRepository, UserSubscriptionRepository>();
+			services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
+			services.AddScoped<IUserSubscriptionService, UserSubscriptionService>();
+
 
 
 		}
