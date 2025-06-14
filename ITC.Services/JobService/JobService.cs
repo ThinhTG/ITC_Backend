@@ -62,7 +62,9 @@ namespace ITC.Services.JobService
 					WorkCountry = dto.WorkCountry,
 					CustomerId = dto.CustomerId,
 					CreatedAt = DateTimeOffset.UtcNow,
-					Deadline = dto.Deadline
+					Deadline = dto.Deadline,
+					RequiredHires = dto.RequiredHires,
+					CurrentHires = 0
 				};
 
 				await _jobRepo.AddAsync(job);

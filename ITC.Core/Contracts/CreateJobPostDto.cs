@@ -37,5 +37,6 @@ namespace ITC.Core.Contracts
 		public DateTimeOffset? WorkingTime { get; set; }      // For Interpretation
 
 		public Guid CustomerId { get; set; }
+		public int RequiredHires { get; set; } = 1; // Default to 1 hire
 	}
 }

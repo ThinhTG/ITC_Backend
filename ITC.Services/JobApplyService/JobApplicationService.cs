@@ -108,25 +108,29 @@ namespace ITC.Services.JobApplyService
 			return await _ApplyRepository.GetByJobIdAsync(jobId);
 		}
 
-		public async Task SelectInterpreterAsync(Guid jobId, Guid intreId)
+		public async Task SelectInterpreterAsync(Guid jobId, Guid InterpreterId)
 		{
-			var applications = await _ApplyRepository.GetByJobIdAsync(jobId);
-			if (!applications.Any())
-				throw new Exception("No applications found");
-
-			// Cập nhật trạng thái từng application
-			foreach (var app in applications)
-			{
-				app.Status = app.InterpreterId == intreId ? "1" : "2"; 
-				app.LastUpdatedAt = DateTime.UtcNow;
-			}
-
-			// Lấy Job và cập nhật trạng thái
 			var job = await _jobRepository.GetJobByIdAsync(jobId);
 			if (job == null)
 				throw new Exception("Job not found");
 
-			job.Status = ((int)JobStatus.AwaitingPayment);
+			var application = await _ApplyRepository.GetByJobIdAsync(jobId)
+				.ContinueWith(t => t.Result.FirstOrDefault(a => a.InterpreterId == InterpreterId));
+
+			if (application == null)
+				throw new Exception("Application not found");
+
+			application.Status = "1"; // Accepted
+			application.LastUpdatedAt = DateTimeOffset.UtcNow;
+
+			// Update job's current hires count
+			job.CurrentHires++;
+
+			// Check if job is fully recruited
+			if (job.CurrentHires >= job.RequiredHires)
+			{
+				job.Status = (int)JobStatus.FullyRecruited;
+			}
 
 			await _ApplyRepository.SaveChangesAsync();
 		}

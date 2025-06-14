@@ -60,6 +60,8 @@ namespace ITC.BusinessObject.Entities
 		public string? ContactAddress { get; set; }
 
 		public int Status { get; set; } = (int)JobStatus.Open;
+		public int RequiredHires { get; set; } = 1; // Default to 1 hire
+		public int CurrentHires { get; set; } = 0; // Track current number of hires
 
 		public DateTimeOffset CreatedAt { get; set; } = CoreHelper.SystemTimeNow;
 		
