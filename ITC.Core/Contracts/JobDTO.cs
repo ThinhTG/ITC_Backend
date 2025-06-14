@@ -16,5 +16,8 @@ namespace ITC.Core.Contracts
 		public string? CompanyName { get; set; }
 		public decimal? TotalFee { get; set; }
 		public DateTimeOffset CreatedAt { get; set; }
+		public int RequiredHires { get; set; }
+		public int CurrentHires { get; set; }
+		public int Status { get; set; }
 	}
 }

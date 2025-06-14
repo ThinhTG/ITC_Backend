@@ -12,9 +12,10 @@ namespace ITC.Core.Enum
 		AwaitingPayment = 1,  // Khách đã chọn interpreter, chờ thanh toán
 		Paid = 2,             // Khách đã thanh toán
 		InProgress = 3,       // Interpreter đang làm việc
-		Submitted = 4,          //  BPDV đã nộp kết quả – chờ khách xác nhận
+		Submitted = 4,        // BPDV đã nộp kết quả – chờ khách xác nhận
 		Completed = 5,        // Đã hoàn thành
-		Canceled = 6        // Bị huỷ
+		Canceled = 6,         // Bị huỷ
+		FullyRecruited = 7    // Đã đủ số lượng người cần tuyển
 	}
 
 }
