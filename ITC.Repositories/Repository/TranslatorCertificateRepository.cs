@@ -19,16 +19,25 @@ namespace ITC.Repositories.Repository
 			_context = context;
 		}
 
-		public async Task<TranslatorCertificate?> GetByUserIdAsync(Guid userId)
+		public async Task<List<TranslatorCertificate>> GetByUserIdAsync(Guid userId)
 		{
 			return await _context.TranslatorCertificates
-			.FirstOrDefaultAsync(t => t.ApplicationUserId == userId);
+				.Where(t => t.ApplicationUserId == userId)
+				.ToListAsync();
 		}
 
-		public async Task AddAsync(TranslatorCertificate certificate)
+		public async Task<TranslatorCertificate?> GetByIdAsync(Guid id)
 		{
+			return await _context.TranslatorCertificates
+				.FirstOrDefaultAsync(t => t.Id == id);
+		}
+
+		public async Task<TranslatorCertificate> AddAsync(TranslatorCertificate certificate)
+		{
+			certificate.Id = Guid.NewGuid();
 			await _context.TranslatorCertificates.AddAsync(certificate);
 			await _context.SaveChangesAsync();
+			return certificate;
 		}
 
 		public async Task UpdateAsync(TranslatorCertificate certificate)
@@ -37,9 +46,9 @@ namespace ITC.Repositories.Repository
 			await _context.SaveChangesAsync();
 		}
 
-		public async Task DeleteAsync(Guid userId)
+		public async Task DeleteAsync(Guid id)
 		{
-			var existing = await GetByUserIdAsync(userId);
+			var existing = await GetByIdAsync(id);
 			if (existing != null)
 			{
 				_context.TranslatorCertificates.Remove(existing);
@@ -47,5 +56,4 @@ namespace ITC.Repositories.Repository
 			}
 		}
 	}
-
 }

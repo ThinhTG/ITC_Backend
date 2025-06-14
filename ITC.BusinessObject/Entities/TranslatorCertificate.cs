@@ -13,7 +13,9 @@ namespace ITC.BusinessObject.Entities
 	public class TranslatorCertificate
 	{
 		[Key]
-		public Guid ApplicationUserId { get; set; } // Là khóa chính & khóa ngoại
+		public Guid Id { get; set; }
+
+		public Guid ApplicationUserId { get; set; }
 
 		[ForeignKey(nameof(ApplicationUserId))]
 		[JsonIgnore]
@@ -34,8 +36,6 @@ namespace ITC.BusinessObject.Entities
 		public string? CertificateFileUrl { get; set; }
 
 		public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-		public DateTimeOffset? UpdatedAt { get; set; }
-
+		public DateTimeOffset? UpdatedAt { get; set; } 
 	}
-
 }

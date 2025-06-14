@@ -56,7 +56,7 @@ namespace ITC.BusinessObject.Identity
 		public string? BankAccountHolderName { get; set; } // Tên người nhận trong ngân hàng 
 
 
-		public virtual TranslatorCertificate? TranslatorCertificate { get; set; }
+		public virtual ICollection<TranslatorCertificate>? TranslatorCertificates { get; set; }
 
 	}
 }

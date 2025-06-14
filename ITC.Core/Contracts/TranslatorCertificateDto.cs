@@ -8,6 +8,7 @@ namespace ITC.Core.Contracts
 {
 	public class TranslatorCertificateDto : TranslatorCertificateCreateUpdateDto
 	{
+		public Guid Id { get; set; }
 		public Guid ApplicationUserId { get; set; }
 	}
 

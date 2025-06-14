@@ -5,11 +5,24 @@ namespace ITC.Core.Hubs
 {
 	public class NotificationHub : Hub
 	{
-		// Gửi theo userId. Ở client cần map token → userId
-		public override Task OnConnectedAsync()
+		public override async Task OnConnectedAsync()
 		{
-			Console.WriteLine($"Client connected: {Context.ConnectionId}");
-			return base.OnConnectedAsync();
+			var userId = Context.User?.FindFirst("sub")?.Value;
+			if (!string.IsNullOrEmpty(userId))
+			{
+				await Groups.AddToGroupAsync(Context.ConnectionId, userId);
+			}
+			await base.OnConnectedAsync();
+		}
+
+		public override async Task OnDisconnectedAsync(Exception? exception)
+		{
+			var userId = Context.User?.FindFirst("sub")?.Value;
+			if (!string.IsNullOrEmpty(userId))
+			{
+				await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId);
+			}
+			await base.OnDisconnectedAsync(exception);
 		}
 	}
 }

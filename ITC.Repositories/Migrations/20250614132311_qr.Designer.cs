@@ -4,6 +4,7 @@ using ITC.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITC.Repositories.Migrations
 {
     [DbContext(typeof(ITCDbContext))]
-    partial class ITCDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250614132311_qr")]
+    partial class qr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -222,10 +225,6 @@ namespace ITC.Repositories.Migrations
 
             modelBuilder.Entity("ITC.BusinessObject.Entities.TranslatorCertificate", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("ApplicationUserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -268,9 +267,7 @@ namespace ITC.Repositories.Migrations
                     b.Property<string>("WorkType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("ApplicationUserId");
 
                     b.ToTable("TranslatorCertificates");
                 });
@@ -711,8 +708,8 @@ namespace ITC.Repositories.Migrations
             modelBuilder.Entity("ITC.BusinessObject.Entities.TranslatorCertificate", b =>
                 {
                     b.HasOne("ITC.BusinessObject.Identity.ApplicationUser", "User")
-                        .WithMany("TranslatorCertificates")
-                        .HasForeignKey("ApplicationUserId")
+                        .WithOne("TranslatorCertificate")
+                        .HasForeignKey("ITC.BusinessObject.Entities.TranslatorCertificate", "ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -830,7 +827,7 @@ namespace ITC.Repositories.Migrations
 
             modelBuilder.Entity("ITC.BusinessObject.Identity.ApplicationUser", b =>
                 {
-                    b.Navigation("TranslatorCertificates");
+                    b.Navigation("TranslatorCertificate");
 
                     b.Navigation("UserRoles");
                 });

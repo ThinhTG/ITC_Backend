@@ -40,6 +40,8 @@
 
 		public virtual DbSet<UserSubscription> UserSubscriptions => Set<UserSubscription>();
 
+		public virtual DbSet<Notification> Notifications => Set<Notification>();
+
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 			{
@@ -81,12 +83,13 @@
 	.HasForeignKey(j => j.CustomerId)
 	.OnDelete(DeleteBehavior.Restrict);
 
+			
+			modelBuilder.Entity<TranslatorCertificate>()
+				.HasOne(tc => tc.User)
+				.WithMany(u => u.TranslatorCertificates)
+				.HasForeignKey(tc => tc.ApplicationUserId)
+				.OnDelete(DeleteBehavior.Cascade);
 
-			modelBuilder.Entity<ApplicationUser>()
-		.HasOne(a => a.TranslatorCertificate)
-		.WithOne(t => t.User)
-		.HasForeignKey<TranslatorCertificate>(t => t.ApplicationUserId)
-		.OnDelete(DeleteBehavior.Cascade);
 
 			modelBuilder.Entity<SubscriptionPlan>().HasKey(sp => sp.Id);
 			modelBuilder.Entity<UserSubscription>().HasKey(us => us.Id);
@@ -103,6 +106,14 @@
 				.HasForeignKey(us => us.SubscriptionPlanId)
 				.OnDelete(DeleteBehavior.Cascade);
 
+			modelBuilder.Entity<Notification>(entity =>
+			{
+				entity.HasKey(x => x.Id);
+				entity.HasOne<ApplicationUser>()
+					  .WithMany()
+					  .HasForeignKey(x => x.ReceiverUserId)
+					  .OnDelete(DeleteBehavior.Cascade);
+			});
 
 
 
