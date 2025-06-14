@@ -42,6 +42,8 @@
 
 		public virtual DbSet<Notification> Notifications => Set<Notification>();
 
+		public virtual DbSet<WithdrawalRequest> WithdrawalRequests => Set<WithdrawalRequest>();
+
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 			{
@@ -114,6 +116,17 @@
 					  .HasForeignKey(x => x.ReceiverUserId)
 					  .OnDelete(DeleteBehavior.Cascade);
 			});
+
+			modelBuilder.Entity<WithdrawalRequest>(entity =>
+			{
+				entity.HasKey(wr => wr.WithdrawalRequestId);
+
+				entity.HasOne(wr => wr.Account)
+					  .WithMany(u => u.WithdrawalRequests)
+					  .HasForeignKey(wr => wr.AccountId)
+					  .OnDelete(DeleteBehavior.Cascade);
+			});
+
 
 
 

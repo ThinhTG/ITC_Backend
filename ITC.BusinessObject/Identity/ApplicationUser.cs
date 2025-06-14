@@ -58,5 +58,7 @@ namespace ITC.BusinessObject.Identity
 
 		public virtual ICollection<TranslatorCertificate>? TranslatorCertificates { get; set; }
 
+        public virtual ICollection<WithdrawalRequest> WithdrawalRequests { get; set; } = new List<WithdrawalRequest>();
+
 	}
 }
