@@ -12,7 +12,7 @@ using ITC.Services.Revenue;
 using ITC.Services.SubscriptionPlan;
 using ITC.Services.TokenService;
 using ITC.Services.WalletService;
-
+using ITC.Services.WithdrawalService;
 
 namespace ITC.API.DI
 {
@@ -45,10 +45,8 @@ namespace ITC.API.DI
 			services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
 			services.AddScoped<INotificationRepository, NotificationRepository>();
 			services.AddScoped<INotificationService, NotificationService>();
-
-
-
-
+			services.AddScoped<IWithdrawalRequestRepository, WithdrawalRequestRepository>();
+			services.AddScoped<IWithdrawalRequestService, WithdrawalRequestService>();
 		}
 	}
 }
