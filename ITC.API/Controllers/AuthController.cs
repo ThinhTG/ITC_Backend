@@ -96,7 +96,7 @@ namespace ITC.API.Controllers
 		{
 			var user = await _userManager.FindByIdAsync(id);
 			var userWithCert = await _userManager.Users
-			 .Include(u => u.TranslatorCertificate)
+			 .Include(u => u.TranslatorCertificates)
 			.FirstOrDefaultAsync(u => u.Id == user.Id);
 			if (user == null)
 				return NotFound(new { Message = "User not found" });

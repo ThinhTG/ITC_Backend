@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ITC.BusinessObject.Entities
+{
+	public class Notification
+	{
+		public Guid Id { get; set; } = Guid.NewGuid();
+		public Guid? ReceiverUserId { get; set; } // Ai nhận thông báo
+		public string Title { get; set; }
+		public string Message { get; set; }
+		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+		public bool IsRead { get; set; } = false;
+	}
+
+}

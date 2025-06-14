@@ -23,33 +23,42 @@ namespace ITC.Services.Certificate
 			_mapper = mapper;
 		}
 
-		public async Task<TranslatorCertificateDto?> GetByUserIdAsync(Guid userId)
+		public async Task<List<TranslatorCertificateDto>> GetByUserIdAsync(Guid userId)
 		{
-			var entity = await _repo.GetByUserIdAsync(userId);
-			return entity == null ? null : _mapper.Map<TranslatorCertificateDto>(entity);
+			var entities = await _repo.GetByUserIdAsync(userId);
+			return _mapper.Map<List<TranslatorCertificateDto>>(entities);
 		}
 
-		public async Task AddOrUpdateAsync(Guid userId, TranslatorCertificateCreateUpdateDto dto)
+		public async Task<TranslatorCertificateDto> GetByIdAsync(Guid id)
 		{
-			var existing = await _repo.GetByUserIdAsync(userId);
+			var entity = await _repo.GetByIdAsync(id);
+			if (entity == null)
+				throw new KeyNotFoundException($"Certificate with ID {id} not found.");
+			return _mapper.Map<TranslatorCertificateDto>(entity);
+		}
+
+		public async Task<TranslatorCertificateDto> AddAsync(Guid userId, TranslatorCertificateCreateUpdateDto dto)
+		{
+			var entity = _mapper.Map<TranslatorCertificate>(dto);
+			entity.ApplicationUserId = userId;
+			var result = await _repo.AddAsync(entity);
+			return _mapper.Map<TranslatorCertificateDto>(result);
+		}
+
+		public async Task UpdateAsync(Guid id, TranslatorCertificateCreateUpdateDto dto)
+		{
+			var existing = await _repo.GetByIdAsync(id);
 			if (existing == null)
-			{
-				var entity = _mapper.Map<TranslatorCertificate>(dto);
-				entity.ApplicationUserId = userId;
-				await _repo.AddAsync(entity);
-			}
-			else
-			{
-				_mapper.Map(dto, existing);
-				existing.UpdatedAt = DateTime.UtcNow;
-				await _repo.UpdateAsync(existing);
-			}
+				throw new KeyNotFoundException($"Certificate with ID {id} not found.");
+
+			_mapper.Map(dto, existing);
+			existing.UpdatedAt = DateTimeOffset.UtcNow;
+			await _repo.UpdateAsync(existing);
 		}
 
-		public async Task DeleteAsync(Guid userId)
+		public async Task DeleteAsync(Guid id)
 		{
-			await _repo.DeleteAsync(userId);
+			await _repo.DeleteAsync(id);
 		}
 	}
-
 }

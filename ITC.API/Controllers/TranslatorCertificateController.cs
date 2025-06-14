@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ITC.API.Controllers
 {
-   
 	[ApiController]
 	[Route("api/[controller]")]
 	public class TranslatorCertificateController : ControllerBase
@@ -17,11 +16,11 @@ namespace ITC.API.Controllers
 			_service = service;
 		}
 
-		[HttpGet("{userId}")]
-		public async Task<IActionResult> Get(Guid userId)
+		[HttpGet("user/{userId}")]
+		public async Task<IActionResult> GetByUserId(Guid userId)
 		{
 			var result = await _service.GetByUserIdAsync(userId);
-			if (result == null)
+			if (result == null || !result.Any())
 			{
 				return NotFound(new
 				{
@@ -32,28 +31,72 @@ namespace ITC.API.Controllers
 			return Ok(result);
 		}
 
-
-		[HttpPost("{userId}")]
-		public async Task<IActionResult> AddOrUpdate(Guid userId, [FromBody] TranslatorCertificateCreateUpdateDto dto)
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetById(Guid id)
 		{
-			await _service.AddOrUpdateAsync(userId, dto);
+			try
+			{
+				var result = await _service.GetByIdAsync(id);
+				return Ok(result);
+			}
+			catch (KeyNotFoundException)
+			{
+				return NotFound(new
+				{
+					message = "Certificate not found."
+				});
+			}
+		}
+
+		[HttpPost("user/{userId}")]
+		public async Task<IActionResult> Add(Guid userId, [FromBody] TranslatorCertificateCreateUpdateDto dto)
+		{
+			var result = await _service.AddAsync(userId, dto);
 			return Ok(new
 			{
-				message = "Certificate information has been successfully added or updated."
+				message = "Certificate information has been successfully added.",
+				data = result
 			});
 		}
 
-
-		[HttpDelete("{userId}")]
-		public async Task<IActionResult> Delete(Guid userId)
+		[HttpPut("{id}")]
+		public async Task<IActionResult> Update(Guid id, [FromBody] TranslatorCertificateCreateUpdateDto dto)
 		{
-			await _service.DeleteAsync(userId);
-			return Ok(new
+			try
 			{
-				message = "Certificate information has been successfully deleted."
-			});
+				await _service.UpdateAsync(id, dto);
+				return Ok(new
+				{
+					message = "Certificate information has been successfully updated."
+				});
+			}
+			catch (KeyNotFoundException)
+			{
+				return NotFound(new
+				{
+					message = "Certificate not found."
+				});
+			}
 		}
 
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> Delete(Guid id)
+		{
+			try
+			{
+				await _service.DeleteAsync(id);
+				return Ok(new
+				{
+					message = "Certificate information has been successfully deleted."
+				});
+			}
+			catch (KeyNotFoundException)
+			{
+				return NotFound(new
+				{
+					message = "Certificate not found."
+				});
+			}
+		}
 	}
-
 }

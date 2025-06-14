@@ -6,6 +6,7 @@ using ITC.Services.Email;
 using ITC.Services.JobApplyService;
 using ITC.Services.JobService;
 using ITC.Services.JobWork;
+using ITC.Services.Notification;
 using ITC.Services.PaymentService;
 using ITC.Services.Revenue;
 using ITC.Services.SubscriptionPlan;
@@ -42,6 +43,8 @@ namespace ITC.API.DI
 			services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
 			services.AddScoped<IUserSubscriptionService, UserSubscriptionService>();
 			services.AddScoped<ISubscriptionPlanService, SubscriptionPlanService>();
+			services.AddScoped<INotificationRepository, NotificationRepository>();
+			services.AddScoped<INotificationService, NotificationService>();
 
 
 

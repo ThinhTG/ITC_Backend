@@ -9,10 +9,10 @@ namespace ITC.Repositories.Interface
 {
 	public interface ITranslatorCertificateRepository
 	{
-		Task<TranslatorCertificate?> GetByUserIdAsync(Guid userId);
-		Task AddAsync(TranslatorCertificate certificate);
+		Task<List<TranslatorCertificate>> GetByUserIdAsync(Guid userId);
+		Task<TranslatorCertificate?> GetByIdAsync(Guid id);
+		Task<TranslatorCertificate> AddAsync(TranslatorCertificate certificate);
 		Task UpdateAsync(TranslatorCertificate certificate);
-		Task DeleteAsync(Guid userId);
+		Task DeleteAsync(Guid id);
 	}
-
 }

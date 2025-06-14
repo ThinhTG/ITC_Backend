@@ -6,6 +6,7 @@ using ITC.Core.Hubs;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.JobApply;
+using ITC.Services.Notification;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -22,14 +23,16 @@ namespace ITC.Services.JobApplyService
 		private readonly IJobRepository _jobRepository;
 		private readonly IHubContext<NotificationHub> _hubContext;
 		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly INotificationService _notificationService;
 
 
-		public JobApplicationService(IJobApplicationRepository repository, IJobRepository jobRepository,UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext)
+		public JobApplicationService(IJobApplicationRepository repository, INotificationService notificationService, IJobRepository jobRepository,UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext)
 		{
 			_ApplyRepository = repository;
 			_jobRepository = jobRepository;
 			_hubContext = hubContext;
 			_userManager = userManager;
+			_notificationService = notificationService;
 
 		}
 
@@ -90,10 +93,12 @@ namespace ITC.Services.JobApplyService
 				AppliedAt = DateTime.UtcNow
 			};
 
-			// (c) Gửi tới đúng customer (owner của Job)
-			await _hubContext.Clients                     //  from IHubContext<NotificationHub>
-							 .User(job.CustomerId.ToString())
-							 .SendAsync("JobApplied", payload);
+			await _notificationService.SendNotificationAsync(
+	            job.CustomerId,
+	           "Có người ứng tuyển",
+	           $"Biên dịch viên {interpreter.FullName} đã ứng tuyển công việc {job.JobTitle}."
+);
+
 
 		}
 

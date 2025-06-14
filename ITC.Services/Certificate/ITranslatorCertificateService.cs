@@ -9,9 +9,10 @@ namespace ITC.Services.Certificate
 {
 	public interface ITranslatorCertificateService
 	{
-		Task<TranslatorCertificateDto?> GetByUserIdAsync(Guid userId);
-		Task AddOrUpdateAsync(Guid userId, TranslatorCertificateCreateUpdateDto dto);
-		Task DeleteAsync(Guid userId);
+		Task<List<TranslatorCertificateDto>> GetByUserIdAsync(Guid userId);
+		Task<TranslatorCertificateDto> GetByIdAsync(Guid id);
+		Task<TranslatorCertificateDto> AddAsync(Guid userId, TranslatorCertificateCreateUpdateDto dto);
+		Task UpdateAsync(Guid id, TranslatorCertificateCreateUpdateDto dto);
+		Task DeleteAsync(Guid id);
 	}
-
 }
