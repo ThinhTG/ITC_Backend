@@ -55,12 +55,12 @@ namespace ITC.API.Controllers
 		/// <param name="jobId">Nhap JobID</param>
 		/// <param name="intrepreterId">Nhap ID của BPDV</param>
 		/// <returns></returns>
-		[HttpPost("{jobId}/select")]
-		public async Task<IActionResult> SelectInterpreter(Guid jobId,  Guid intrepreterId)
+		[HttpPost("/select")]
+		public async Task<IActionResult> SelectInterpreter([FromBody]SelectInterRequest selectInterRequest)
 		{
 			try
 			{
-				await _service.SelectInterpreterAsync(jobId, intrepreterId);
+				await _service.SelectInterpreterAsync(selectInterRequest);
 				return Ok("Interpreter selected successfully");
 			}
 			catch (Exception ex)
