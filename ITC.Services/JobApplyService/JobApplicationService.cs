@@ -108,14 +108,14 @@ namespace ITC.Services.JobApplyService
 			return await _ApplyRepository.GetByJobIdAsync(jobId);
 		}
 
-		public async Task SelectInterpreterAsync(Guid jobId, Guid InterpreterId)
+		public async Task SelectInterpreterAsync(SelectInterRequest selectInterRequest)
 		{
-			var job = await _jobRepository.GetJobByIdAsync(jobId);
+			var job = await _jobRepository.GetJobByIdAsync(selectInterRequest.JobId);
 			if (job == null)
 				throw new Exception("Job not found");
 
-			var application = await _ApplyRepository.GetByJobIdAsync(jobId)
-				.ContinueWith(t => t.Result.FirstOrDefault(a => a.InterpreterId == InterpreterId));
+			var application = await _ApplyRepository.GetByJobIdAsync(selectInterRequest.JobId)
+				.ContinueWith(t => t.Result.FirstOrDefault(a => a.InterpreterId == selectInterRequest.InterpreterId));
 
 			if (application == null)
 				throw new Exception("Application not found");

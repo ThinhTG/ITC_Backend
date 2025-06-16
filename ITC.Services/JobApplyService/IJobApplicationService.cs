@@ -13,7 +13,7 @@ namespace ITC.Services.JobApplyService
 	{
 		Task ApplyAsync(JobApplicationDto dto);
 		Task<List<JobApplication>> GetApplicationsForJobAsync(Guid jobId);
-		Task SelectInterpreterAsync(Guid jobId, Guid InterpreterId);
+		Task SelectInterpreterAsync(SelectInterRequest selectInterRequest);
 
 		Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId);
 
