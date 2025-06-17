@@ -108,6 +108,29 @@ namespace ITC.Services.JobApplyService
 			return await _ApplyRepository.GetByJobIdAsync(jobId);
 		}
 
+		public async Task<List<JobApplicationViewDto>> GetApplicationsForJobWithDetailsAsync(Guid jobId)
+		{
+			var applications = await _ApplyRepository.GetByJobIdAsync(jobId);
+			
+			return applications.Select(app => new JobApplicationViewDto
+			{
+				ApplicationId = app.Id,
+				JobTitle = app.Job?.JobTitle ?? "Unknown",
+				Message = app.Message,
+				Status = app.ApplicationStatus,
+				CreatedAt = app.CreatedAt.DateTime,
+				LastUpdatedAt = app.LastUpdatedAt.DateTime,
+				// Thêm thông tin file upload và chi tiết job để talent có thể tải file về làm
+				UploadFileUrl = app.Job?.UploadFileUrl,
+				Description = app.Job?.Description,
+				TranslationType = app.Job?.TranslationType ?? string.Empty,
+				SourceLanguage = app.Job?.SourceLanguage ?? string.Empty,
+				TargetLanguage = app.Job?.TargetLanguage ?? string.Empty,
+				Deadline = app.Job?.Deadline,
+				HourlyRate = app.Job?.HourlyRate
+			}).ToList();
+		}
+
 		public async Task SelectInterpreterAsync(SelectInterRequest selectInterRequest)
 		{
 			var job = await _jobRepository.GetJobByIdAsync(selectInterRequest.JobId);
@@ -154,7 +177,12 @@ namespace ITC.Services.JobApplyService
 				Price = app.Job?.HourlyRate != null ? $"${app.Job.HourlyRate / 1000}k" : "$0",
 				Status = ConvertStatus(app.ApplicationStatus),
 				DeadLine = app.Job?.Deadline,
-				CreatedDate = app.CreatedAt
+				CreatedDate = app.CreatedAt,
+				UploadFileUrl = app.Job?.UploadFileUrl,
+				Description = app.Job?.Description,
+				TranslationType = app.Job?.TranslationType ?? string.Empty,
+				SourceLanguage = app.Job?.SourceLanguage ?? string.Empty,
+				TargetLanguage = app.Job?.TargetLanguage ?? string.Empty
 			}).ToList();
 		}
 
