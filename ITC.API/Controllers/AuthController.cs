@@ -91,7 +91,7 @@ namespace ITC.API.Controllers
 		/// <param name="id"></param>
 		/// <returns></returns>
 		[HttpGet("user/{id}")]
-		[Authorize]
+		[AllowAnonymous]
 		public async Task<IActionResult> GetById(string id)
 		{
 			var user = await _userManager.FindByIdAsync(id);
