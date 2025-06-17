@@ -1,7 +1,10 @@
 ﻿using ITC.Services.DTOs.JobApply;
 using ITC.Services.JobApplyService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.IO;
 
 namespace ITC.API.Controllers
 {
@@ -37,14 +40,14 @@ namespace ITC.API.Controllers
 		}
 
 		/// <summary>
-		/// Lay Toan Bo Apply cua 1 Job
+		/// Lay Toan Bo Apply cua 1 Job (bao gồm thông tin file upload của customer)
 		/// </summary>
 		/// <param name="jobId"></param>
 		/// <returns></returns>
 		[HttpGet("{jobId}/applications")]
 		public async Task<IActionResult> GetApplications(Guid jobId)
 		{
-			var result = await _service.GetApplicationsForJobAsync(jobId);
+			var result = await _service.GetApplicationsForJobWithDetailsAsync(jobId);
 			return Ok(result);
 		}
 
