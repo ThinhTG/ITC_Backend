@@ -24,9 +24,6 @@ namespace ITC.BusinessObject.Entities
 		// Upload từ phía khách hàng (file cần dịch nếu là biên dịch)
 		public string? UploadFileUrl { get; set; }
 
-		// BPDV đã được chọn (nếu có)
-		public Guid? SelectedInterpreterId { get; set; }   // BPDV đã được chọn
-
 		//  THÔNG TIN DÀNH CHO PHIÊN DỊCH
 		public DateTimeOffset? WorkingTime { get; set; } // Thời gian làm việc cụ thể
 		public string? WorkAddressLine { get; set; }
@@ -41,13 +38,10 @@ namespace ITC.BusinessObject.Entities
 
 		public int? CompletionOffsetMinutes { get; set; }  // độ trễ công việc khi hoàn thành ( so sánh thời gian hoàn thành với Deadline)   // <0: sớm, >0: trễ
 
-		// Thanh toán
+		// Thanh toán tổng thể
 		public decimal? HourlyRate { get; set; }
 		public decimal? PlatformServiceFee { get; set; }
 		public decimal TotalFee { get; set; }
-
-		// Thanh toán ví - true khi đã chuyển tiền cho BPDV
-		public bool IsPaidToInterpreter { get; set; } = false;
 
 		// Công ty/Tổ chức đăng tuyển
 		public string? CompanyName { get; set; }
@@ -59,6 +53,7 @@ namespace ITC.BusinessObject.Entities
 		public string? ContactPhone { get; set; }
 		public string? ContactAddress { get; set; }
 
+		// Trạng thái tổng thể của job
 		public int Status { get; set; } = (int)JobStatus.Open;
 		public int RequiredHires { get; set; } = 1; // Default to 1 hire
 		public int CurrentHires { get; set; } = 0; // Track current number of hires
@@ -68,6 +63,12 @@ namespace ITC.BusinessObject.Entities
 		public ApplicationUser Customer { get; set; }
 		public ICollection<JobApplication>? Applications { get; set; } = new List<JobApplication>();
 
-		public ApplicationUser? SelectedInterpreter { get; set; }
+		// Helper properties để tính toán trạng thái tổng thể
+		public int TotalHiredInterpreters => Applications?.Count(a => a.ApplicationStatus == "1") ?? 0;
+		public int TotalInProgressInterpreters => Applications?.Count(a => a.WorkStatus == (int)InterpreterWorkStatus.InProgress) ?? 0;
+		public int TotalCompletedInterpreters => Applications?.Count(a => a.WorkStatus == (int)InterpreterWorkStatus.Completed) ?? 0;
+		public bool IsFullyRecruited => TotalHiredInterpreters >= RequiredHires;
+		public bool HasAnyInProgress => TotalInProgressInterpreters > 0;
+		public bool IsAllCompleted => TotalCompletedInterpreters >= RequiredHires;
 	}
 }

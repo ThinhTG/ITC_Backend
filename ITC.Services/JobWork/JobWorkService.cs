@@ -32,28 +32,86 @@ namespace ITC.Services.JobWork
 		}
 
 		/// <summary>
+		/// BPDV bắt đầu làm việc - chuyển trạng thái từ Paid sang InProgress
+		/// </summary>
+		public async Task StartWorkAsync(Guid jobId, Guid interpreterId)
+		{
+			var job = await _jobRepo.GetJobByIdAsync(jobId)
+					  ?? throw new Exception($"Job not found with ID: {jobId}");
+
+			// Debug: Kiểm tra xem job có applications không
+			if (job.Applications == null || !job.Applications.Any())
+			{
+				throw new Exception($"Job {jobId} has no applications");
+			}
+
+			var application = job.Applications.FirstOrDefault(a => a.InterpreterId == interpreterId);
+			if (application == null)
+			{
+				var availableInterpreterIds = string.Join(", ", job.Applications.Select(a => a.InterpreterId));
+				throw new Exception($"Interpreter {interpreterId} not found in job {jobId}. Available interpreters: {availableInterpreterIds}");
+			}
+
+			if (application.WorkStatus != (int)InterpreterWorkStatus.Paid)
+				throw new InvalidOperationException($"Interpreter {interpreterId} chưa được thanh toán hoặc không ở trạng thái Paid. Current status: {application.WorkStatus}");
+
+			// Chuyển trạng thái sang InProgress cho BPDV này
+			application.WorkStatus = (int)InterpreterWorkStatus.InProgress;
+			application.StartedAt = DateTimeOffset.UtcNow;
+			application.LastUpdatedAt = DateTimeOffset.UtcNow;
+
+			// Cập nhật trạng thái Job nếu đây là BPDV đầu tiên bắt đầu làm việc
+			if (job.Status == (int)JobStatus.Recruiting || job.Status == (int)JobStatus.FullyRecruited)
+			{
+				job.Status = (int)JobStatus.InProgress;
+			}
+
+			await _jobRepo.SaveChangesAsync();
+
+			// Thông báo cho Customer
+			await _hub.Clients.User(job.CustomerId.ToString())
+				.SendAsync("JobStarted", new
+				{
+					JobId = job.Id,
+					JobTitle = job.JobTitle,
+					InterpreterId = interpreterId,
+					StartedAt = DateTime.UtcNow
+				});
+		}
+
+		/// <summary>
 		/// BPDV nộp kết quả hoặc đánh dấu hoàn thành.
 		/// </summary>
 		public async Task SubmitWorkAsync(Guid jobId, Guid interpreterId, string? resultFileUrl)
 		{
 			var job = await _jobRepo.GetJobByIdAsync(jobId)
-					  ?? throw new Exception("Job not found");
+					  ?? throw new Exception($"Job not found with ID: {jobId}");
 
-			if (job.SelectedInterpreterId != interpreterId)
-				throw new UnauthorizedAccessException("Bạn không phải BPDV của job này");
+			if (job.Applications == null || !job.Applications.Any())
+			{
+				throw new Exception($"Job {jobId} has no applications");
+			}
 
-			if (job.Status != (int)JobStatus.InProgress)
-				throw new InvalidOperationException("Job chưa ở trạng thái InProgress");
+			var application = job.Applications.FirstOrDefault(a => a.InterpreterId == interpreterId);
+			if (application == null)
+			{
+				var availableInterpreterIds = string.Join(", ", job.Applications.Select(a => a.InterpreterId));
+				throw new Exception($"Interpreter {interpreterId} not found in job {jobId}. Available interpreters: {availableInterpreterIds}");
+			}
+
+			if (application.WorkStatus != (int)InterpreterWorkStatus.InProgress)
+				throw new InvalidOperationException($"Interpreter {interpreterId} chưa ở trạng thái InProgress. Current status: {application.WorkStatus}");
 
 			if (job.TranslationType == "Translation")
 			{
 				if (string.IsNullOrWhiteSpace(resultFileUrl))
 					throw new ArgumentException("Kết quả dịch cần file");
-				job.ResultFileUrl = resultFileUrl;
+				application.IndividualResultFileUrl = resultFileUrl;
 			}
 
-			job.CompletedAt = DateTime.UtcNow;
-			job.Status = (int)JobStatus.Submitted;
+			application.CompletedAt = DateTimeOffset.UtcNow;
+			application.WorkStatus = (int)InterpreterWorkStatus.Submitted;
+			application.LastUpdatedAt = DateTimeOffset.UtcNow;
 
 			await _jobRepo.SaveChangesAsync();
 
@@ -63,7 +121,8 @@ namespace ITC.Services.JobWork
 				{
 					JobId = job.Id,
 					JobTitle = job.JobTitle,
-					SubmittedAt = job.CompletedAt
+					InterpreterId = interpreterId,
+					SubmittedAt = application.CompletedAt
 				});
 		}
 
@@ -76,69 +135,54 @@ namespace ITC.Services.JobWork
 			if (job.CustomerId != customerId)
 				throw new UnauthorizedAccessException("Bạn không phải chủ job này");
 
-			if (job.Status != (int)JobStatus.Submitted)
-				throw new InvalidOperationException("Job chưa ở trạng thái Submitted");
+			// Tìm tất cả các application đã submitted
+			var submittedApplications = job.Applications?.Where(a => a.WorkStatus == (int)InterpreterWorkStatus.Submitted).ToList() ?? new List<JobApplication>();
+			
+			if (!submittedApplications.Any())
+				throw new InvalidOperationException("Không có BPDV nào đã nộp kết quả");
 
-			var wallet = await _walletSvc.GetWalletByAccountId(job.SelectedInterpreterId!.Value);
-
-			//  Cập nhật trạng thái Job → Completed (5) + CompletedAt
-			job.Status = (int)JobStatus.Completed;
-			job.CompletedAt = DateTime.UtcNow;
-			job.IsPaidToInterpreter = true;
-
-			//  Đánh dấu JobApply của BPDV được chọn → Done (3)
-			var chosenApply = job.Applications
-								 .FirstOrDefault(a => a.InterpreterId == job.SelectedInterpreterId);
-			if (chosenApply != null)
-				chosenApply.Status = "Done";
-
-			//  Tính chênh lệch Deadline 
-			if (job.Deadline.HasValue)
-				job.CompletionOffsetMinutes =
-					(int)(job.CompletedAt!.Value - job.Deadline.Value).TotalMinutes; 
-
-			//  Ghi nhận giao dịch ví (WalletTransaction) + cộng tiền
-			if (job.TotalFee > 0 && job.SelectedInterpreterId.HasValue)
+			// Xác nhận hoàn thành cho tất cả BPDV đã submitted
+			foreach (var application in submittedApplications)
 			{
-				var tx = new WalletTransaction
+				application.WorkStatus = (int)InterpreterWorkStatus.Completed;
+				application.LastUpdatedAt = DateTimeOffset.UtcNow;
+
+				// Tính chênh lệch Deadline 
+				if (job.Deadline.HasValue && application.CompletedAt.HasValue)
+					application.CompletionOffsetMinutes = (int)(application.CompletedAt.Value - job.Deadline.Value).TotalMinutes;
+
+				// Ghi nhận giao dịch ví (WalletTransaction) + cộng tiền cho BPDV này
+				if (application.IndividualFee > 0)
 				{
-					WalletTransactionId = Guid.NewGuid(),
-					Amount = job.HourlyRate.Value,
-					TransactionType = "Job Payment",  // Enum tuỳ bạn định nghĩa
-													  //JobId = job.Id,
-					CreateAt = DateTime.UtcNow,
-					Description = $"Thanh toán job \"{job.JobTitle}\""
-				};
+					var wallet = await _walletSvc.GetWalletByAccountId(application.InterpreterId);
+					if (wallet != null)
+					{
+						var tx = new WalletTransaction
+						{
+							WalletTransactionId = Guid.NewGuid(),
+							Amount = application.IndividualFee.Value,
+							TransactionType = "Job Payment",
+							CreateAt = DateTime.UtcNow,
+							Description = $"Thanh toán job \"{job.JobTitle}\" cho BPDV {application.InterpreterId}"
+						};
 
-				await _walletTransactionRepo.AddWalletTransactionAsync(tx);   // tạo record
-
-				wallet.Balance += job.HourlyRate.Value;  // cộng tiền vào ví
-				await _walletSvc.UpdateUserWalletAsync(wallet);  // + tiền vào ví
+						wallet.Balance += application.IndividualFee.Value;
+						await _walletTransactionRepo.AddWalletTransactionAsync(tx);
+					}
+				}
 			}
 
-			await _jobRepo.SaveChangesAsync();   // tất cả thay đổi trong một transaction
+			// Cập nhật trạng thái tổng thể của job
+			if (job.IsAllCompleted)
+			{
+				job.Status = (int)JobStatus.Completed;
+			}
+			else if (job.TotalCompletedInterpreters > 0)
+			{
+				job.Status = (int)JobStatus.PartiallyCompleted;
+			}
 
-			//  Thông báo realtime qua SignalR cho BPDV
-			await _hub.Clients.User(job.SelectedInterpreterId!.Value.ToString())
-				.SendAsync("JobCompleted", new
-				{
-					JobId = job.Id,
-					JobTitle = job.JobTitle,
-					Paid = job.TotalFee,
-					OffsetMinute = job.CompletionOffsetMinutes      // cho biết sớm/trễ
-				});
-
-			//// (tuỳ ý) Thông báo cho Admin / Customer
-			//await _notificationSvc.CreateAsync(new Notification
-			//{
-			//	Id = Guid.NewGuid(),
-			//	UserId = job.SelectedInterpreterId!.Value,
-			//	Title = "Bạn đã nhận thanh toán",
-			//	Content = $"Khách hàng đã xác nhận hoàn thành job \"{job.JobTitle}\".",
-			//	CreatedAt = DateTime.UtcNow,
-			//	IsRead = false,
-			//	Link = $"/jobs/{job.Id}"
-			//});
+			await _jobRepo.SaveChangesAsync();
 		}
 
 	}

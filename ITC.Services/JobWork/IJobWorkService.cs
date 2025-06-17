@@ -8,6 +8,7 @@ namespace ITC.Services.JobWork
 {
 	public interface IJobWorkService
 	{
+		Task StartWorkAsync(Guid jobId, Guid interpreterId);
 		Task SubmitWorkAsync(Guid jobId, Guid interpreterId, string? resultFileUrl);
 		Task ConfirmCompletionAsync(Guid jobId, Guid customerId);
 	}
