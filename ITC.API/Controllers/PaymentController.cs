@@ -2,6 +2,7 @@
 using ITC.Core.Base;
 using ITC.Core.Constants;
 using ITC.Core.Enum;
+using ITC.Services.JobApplyService;
 using ITC.Services.JobService;
 using ITC.Services.PaymentService;
 using ITC.Services.Request;
@@ -17,12 +18,13 @@ namespace ITC.API.Controllers
 	
 		private readonly IJobService _jobService;
 
+		private readonly IJobApplicationService _jobApplicationService;
 
-		public PaymentController(IPaymentService paymentService,IJobService jobService)
+		public PaymentController(IPaymentService paymentService,IJobService jobService, IJobApplicationService jobApplicationService)
 		{
 			_paymentService = paymentService;
 			_jobService = jobService;	
-
+			_jobApplicationService = jobApplicationService;
 		}
 
 		/// <summary>
@@ -111,7 +113,37 @@ namespace ITC.API.Controllers
 
 			try
 			{
-				// Trừ tiền trong ví
+				// Get job and verify it exists
+				var job = await _jobService.GetJobDetailsByIdAsync(request.JobId);
+				if (job == null)
+				{
+					return NotFound(new BaseResponse<string>(
+						StatusCodeHelper.NotFound,
+						ResponseCodeConstants.NOT_FOUND,
+						"Job not found"));
+				}
+
+				// Get the specific application for this interpreter
+				var applications = await _jobApplicationService.GetApplicationsForJobAsync(request.JobId);
+				var application = applications.FirstOrDefault(a => a.InterpreterId == request.InterpreterId);
+				
+				if (application == null)
+				{
+					return NotFound(new BaseResponse<string>(
+						StatusCodeHelper.NotFound,
+						ResponseCodeConstants.NOT_FOUND,
+						"Interpreter application not found"));
+				}
+
+				if (application.WorkStatus != (int)InterpreterWorkStatus.AwaitingPayment)
+				{
+					return BadRequest(new BaseResponse<string>(
+						StatusCodeHelper.BadRequest,
+						ResponseCodeConstants.BADREQUEST,
+						$"Interpreter is not in awaiting payment status. Current status: {application.WorkStatus}"));
+				}
+
+				// Process payment
 				var result = await _paymentService.ProcessWalletPaymentAsync(request.CustomerId, request.Amount, request.JobId);
 				if (!result.IsSuccess)
 				{
@@ -121,10 +153,20 @@ namespace ITC.API.Controllers
 						result.ErrorMessage ?? "Payment failed"));
 				}
 
-				// Cập nhật trạng thái Job
-				await _jobService.UpdateJobStatusAsync(request.JobId, (int)JobStatus.Paid);
+				// Update application payment status
+				application.WorkStatus = (int)InterpreterWorkStatus.Paid;
+				application.IsPaid = true;
+				application.IndividualFee = request.Amount;
+				application.PaidAt = DateTimeOffset.UtcNow;
+				application.LastUpdatedAt = DateTimeOffset.UtcNow;
 
-				return Ok(BaseResponse<string>.OkDataResponse("Payment successful and job updated."));
+				// Save changes to database
+				await _jobApplicationService.SaveChangesAsync();
+
+				// Note: Job status is not updated here since payment is per interpreter
+				// Job status will be updated when interpreters start working
+
+				return Ok(BaseResponse<string>.OkDataResponse($"Payment successful. Interpreter {request.InterpreterId} status updated to Paid."));
 			}
 			catch (Exception ex)
 			{
@@ -134,6 +176,49 @@ namespace ITC.API.Controllers
 						StatusCodeHelper.ServerError,
 						ResponseCodeConstants.INTERNAL_SERVER_ERROR,
 						"Internal Server Error"));
+			}
+		}
+
+		/// <summary>
+		/// Debug endpoint để kiểm tra trạng thái thanh toán
+		/// </summary>
+		/// <param name="jobId"></param>
+		/// <param name="interpreterId"></param>
+		/// <returns></returns>
+		[HttpGet("debug/{jobId}/{interpreterId}")]
+		public async Task<IActionResult> DebugPayment(Guid jobId, Guid interpreterId)
+		{
+			try
+			{
+				var job = await _jobService.GetJobDetailsByIdAsync(jobId);
+				if (job == null)
+				{
+					return NotFound(new { message = "Job not found" });
+				}
+
+				var applications = await _jobApplicationService.GetApplicationsForJobAsync(jobId);
+				var application = applications.FirstOrDefault(a => a.InterpreterId == interpreterId);
+				
+				if (application == null)
+				{
+					return NotFound(new { message = "Interpreter application not found" });
+				}
+
+				return Ok(new
+				{
+					JobId = jobId,
+					InterpreterId = interpreterId,
+					ApplicationStatus = application.ApplicationStatus,
+					WorkStatus = application.WorkStatus,
+					IsPaid = application.IsPaid,
+					IndividualFee = application.IndividualFee,
+					PaidAt = application.PaidAt,
+					LastUpdatedAt = application.LastUpdatedAt
+				});
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { message = ex.Message, details = ex.StackTrace });
 			}
 		}
 

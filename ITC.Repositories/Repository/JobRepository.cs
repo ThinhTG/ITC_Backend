@@ -44,7 +44,8 @@ namespace ITC.Repositories.Repository
 		{
 			return await _context.Jobs
 				.Include(j => j.Customer)
-				.Include(j => j.SelectedInterpreter) // Include selected interpreter if needed
+				.Include(j => j.Applications)
+					.ThenInclude(a => a.Interpreter)
 				.FirstOrDefaultAsync(j => j.Id == jobId);
 		}
 

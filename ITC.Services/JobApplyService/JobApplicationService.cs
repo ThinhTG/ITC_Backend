@@ -72,7 +72,7 @@ namespace ITC.Services.JobApplyService
 				JobId = dto.JobId,
 				InterpreterId = dto.InterpreterId,
 				Message = dto.Message,
-				Status = "0",            // Pending
+				ApplicationStatus = "0",            // Pending
 				CreatedAt = DateTime.UtcNow // nếu có trường
 			};
 
@@ -120,14 +120,19 @@ namespace ITC.Services.JobApplyService
 			if (application == null)
 				throw new Exception("Application not found");
 
-			application.Status = "1"; // Accepted
+			// Update application status to accepted
+			application.ApplicationStatus = "1"; // Accepted
+			application.WorkStatus = (int)InterpreterWorkStatus.AwaitingPayment; // Chờ thanh toán cho BPDV này
 			application.LastUpdatedAt = DateTimeOffset.UtcNow;
 
-			// Update job's current hires count
-			job.CurrentHires++;
+			// Update job status based on recruitment progress
+			if (job.Status == (int)JobStatus.Open)
+			{
+				job.Status = (int)JobStatus.Recruiting; // Chuyển sang đang tuyển
+			}
 
 			// Check if job is fully recruited
-			if (job.CurrentHires >= job.RequiredHires)
+			if (job.IsFullyRecruited)
 			{
 				job.Status = (int)JobStatus.FullyRecruited;
 			}
@@ -147,7 +152,7 @@ namespace ITC.Services.JobApplyService
 				JobId = app.JobId,
 				JobTitle = app.Job?.JobTitle ?? "Unknown",
 				Price = app.Job?.HourlyRate != null ? $"${app.Job.HourlyRate / 1000}k" : "$0",
-				Status = ConvertStatus(app.Status),
+				Status = ConvertStatus(app.ApplicationStatus),
 				DeadLine = app.Job?.Deadline,
 				CreatedDate = app.CreatedAt
 			}).ToList();
@@ -162,6 +167,11 @@ namespace ITC.Services.JobApplyService
 				"2" => "Rejected",
 				_ => "Unknown"
 			};
+		}
+
+		public async Task SaveChangesAsync()
+		{
+			await _ApplyRepository.SaveChangesAsync();
 		}
 
 	}

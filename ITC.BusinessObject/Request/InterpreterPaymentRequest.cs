@@ -10,6 +10,7 @@ namespace ITC.BusinessObject.Request
 	{
 		public Guid JobId { get; set; }
 		public Guid CustomerId { get; set; } // ID người thanh toán
+		public Guid InterpreterId { get; set; } // ID người phiên dịch
 		public decimal Amount { get; set; } // Số tiền cần trừ
 	}
 

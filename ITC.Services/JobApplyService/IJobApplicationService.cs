@@ -17,6 +17,6 @@ namespace ITC.Services.JobApplyService
 
 		Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId);
 
-
+		Task SaveChangesAsync();
 	}
 }
