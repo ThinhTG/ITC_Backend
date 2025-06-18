@@ -114,7 +114,7 @@ namespace ITC.API.Controllers
 			try
 			{
 				// Get job and verify it exists
-				var job = await _jobService.GetJobDetailsByIdAsync(request.JobId);
+				var job = await _jobService.GetJobDetailsDtoByIdAsync(request.JobId);
 				if (job == null)
 				{
 					return NotFound(new BaseResponse<string>(
@@ -190,7 +190,7 @@ namespace ITC.API.Controllers
 		{
 			try
 			{
-				var job = await _jobService.GetJobDetailsByIdAsync(jobId);
+				var job = await _jobService.GetJobDetailsDtoByIdAsync(jobId);
 				if (job == null)
 				{
 					return NotFound(new { message = "Job not found" });

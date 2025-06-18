@@ -64,10 +64,9 @@ namespace ITC.API.Controllers
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetJobById(Guid id)
 		{
-			var job = await _jobService.GetJobDetailsByIdAsync(id);
+			var job = await _jobService.GetJobDetailsDtoByIdAsync(id);
 			if (job == null)
 				return NotFound(new { message = "Job not found." });
-
 			return Ok(job);
 		}
 

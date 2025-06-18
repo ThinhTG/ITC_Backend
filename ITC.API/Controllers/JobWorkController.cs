@@ -81,7 +81,7 @@ namespace ITC.API.Controllers
 		{
 			try
 			{
-				var job = await _jobService.GetJobDetailsByIdAsync(jobId);
+				var job = await _jobService.GetJobDetailsDtoByIdAsync(jobId);
 				if (job == null)
 				{
 					return NotFound(new { message = "Job not found" });
@@ -129,7 +129,7 @@ namespace ITC.API.Controllers
 		{
 			try
 			{
-				var job = await _jobService.GetJobDetailsByIdAsync(jobId);
+				var job = await _jobService.GetJobDetailsDtoByIdAsync(jobId);
 				if (job == null)
 				{
 					return NotFound(new { message = "Job not found" });
