@@ -22,7 +22,7 @@ namespace ITC.BusinessObject.Entities
         public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected, Completed
 
         [Required]
-        public DateTime RequestDate { get; set; } = DateTime.UtcNow;
+        public DateTimeOffset RequestDate { get; set; } = DateTimeOffset.UtcNow;
 
         public DateTime? ProcessedDate { get; set; }
 
