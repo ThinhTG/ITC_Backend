@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ITC.BusinessObject.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,5 +23,6 @@ namespace ITC.Services.DTOs.JobApply
 		public string TargetLanguage { get; set; } = string.Empty;
 		public DateTimeOffset? Deadline { get; set; }
 		public decimal? HourlyRate { get; set; }
+		 public ApplicationUser? Interpreter { get; set; }
 	}
 }
