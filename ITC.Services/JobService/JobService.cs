@@ -11,6 +11,7 @@ using ITC.Services.DTOs;
 using ITC.Services.DTOs.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using ITC.Core.Enum;
 
 namespace ITC.Services.JobService
 {
@@ -36,42 +37,111 @@ namespace ITC.Services.JobService
 			return job;
 		}
 
-		public async Task<Guid> CreateJobAsync(CreateJobPostDto dto)
+		public async Task<JobDetailsDto?> GetJobDetailsDtoByIdAsync(Guid jobId)
+		{
+			var job = await _jobRepo.GetJobByIdAsync(jobId);
+			if (job == null) return null;
+
+			var jobDetailsDto = new JobDetailsDto
 			{
-				var job = new Job
+				Id = job.Id,
+				CustomerId = job.CustomerId,
+				JobTitle = job.JobTitle,
+				TranslationType = job.TranslationType,
+				SourceLanguage = job.SourceLanguage,
+				TargetLanguage = job.TargetLanguage,
+				Description = job.Description,
+				UploadFileUrl = job.UploadFileUrl,
+				WorkingTime = job.WorkingTime,
+				WorkAddressLine = job.WorkAddressLine,
+				WorkCity = job.WorkCity,
+				WorkPostalCode = job.WorkPostalCode,
+				WorkCountry = job.WorkCountry,
+				Deadline = job.Deadline,
+				ResultFileUrl = job.ResultFileUrl,
+				CompletedAt = job.CompletedAt,
+				CompletionOffsetMinutes = job.CompletionOffsetMinutes,
+				HourlyRate = job.HourlyRate,
+				PlatformServiceFee = job.PlatformServiceFee,
+				TotalFee = job.TotalFee,
+				CompanyName = job.CompanyName,
+				CompanyDescription = job.CompanyDescription,
+				CompanyLogoUrl = job.CompanyLogoUrl,
+				ContactEmail = job.ContactEmail,
+				ContactPhone = job.ContactPhone,
+				ContactAddress = job.ContactAddress,
+				Status = job.Status,
+				RequiredHires = job.RequiredHires,
+				CurrentHires = job.CurrentHires,
+				CreatedAt = job.CreatedAt,
+				CustomerName = job.Customer?.FullName,
+				CustomerEmail = job.Customer?.Email,
+				Applications = job.Applications?.Select(app => new JobApplicationSummaryDto
 				{
-					Id = Guid.NewGuid(),
-					JobTitle = dto.JobTitle,
-					TranslationType = dto.TranslationType,
-					SourceLanguage = dto.SourceLanguage,
-					TargetLanguage = dto.TargetLanguage,
-					Description = dto.Description,
-					UploadFileUrl = dto.UploadFileUrl,
-					HourlyRate = dto.HourlyRate,
-					PlatformServiceFee = dto.PlatformServiceFee,
-					TotalFee = dto.TotalFee,
-					CompanyName = dto.CompanyName,
-					CompanyDescription = dto.CompanyDescription,
-					CompanyLogoUrl = dto.CompanyLogoUrl,
-					ContactEmail = dto.ContactEmail,
-					ContactPhone = dto.ContactPhone,
-					ContactAddress = dto.ContactAddress,
-					WorkAddressLine = dto.WorkAddressLine,
-					WorkCity = dto.WorkCity,
-					WorkPostalCode = dto.WorkPostalCode,
-					WorkCountry = dto.WorkCountry,
-					CustomerId = dto.CustomerId,
-					CreatedAt = DateTimeOffset.UtcNow,
-					Deadline = dto.Deadline,
-					RequiredHires = dto.RequiredHires,
-					CurrentHires = 0
-				};
+					Id = app.Id,
+					InterpreterId = app.InterpreterId,
+					InterpreterName = app.Interpreter?.FullName ?? string.Empty,
+					InterpreterEmail = app.Interpreter?.Email ?? string.Empty,
+					Message = app.Message,
+					CreatedAt = app.CreatedAt,
+					LastUpdatedAt = app.LastUpdatedAt,
+					ApplicationStatus = app.ApplicationStatus,
+					WorkStatus = app.WorkStatus,
+					IsPaid = app.IsPaid,
+					IndividualFee = app.IndividualFee,
+					PaidAt = app.PaidAt,
+					IndividualResultFileUrl = app.IndividualResultFileUrl,
+					StartedAt = app.StartedAt,
+					CompletedAt = app.CompletedAt,
+					CompletionOffsetMinutes = app.CompletionOffsetMinutes
+				}).ToList() ?? new List<JobApplicationSummaryDto>(),
+				TotalHiredInterpreters = job.TotalHiredInterpreters,
+				TotalInProgressInterpreters = job.TotalInProgressInterpreters,
+				TotalCompletedInterpreters = job.TotalCompletedInterpreters,
+				IsFullyRecruited = job.IsFullyRecruited,
+				HasAnyInProgress = job.HasAnyInProgress,
+				IsAllCompleted = job.IsAllCompleted
+			};
 
-				await _jobRepo.AddAsync(job);
-				await _jobRepo.SaveChangesAsync();
+			return jobDetailsDto;
+		}
 
-				return job.Id;
-			}
+		public async Task<Guid> CreateJobAsync(CreateJobPostDto dto)
+		{
+			var job = new Job
+			{
+				Id = Guid.NewGuid(),
+				JobTitle = dto.JobTitle,
+				TranslationType = dto.TranslationType,
+				SourceLanguage = dto.SourceLanguage,
+				TargetLanguage = dto.TargetLanguage,
+				Description = dto.Description,
+				UploadFileUrl = dto.UploadFileUrl,
+				HourlyRate = dto.HourlyRate,
+				PlatformServiceFee = dto.PlatformServiceFee,
+				TotalFee = dto.TotalFee,
+				CompanyName = dto.CompanyName,
+				CompanyDescription = dto.CompanyDescription,
+				CompanyLogoUrl = dto.CompanyLogoUrl,
+				ContactEmail = dto.ContactEmail,
+				ContactPhone = dto.ContactPhone,
+				ContactAddress = dto.ContactAddress,
+				WorkAddressLine = dto.WorkAddressLine,
+				WorkCity = dto.WorkCity,
+				WorkPostalCode = dto.WorkPostalCode,
+				WorkCountry = dto.WorkCountry,
+				CustomerId = dto.CustomerId,
+				CreatedAt = DateTimeOffset.UtcNow,
+				Deadline = dto.Deadline,
+				RequiredHires = dto.RequiredHires,
+				CurrentHires = 0
+			};
+
+			await _jobRepo.AddAsync(job);
+			await _jobRepo.SaveChangesAsync();
+
+			return job.Id;
+		}
 
 		public async Task<PaginatedList<JobDTO>> GetAllJobsAsync(JobFilterRequest request)
 		{
@@ -96,7 +166,6 @@ namespace ITC.Services.JobService
 			return true;
 		}
 	}
-
-	}
+}
 
 

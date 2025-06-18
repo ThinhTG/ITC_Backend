@@ -20,6 +20,8 @@ namespace ITC.Services.JobService
 		//Task<List<JobResponseDto>> GetAllAvailableJobsAsync();
 
 		Task<Job?> GetJobDetailsByIdAsync(Guid jobId);
+		
+		Task<JobDetailsDto?> GetJobDetailsDtoByIdAsync(Guid jobId);
 
 		Task<List<Job>> GetJobsByCustomerIdAsync(Guid customerId);
 
