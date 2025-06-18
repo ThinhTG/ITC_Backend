@@ -11,8 +11,8 @@ namespace ITC.Services.DTOs.Withdrawal
         public string PhoneNumber { get; set; }
         public decimal Amount { get; set; }
         public string Status { get; set; }
-        public DateTime RequestDate { get; set; }
-        public DateTime? ProcessedDate { get; set; }
+        public DateTimeOffset RequestDate { get; set; }
+        public DateTimeOffset? ProcessedDate { get; set; }
         public string BankAccountNumber { get; set; }
         public string BankName { get; set; }
         public string BankAccountHolderName { get; set; }
