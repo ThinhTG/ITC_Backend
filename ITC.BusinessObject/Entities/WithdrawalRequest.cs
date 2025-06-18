@@ -1,4 +1,5 @@
 using ITC.BusinessObject.Identity;
+using ITC.Core.Enum;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,7 +20,7 @@ namespace ITC.BusinessObject.Entities
         public decimal Amount { get; set; }
 
         [Required]
-        public string Status { get; set; } = "Pending"; // Pending, Approved, Completed
+        public WithdrawalStatus Status { get; set; } = WithdrawalStatus.Pending;
 
         [Required]
         public DateTimeOffset RequestDate { get; set; } = DateTimeOffset.UtcNow;

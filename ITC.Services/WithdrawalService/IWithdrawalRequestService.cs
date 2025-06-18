@@ -13,5 +13,6 @@ namespace ITC.Services.WithdrawalService
         Task<IEnumerable<WithdrawalRequestDto>> GetByAccountIdAsync(Guid accountId);
         Task<PaginatedList<WithdrawalRequestDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<WithdrawalRequestDto> UpdateStatusAsync(Guid id, UpdateWithdrawalRequestDto dto, Guid staffId);
+        Task<WithdrawalRequestDto> ConfirmReceivedAsync(Guid id, Guid accountId);
     }
 } 
