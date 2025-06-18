@@ -22,6 +22,9 @@ namespace ITC.API.Controllers
             _withdrawalRequestService = withdrawalRequestService;
             _logger = logger;
         }
+
+
+
 		[HttpPost]
 		[Authorize]
 		public async Task<IActionResult> CreateWithdrawalRequest([FromBody] CreateWithdrawalRequestDto dto)
@@ -45,6 +48,13 @@ namespace ITC.API.Controllers
 			}
 		}
 
+
+		/// <summary>
+		/// L?y t?t c? Requesst rút ti?n v?i phân trang
+		/// </summary>
+		/// <param name="pageNumber"></param>
+		/// <param name="pageSize"></param>
+		/// <returns></returns>
 		[HttpGet]
         [Authorize(Roles = "Staff")]
         public async Task<IActionResult> GetAllWithdrawalRequests([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
@@ -61,7 +71,12 @@ namespace ITC.API.Controllers
             }
         }
 
-        [HttpGet("my-requests")]
+
+		/// <summary>
+		/// L?y t?t c? Request rút ti?n c?a ng??i dùng hi?n t?i
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet("my-requests")]
         [Authorize]
         public async Task<IActionResult> GetMyWithdrawalRequests()
         {
@@ -78,7 +93,13 @@ namespace ITC.API.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+
+		/// <summary>
+		/// L?y chi ti?t m?t Request rút ti?n theo ID
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		[HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetWithdrawalRequest(Guid id)
         {
@@ -94,7 +115,14 @@ namespace ITC.API.Controllers
             }
         }
 
-        [HttpPut("{id}/status")]
+
+		/// <summary>
+		/// C?p nh?t tr?ng thái c?a Request rút ti?n
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="dto"></param>
+		/// <returns></returns>
+		[HttpPut("{id}/status")]
         [Authorize(Roles = "Staff")]
         public async Task<IActionResult> UpdateWithdrawalRequestStatus(Guid id, [FromBody] UpdateWithdrawalRequestDto dto)
         {
@@ -111,7 +139,13 @@ namespace ITC.API.Controllers
             }
         }
 
-        [HttpPost("{id}/confirm-received")]
+
+		/// <summary>
+		/// BPDV xác nh?n ?ã nh?n ti?n t? yêu c?u rút ti?n
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		[HttpPost("{id}/confirm-received")]
         [Authorize]
         public async Task<IActionResult> ConfirmReceived(Guid id)
         {
