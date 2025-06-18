@@ -72,6 +72,24 @@ namespace ITC.API.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Từ chối BPDV cho 1 Job
+		/// </summary>
+		/// <param name="rejectRequest">Chứa JobId và InterpreterId</param>
+		/// <returns></returns>
+		[HttpPost("/reject")]
+		public async Task<IActionResult> RejectInterpreter([FromBody]SelectInterRequest rejectRequest)
+		{
+			try
+			{
+				await _service.RejectInterpreterAsync(rejectRequest);
+				return Ok("Interpreter rejected successfully");
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
 
 		/// <summary>
 		/// get all Apply cua 1 interpreter 

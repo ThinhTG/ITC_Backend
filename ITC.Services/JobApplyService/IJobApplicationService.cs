@@ -15,6 +15,7 @@ namespace ITC.Services.JobApplyService
 		Task<List<JobApplication>> GetApplicationsForJobAsync(Guid jobId);
 		Task<List<JobApplicationViewDto>> GetApplicationsForJobWithDetailsAsync(Guid jobId);
 		Task SelectInterpreterAsync(SelectInterRequest selectInterRequest);
+		Task RejectInterpreterAsync(SelectInterRequest rejectRequest);
 
 		Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId);
 

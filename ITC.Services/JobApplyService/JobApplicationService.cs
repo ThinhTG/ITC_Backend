@@ -144,10 +144,19 @@ namespace ITC.Services.JobApplyService
 			if (application == null)
 				throw new Exception("Application not found");
 
+			// Check if this is a new selection (status changing from "0" to "1")
+			bool isNewSelection = application.ApplicationStatus == "0";
+
 			// Update application status to accepted
 			application.ApplicationStatus = "1"; // Accepted
 			application.WorkStatus = (int)InterpreterWorkStatus.AwaitingPayment; // Chờ thanh toán cho BPDV này
 			application.LastUpdatedAt = DateTimeOffset.UtcNow;
+
+			// Increment CurrentHires only if this is a new selection
+			if (isNewSelection)
+			{
+				job.CurrentHires++;
+			}
 
 			// Update job status based on recruitment progress
 			if (job.Status == (int)JobStatus.Open)
@@ -164,7 +173,44 @@ namespace ITC.Services.JobApplyService
 			await _ApplyRepository.SaveChangesAsync();
 		}
 
+		public async Task RejectInterpreterAsync(SelectInterRequest rejectRequest)
+		{
+			var job = await _jobRepository.GetJobByIdAsync(rejectRequest.JobId);
+			if (job == null)
+				throw new Exception("Job not found");
 
+			var application = await _ApplyRepository.GetByJobIdAsync(rejectRequest.JobId)
+				.ContinueWith(t => t.Result.FirstOrDefault(a => a.InterpreterId == rejectRequest.InterpreterId));
+
+			if (application == null)
+				throw new Exception("Application not found");
+
+			// Check if this interpreter was previously accepted (status was "1")
+			bool wasAccepted = application.ApplicationStatus == "1";
+
+			// Update application status to rejected
+			application.ApplicationStatus = "2"; // Rejected
+			application.WorkStatus = (int)InterpreterWorkStatus.NotStarted; // Reset work status
+			application.LastUpdatedAt = DateTimeOffset.UtcNow;
+
+			// Decrement CurrentHires only if this interpreter was previously accepted
+			if (wasAccepted)
+			{
+				job.CurrentHires = Math.Max(0, job.CurrentHires - 1); // Ensure it doesn't go below 0
+			}
+
+			// Update job status based on recruitment progress
+			if (job.CurrentHires == 0 && job.Status == (int)JobStatus.Recruiting)
+			{
+				job.Status = (int)JobStatus.Open; // Back to open if no hires
+			}
+			else if (job.CurrentHires > 0 && job.Status == (int)JobStatus.FullyRecruited && !job.IsFullyRecruited)
+			{
+				job.Status = (int)JobStatus.Recruiting; // Back to recruiting if no longer fully recruited
+			}
+
+			await _ApplyRepository.SaveChangesAsync();
+		}
 
 		public async Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId)
 		{

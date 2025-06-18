@@ -13,8 +13,8 @@ namespace ITC.Services.DTOs.JobApply
 		public string JobTitle { get; set; } = string.Empty;
 		public string Message { get; set; } = string.Empty;
 		public string Status { get; set; } = "0"; // 0: pending, 1: accepted, 2: rejected
-		public DateTime CreatedAt { get; set; }
-		public DateTime LastUpdatedAt { get; set; }
+		public DateTimeOffset CreatedAt { get; set; }
+		public DateTimeOffset LastUpdatedAt { get; set; }
 		// Thêm thông tin file upload của customer để talent có thể tải về
 		public string? UploadFileUrl { get; set; }
 		public string? Description { get; set; }

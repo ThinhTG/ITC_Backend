@@ -19,12 +19,12 @@ namespace ITC.BusinessObject.Entities
         public decimal Amount { get; set; }
 
         [Required]
-        public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected, Completed
+        public string Status { get; set; } = "Pending"; // Pending, Approved, Completed
 
         [Required]
         public DateTimeOffset RequestDate { get; set; } = DateTimeOffset.UtcNow;
 
-        public DateTime? ProcessedDate { get; set; }
+        public DateTimeOffset? ProcessedDate { get; set; }
 
         [Required]
         public string BankAccountNumber { get; set; }
