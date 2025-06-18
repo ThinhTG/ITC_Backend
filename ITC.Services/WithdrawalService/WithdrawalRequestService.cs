@@ -1,5 +1,6 @@
 using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
+using ITC.Core.Enum;
 using ITC.Repositories.Interface;
 using ITC.Repositories.PaggingItems;
 using ITC.Services.DTOs.Withdrawal;
@@ -55,7 +56,7 @@ namespace ITC.Services.WithdrawalService
                 BankName = user.BankName,
                 BankAccountHolderName = user.BankAccountHolderName,
                 Note = dto.Note,
-                Status = "Pending",
+                Status = WithdrawalStatus.Pending,
                 RequestDate = DateTime.UtcNow
             };
 
@@ -109,16 +110,17 @@ namespace ITC.Services.WithdrawalService
             if (request == null)
                 throw new Exception("Withdrawal request not found");
 
-            if (request.Status != "Pending")
-                throw new Exception("Can only update pending requests");
+            // Validate status transition
+            if (!IsValidStatusTransition(request.Status, dto.Status))
+                throw new Exception($"Invalid status transition from {request.Status} to {dto.Status}");
 
             request.Status = dto.Status;
             request.Note = dto.Note;
             request.ProcessedBy = staffId;
             request.ProcessedDate = DateTime.UtcNow;
 
-            // If approved, deduct from wallet
-            if (dto.Status == "Approved")
+            // If status is WaitingForConfirmation (staff confirmed transfer), deduct from wallet
+            if (dto.Status == WithdrawalStatus.WaitingForConfirmation)
             {
                 var wallet = await _walletRepository.GetWalletByAccountIdAsync(request.AccountId);
                 if (wallet == null)
@@ -133,6 +135,38 @@ namespace ITC.Services.WithdrawalService
 
             await _withdrawalRequestRepository.UpdateAsync(request);
             return await MapToDto(request);
+        }
+
+        /// <summary>
+        /// BPDV xác nhận đã nhận được tiền
+        /// </summary>
+        public async Task<WithdrawalRequestDto> ConfirmReceivedAsync(Guid id, Guid accountId)
+        {
+            var request = await _withdrawalRequestRepository.GetByIdAsync(id);
+            if (request == null)
+                throw new Exception("Withdrawal request not found");
+
+            if (request.AccountId != accountId)
+                throw new Exception("You can only confirm your own withdrawal requests");
+
+            if (request.Status != WithdrawalStatus.WaitingForConfirmation)
+                throw new Exception("Can only confirm requests that are waiting for confirmation");
+
+            request.Status = WithdrawalStatus.Completed;
+            request.ProcessedDate = DateTime.UtcNow;
+
+            await _withdrawalRequestRepository.UpdateAsync(request);
+            return await MapToDto(request);
+        }
+
+        private bool IsValidStatusTransition(WithdrawalStatus currentStatus, WithdrawalStatus newStatus)
+        {
+            return (currentStatus, newStatus) switch
+            {
+                (WithdrawalStatus.Pending, WithdrawalStatus.WaitingForConfirmation) => true, // Staff confirms transfer
+                (WithdrawalStatus.WaitingForConfirmation, WithdrawalStatus.Completed) => true, // BPDV confirms received
+                _ => false
+            };
         }
 
         private async Task<WithdrawalRequestDto> MapToDto(WithdrawalRequest request)

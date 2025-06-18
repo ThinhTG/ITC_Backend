@@ -1,3 +1,4 @@
+using ITC.Core.Enum;
 using System;
 
 namespace ITC.Services.DTOs.Withdrawal
@@ -10,7 +11,7 @@ namespace ITC.Services.DTOs.Withdrawal
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public decimal Amount { get; set; }
-        public string Status { get; set; }
+        public WithdrawalStatus Status { get; set; }
         public DateTimeOffset RequestDate { get; set; }
         public DateTimeOffset? ProcessedDate { get; set; }
         public string BankAccountNumber { get; set; }
@@ -29,7 +30,7 @@ namespace ITC.Services.DTOs.Withdrawal
 
     public class UpdateWithdrawalRequestDto
     {
-        public string Status { get; set; }
+        public WithdrawalStatus Status { get; set; }
         public string? Note { get; set; }
     }
 } 

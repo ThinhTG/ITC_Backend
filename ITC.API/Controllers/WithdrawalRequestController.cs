@@ -67,7 +67,7 @@ namespace ITC.API.Controllers
         {
             try
             {
-                var accountId = Guid.Parse(User.FindFirst("sub")?.Value);
+                var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var result = await _withdrawalRequestService.GetByAccountIdAsync(accountId);
                 return Ok(result);
             }
@@ -100,13 +100,30 @@ namespace ITC.API.Controllers
         {
             try
             {
-                var staffId = Guid.Parse(User.FindFirst("sub")?.Value);
+                var staffId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 var result = await _withdrawalRequestService.UpdateStatusAsync(id, dto, staffId);
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating withdrawal request status for {Id}", id);
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/confirm-received")]
+        [Authorize]
+        public async Task<IActionResult> ConfirmReceived(Guid id)
+        {
+            try
+            {
+                var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var result = await _withdrawalRequestService.ConfirmReceivedAsync(id, accountId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming withdrawal request {Id}", id);
                 return BadRequest(new { Message = ex.Message });
             }
         }
