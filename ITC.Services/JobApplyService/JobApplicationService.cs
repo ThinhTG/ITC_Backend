@@ -128,7 +128,8 @@ namespace ITC.Services.JobApplyService
 				TargetLanguage = app.Job?.TargetLanguage ?? string.Empty,
 				Deadline = app.Job?.Deadline,
 				HourlyRate = app.Job?.HourlyRate,
-				Interpreter = app.Interpreter // Thông tin người ứng tuyển
+				Interpreter = app.Interpreter, // Thông tin người ứng tuyển,
+				WorkStatus = app.WorkStatus
 			}).ToList();
 		}
 
