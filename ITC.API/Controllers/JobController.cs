@@ -45,15 +45,15 @@ namespace ITC.API.Controllers
 		}
 
 		[HttpGet("by-customer/{customerId}")]
-		public async Task<IActionResult> GetJobsByCustomer(Guid customerId)
+		public async Task<IActionResult> GetJobsByCustomer(Guid customerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
 		{
-			var jobs = await _jobService.GetJobsByCustomerIdAsync(customerId);
-			if (jobs == null || !jobs.Any())
+			var jobs = await _jobService.GetJobsByCustomerIdPaginatedAsync(customerId, pageNumber, pageSize);
+			if (jobs == null || !jobs.Items.Any())
 			{
 				return NotFound("No jobs found for this customer.");
 			}
 
-			return Ok(jobs); 
+			return Ok(jobs);
 		}
 
 		/// <summary>
