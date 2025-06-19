@@ -26,13 +26,12 @@ namespace ITC.BusinessObject.Entities
 		[Required]
 		public string TransactionStatus { get; set; } = string.Empty;
 		[Required]
-		public string TransactionDate { get; set; } = string.Empty;
+		public DateTimeOffset TransactionDate { get; set; }
 		[Required]
-		public string TransactionBalance { get; set; } = string.Empty;
+		public decimal TransactionBalance { get; set; }
 
 		public string? Description { get; set; } = string.Empty;
 		public int? OrderId { get; set; }
-
 		public DateTimeOffset CreateAt { get; set; } = DateTimeOffset.UtcNow;
 
 		[JsonIgnore]

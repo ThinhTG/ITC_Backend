@@ -18,7 +18,7 @@ namespace ITC.Services.WalletService
 			_walletTransactionRepository = walletTransactionRepository;
 		}
 
-		public async Task AddWalletTransactionAsync(Guid walletId, decimal amount, string transactionType, string transactionStatus, string transactionDate, decimal transacionBalance, int? orderId)
+		public async Task AddWalletTransactionAsync(Guid walletId, decimal amount, string transactionType, string transactionStatus, DateTimeOffset transactionDate, decimal transacionBalance, int? orderId)
 		{
 			WalletTransaction walletTransaction = new WalletTransaction
 			{
@@ -27,7 +27,7 @@ namespace ITC.Services.WalletService
 				TransactionType = transactionType,
 				TransactionStatus = transactionStatus,
 				TransactionDate = transactionDate,
-				TransactionBalance = transacionBalance.ToString(),
+				TransactionBalance = transacionBalance,
 				OrderId = orderId
 			};
 			await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
