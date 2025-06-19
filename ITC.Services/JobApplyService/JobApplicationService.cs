@@ -230,7 +230,8 @@ namespace ITC.Services.JobApplyService
 				Description = app.Job?.Description,
 				TranslationType = app.Job?.TranslationType ?? string.Empty,
 				SourceLanguage = app.Job?.SourceLanguage ?? string.Empty,
-				TargetLanguage = app.Job?.TargetLanguage ?? string.Empty
+				TargetLanguage = app.Job?.TargetLanguage ?? string.Empty,
+				WorkStatus = app.WorkStatus
 			}).ToList();
 		}
 
