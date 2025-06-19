@@ -24,5 +24,7 @@ namespace ITC.Services.DTOs.JobApply
 		public DateTimeOffset? Deadline { get; set; }
 		public decimal? HourlyRate { get; set; }
 		 public ApplicationUser? Interpreter { get; set; }
+
+		public int WorkStatus { get; set; }
 	}
 }
