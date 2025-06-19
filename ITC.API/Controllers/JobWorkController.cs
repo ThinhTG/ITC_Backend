@@ -63,9 +63,9 @@ namespace ITC.API.Controllers
 		/// <returns></returns>
 		[HttpPost("{jobId}/confirm-completion/{interpreterId}")]
 		[Authorize(Roles = "Customer")]
-		public async Task<IActionResult> ConfirmCompletion(Guid jobId, Guid interpreterId)
+		public async Task<IActionResult> ConfirmCompletion(Guid jobId, Guid customerId)
 		{
-			await _svc.ConfirmCompletionAsync(jobId, interpreterId);
+			await _svc.ConfirmCompletionAsync(jobId, customerId);
 			return Ok(new { message = "Đã đánh dấu hoàn thành công việc." });
 		}
 
