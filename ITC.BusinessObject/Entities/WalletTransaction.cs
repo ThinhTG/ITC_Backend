@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static ITC.Core.Constants.EndPointAPI;
+using System.Text.Json.Serialization;
 
 namespace ITC.BusinessObject.Entities
 {
@@ -34,6 +35,7 @@ namespace ITC.BusinessObject.Entities
 
 		public DateTimeOffset CreateAt { get; set; } = DateTimeOffset.UtcNow;
 
+		[JsonIgnore]
 		public virtual Wallet? Wallet { get; set; }
 		//public virtual Order? Order { get; set; }
 	}

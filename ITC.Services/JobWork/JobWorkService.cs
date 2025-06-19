@@ -32,7 +32,7 @@ namespace ITC.Services.JobWork
 		}
 
 		/// <summary>
-		/// BPDV bắt đầu làm việc - chuyển trạng thái từ Paid sang InProgress
+		/// BPDV bắt đầu làm việc - chuyển trạng thái từ Paid sang InProgress ( WorkStatus)
 		/// </summary>
 		public async Task StartWorkAsync(Guid jobId, Guid interpreterId)
 		{
@@ -159,6 +159,7 @@ namespace ITC.Services.JobWork
 					{
 						var tx = new WalletTransaction
 						{
+							WalletId = wallet.WalletId,
 							WalletTransactionId = Guid.NewGuid(),
 							Amount = application.IndividualFee.Value,
 							TransactionType = "Job Payment",
