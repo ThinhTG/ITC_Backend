@@ -165,6 +165,20 @@ namespace ITC.Services.JobService
 			await _jobRepo.SaveChangesAsync();
 			return true;
 		}
+
+		public async Task<PaginatedList<JobDTO>> GetJobsByCustomerIdPaginatedAsync(Guid customerId, int pageNumber, int pageSize)
+		{
+			var query = _jobRepo
+				.GetAllAsync()
+				.Result
+				.Where(j => j.CustomerId == customerId)
+				.OrderByDescending(j => j.CreatedAt)
+				.AsQueryable();
+
+			var pagedJobs = await PaginatedList<Job>.CreateAsync(query, pageNumber, pageSize);
+			var jobDtos = pagedJobs.Items.Select(job => _mapper.Map<JobDTO>(job)).ToList();
+			return new PaginatedList<JobDTO>(jobDtos, pagedJobs.TotalCount, pageNumber, pageSize);
+		}
 	}
 }
 

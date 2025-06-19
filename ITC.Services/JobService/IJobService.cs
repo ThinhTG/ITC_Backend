@@ -29,6 +29,7 @@ namespace ITC.Services.JobService
 
 		Task<bool> UpdateJobStatusAsync(Guid jobId, int newStatus);
 
+		Task<PaginatedList<JobDTO>> GetJobsByCustomerIdPaginatedAsync(Guid customerId, int pageNumber, int pageSize);
 
 	}
 }
