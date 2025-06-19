@@ -21,5 +21,7 @@ namespace ITC.BusinessObject.Request
 		public string TranslationType { get; set; } = string.Empty;
 		public string SourceLanguage { get; set; } = string.Empty;
 		public string TargetLanguage { get; set; } = string.Empty;
+
+		public int WorkStatus { get; set; }  
 	}
 }
