@@ -61,7 +61,7 @@ namespace ITC.API.Controllers
 		/// <param name="jobId">nhập Job Id</param>
 		/// <param name="interpreterId">Nhập BPDV Id</param>
 		/// <returns></returns>
-		[HttpPost("{jobId}/confirm-completion/{interpreterId}")]
+		[HttpPost("{jobId}/confirm-completion")]
 		[Authorize(Roles = "Customer")]
 		public async Task<IActionResult> ConfirmCompletion(Guid jobId, Guid customerId)
 		{
