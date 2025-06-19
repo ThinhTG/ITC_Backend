@@ -108,8 +108,8 @@ namespace ITC.Services.PaymentService
 				Amount = -amount,
 				TransactionType = "PAY_INTERPRETER", // Hoặc dùng enum/hằng
 				TransactionStatus = "SUCCESS",       // Hoặc dùng enum/hằng
-				TransactionDate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-				TransactionBalance = wallet.Balance.ToString("F2"), // Đảm bảo 2 chữ số thập phân
+				TransactionDate = DateTimeOffset.UtcNow,
+				TransactionBalance = wallet.Balance, // Đảm bảo 2 chữ số thập phân
 			};
 
 			await _walletTransactionRepository.AddWalletTransactionAsync(transaction);

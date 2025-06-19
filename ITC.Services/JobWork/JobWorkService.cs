@@ -162,6 +162,9 @@ namespace ITC.Services.JobWork
 							WalletId = wallet.WalletId,
 							WalletTransactionId = Guid.NewGuid(),
 							Amount = application.IndividualFee.Value,
+							TransactionBalance = wallet.Balance + application.IndividualFee.Value,
+							TransactionStatus = "Completed",
+							TransactionDate = DateTimeOffset.UtcNow, 
 							TransactionType = "Job Payment",
 							CreateAt = DateTime.UtcNow,
 							Description = $"Thanh toán job \"{job.JobTitle}\" cho BPDV {application.InterpreterId}"

@@ -84,7 +84,7 @@ namespace ITC.Services.WalletService
 			try
 			{
 
-				await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "deposit", "success", transactionDatetime.ToString(dateFormat, CultureInfo.InvariantCulture), wallet.Balance, null);
+				await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "deposit", "success", transactionDatetime, wallet.Balance, null);
 			}
 			catch (Exception ex)
 			{
@@ -131,11 +131,11 @@ namespace ITC.Services.WalletService
 				Amount = amount,
 				TransactionType = "Debit",
 				TransactionStatus = "Success",
-				TransactionDate = transactionDatetime.ToString(dateFormat, CultureInfo.InvariantCulture),
-				TransactionBalance = wallet.Balance.ToString(),
+				TransactionDate = transactionDatetime,
+				TransactionBalance = wallet.Balance,
 			};
 
-			await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "purchase", "success", transactionDatetime.ToString(dateFormat, CultureInfo.InvariantCulture), wallet.Balance, orderId);
+			await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "purchase", "success", transactionDatetime, wallet.Balance, orderId);
 			return true;
 		}
 
