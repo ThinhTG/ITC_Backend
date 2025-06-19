@@ -99,6 +99,12 @@ namespace ITC.Repositories.Repository
 				(jobDtos, PagingJobs.TotalCount, request.PageIndex, request.PageSize);
 		}
 
+		public IQueryable<Job> GetJobsByCustomerIdQueryable(Guid customerId)
+		{
+			return _context.Jobs
+				.Where(j => j.CustomerId == customerId)
+				.OrderByDescending(j => j.CreatedAt);
+		}
 
 		public async Task SaveChangesAsync()
 		{
