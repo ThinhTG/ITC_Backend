@@ -11,7 +11,7 @@ namespace ITC.Services.Request
 		public string? accountId { get; set; }
 		public string description = "Deposit ";
 		public int price { get; set; }
-		public string returnUrl = "http://localhost:3000/deposit_success";
-		public string cancelUrl = "http://localhost:3000/deposit_fail";
+		public string returnUrl = "https://inter-trans-connect.web.app/deposit_success";
+		public string cancelUrl = "https://inter-trans-connect.web.app/deposit_fail";
 	}
 }

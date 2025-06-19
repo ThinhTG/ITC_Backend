@@ -22,5 +22,7 @@ namespace ITC.Repositories.Interface
 
 		Task<PaginatedList<JobDTO>> GetFilteredJobsAsync(JobFilterRequest request);
 		Task SaveChangesAsync();
+
+		IQueryable<Job> GetJobsByCustomerIdQueryable(Guid customerId);
 	}
 }
