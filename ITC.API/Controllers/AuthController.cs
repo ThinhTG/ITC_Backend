@@ -76,6 +76,19 @@ namespace ITC.API.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
+			var user = await _userManager.FindByEmailAsync(loginDto.UserName);
+			if (user != null && user.ApprovalStatus != Core.Enum.UserApprovalStatus.Approved)
+			{
+				if (user.ApprovalStatus == Core.Enum.UserApprovalStatus.PendingApproval)
+				{
+					return Unauthorized(new { Message = "Your account is pending approval." });
+				}
+				if (user.ApprovalStatus == Core.Enum.UserApprovalStatus.Rejected)
+				{
+					return Unauthorized(new { Message = $"Your account has been rejected. Reason: {user.RejectReason}" });
+				}
+			}
+
 			var result = await _authService.LoginAsync(loginDto);
 
 			if (!result.Success)
@@ -250,7 +263,7 @@ namespace ITC.API.Controllers
 		{
 			bool isConfirmed = await _authService.ConfirmEmailAsync(userId, token);
 			if (isConfirmed)
-				return Redirect("http://localhost:3000/welcome");   // deploy sửa lại
+				return Redirect("https://inter-trans-connect.web.app/welcome");   // deploy sửa lại
 			return BadRequest("Xác nhận email thất bại.");
 		}
 

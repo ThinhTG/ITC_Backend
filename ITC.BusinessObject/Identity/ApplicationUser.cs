@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.Core.Enum;
 using ITC.Core.Utils;
 using Microsoft.AspNetCore.Identity;
 using static System.Net.Mime.MediaTypeNames;
@@ -7,10 +8,17 @@ namespace ITC.BusinessObject.Identity
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
+        public UserApprovalStatus ApprovalStatus { get; set; }
+        public string? RejectReason { get; set; }
         /// <summary>
         /// Tên người dùng
         /// </summary>
         public string? FullName { get; set; }
+
+        // Talent only
+        public string? CertificateFiles { get; set; } // Dạng chuỗi JSON hoặc phân cách
+        public string? Experience { get; set; }
+        public string? PortraitUrl { get; set; }
 
 		public string? AvatarUrl { get; set; }
 		public string? Gender { get; set; }
@@ -48,6 +56,7 @@ namespace ITC.BusinessObject.Identity
         {
             CreatedTime = CoreHelper.SystemTimeNow;
             LastUpdatedTime = CreatedTime;
+            ApprovalStatus = UserApprovalStatus.PendingApproval;
         }
 
 		// Bank Account

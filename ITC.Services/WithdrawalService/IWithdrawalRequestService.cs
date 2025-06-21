@@ -14,5 +14,6 @@ namespace ITC.Services.WithdrawalService
         Task<PaginatedList<WithdrawalRequestDto>> GetAllAsync(int pageNumber, int pageSize);
         Task<WithdrawalRequestDto> UpdateStatusAsync(Guid id, UpdateWithdrawalRequestDto dto, Guid staffId);
         Task<WithdrawalRequestDto> ConfirmReceivedAsync(Guid id, Guid accountId);
+        Task<bool> CancelRequestAsync(Guid requestId, Guid accountId);
     }
 } 

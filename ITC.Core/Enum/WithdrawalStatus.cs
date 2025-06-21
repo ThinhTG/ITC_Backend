@@ -9,6 +9,7 @@ namespace ITC.Core.Enum
     {
         Pending = 0,                    // BPDV gửi request withdraw
         WaitingForConfirmation = 1,     // Staff đã chuyển tiền, chờ BPDV xác nhận
-        Completed = 2                   // BPDV đã xác nhận nhận được tiền
+        Completed = 2,                  // BPDV đã xác nhận nhận được tiền
+        Canceled = 3                   // BPDV hủy yêu cầu rút tiền
     }
 } 

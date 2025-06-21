@@ -1,0 +1,64 @@
+using ITC.BusinessObject.Request;
+using ITC.Services.User;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace ITC.API.Controllers
+{
+    [Route("api/admin")]
+    [ApiController]
+    [Authorize(Roles = "Admin")]
+    public class AdminController : ControllerBase
+    {
+        private readonly IUserService _userService;
+
+        public AdminController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        [HttpGet("pending-approvals")]
+        public async Task<IActionResult> GetPendingApprovalUsers()
+        {
+            var users = await _userService.GetPendingApprovalUsersAsync();
+            return Ok(users);
+        }
+
+        [HttpPost("approve-user/{userId}")]
+        public async Task<IActionResult> ApproveUser(Guid userId)
+        {
+            var result = await _userService.ApproveUserAsync(userId);
+            if (!result)
+            {
+                return NotFound(new { Message = "User not found or approval failed." });
+            }
+            return Ok(new { Message = "User approved successfully." });
+        }
+
+        [HttpPost("reject-user/{userId}")]
+        public async Task<IActionResult> RejectUser(Guid userId, [FromBody] RejectUserRequest request)
+        {
+            var result = await _userService.RejectUserAsync(userId, request);
+            if (!result)
+            {
+                return NotFound(new { Message = "User not found or rejection failed." });
+            }
+            return Ok(new { Message = "User rejected successfully." });
+        }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetUserDetail(Guid userId)
+        {
+            var users = await _userService.GetPendingApprovalUsersAsync();
+            var user = users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found." });
+            }
+            return Ok(user);
+        }
+    }
+} 
