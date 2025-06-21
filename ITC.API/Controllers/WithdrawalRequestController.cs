@@ -50,7 +50,7 @@ namespace ITC.API.Controllers
 
 
 		/// <summary>
-		/// L?y t?t c? Requesst rút ti?n v?i phân trang
+		/// L?y t?t c? Requesst rï¿½t ti?n v?i phï¿½n trang
 		/// </summary>
 		/// <param name="pageNumber"></param>
 		/// <param name="pageSize"></param>
@@ -73,7 +73,7 @@ namespace ITC.API.Controllers
 
 
 		/// <summary>
-		/// L?y t?t c? Request rút ti?n c?a ng??i dùng hi?n t?i
+		/// L?y t?t c? Request rï¿½t ti?n c?a ng??i dï¿½ng hi?n t?i
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet("my-requests")]
@@ -95,7 +95,7 @@ namespace ITC.API.Controllers
 
 
 		/// <summary>
-		/// L?y chi ti?t m?t Request rút ti?n theo ID
+		/// L?y chi ti?t m?t Request rï¿½t ti?n theo ID
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
@@ -117,7 +117,7 @@ namespace ITC.API.Controllers
 
 
 		/// <summary>
-		/// C?p nh?t tr?ng thái c?a Request rút ti?n
+		/// C?p nh?t tr?ng thï¿½i c?a Request rï¿½t ti?n
 		/// </summary>
 		/// <param name="id"></param>
 		/// <param name="dto"></param>
@@ -141,7 +141,7 @@ namespace ITC.API.Controllers
 
 
 		/// <summary>
-		/// BPDV xác nh?n ?ã nh?n ti?n t? yêu c?u rút ti?n
+		/// BPDV xï¿½c nh?n ?ï¿½ nh?n ti?n t? yï¿½u c?u rï¿½t ti?n
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
@@ -158,6 +158,27 @@ namespace ITC.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error confirming withdrawal request {Id}", id);
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}/cancel")]
+        [Authorize]
+        public async Task<IActionResult> CancelWithdrawalRequest(Guid id)
+        {
+            try
+            {
+                var accountId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var result = await _withdrawalRequestService.CancelRequestAsync(id, accountId);
+                if (!result)
+                {
+                    return BadRequest(new { Message = "Cannot cancel this withdrawal request." });
+                }
+                return Ok(new { Message = "Withdrawal request canceled successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error canceling withdrawal request {Id}", id);
                 return BadRequest(new { Message = ex.Message });
             }
         }

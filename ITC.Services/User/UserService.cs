@@ -1,5 +1,9 @@
+using AutoMapper;
 using ITC.BusinessObject.DTOs.User;
 using ITC.BusinessObject.Identity;
+using ITC.BusinessObject.Request;
+using ITC.BusinessObject.Response;
+using ITC.Core.Enum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,13 +13,16 @@ namespace ITC.Services.User
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IMapper _mapper;
 
         public UserService(
             UserManager<ApplicationUser> userManager,
-            RoleManager<ApplicationRole> roleManager)
+            RoleManager<ApplicationRole> roleManager,
+            IMapper mapper)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _mapper = mapper;
         }
 
         public async Task<UserCountByRoleDto> GetUserCountByRoleAsync()
@@ -36,6 +43,37 @@ namespace ITC.Services.User
                 CustomerCount = customerCount,
                 TalentCount = talentCount
             };
+        }
+
+        public async Task<IEnumerable<UserResponse>> GetPendingApprovalUsersAsync()
+        {
+            var users = await _userManager.Users
+                                          .Where(u => u.ApprovalStatus == UserApprovalStatus.PendingApproval)
+                                          .ToListAsync();
+            return _mapper.Map<IEnumerable<UserResponse>>(users);
+        }
+
+        public async Task<bool> ApproveUserAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null) return false;
+
+            user.ApprovalStatus = UserApprovalStatus.Approved;
+            var result = await _userManager.UpdateAsync(user);
+
+            return result.Succeeded;
+        }
+
+        public async Task<bool> RejectUserAsync(Guid userId, RejectUserRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null) return false;
+
+            user.ApprovalStatus = UserApprovalStatus.Rejected;
+            user.RejectReason = request.Reason;
+            var result = await _userManager.UpdateAsync(user);
+
+            return result.Succeeded;
         }
     }
 } 

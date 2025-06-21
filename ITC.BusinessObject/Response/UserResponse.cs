@@ -22,7 +22,11 @@ namespace ITC.BusinessObject.Response
 
 		public string? Message { get; set; } // Thêm thông điệp trả về
 
-
+		// Talent only
+		public string? CertificateFiles { get; set; }
+		public string? Experience { get; set; }
+		public string? PortraitUrl { get; set; }
+		public string? ApprovalStatus { get; set; }
+		public string? RejectReason { get; set; }
 	}
-
 }

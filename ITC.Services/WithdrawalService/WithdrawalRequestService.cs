@@ -159,6 +159,19 @@ namespace ITC.Services.WithdrawalService
             return await MapToDto(request);
         }
 
+        public async Task<bool> CancelRequestAsync(Guid requestId, Guid accountId)
+        {
+            var request = await _withdrawalRequestRepository.GetByIdAsync(requestId);
+            if (request == null) return false;
+            if (request.AccountId != accountId) return false;
+            if (request.Status != WithdrawalStatus.Pending) return false;
+
+            request.Status = WithdrawalStatus.Canceled;
+            request.ProcessedDate = DateTime.UtcNow;
+            await _withdrawalRequestRepository.UpdateAsync(request);
+            return true;
+        }
+
         private bool IsValidStatusTransition(WithdrawalStatus currentStatus, WithdrawalStatus newStatus)
         {
             return (currentStatus, newStatus) switch

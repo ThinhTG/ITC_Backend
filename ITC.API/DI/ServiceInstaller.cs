@@ -11,6 +11,7 @@ using ITC.Services.PaymentService;
 using ITC.Services.Revenue;
 using ITC.Services.SubscriptionPlan;
 using ITC.Services.TokenService;
+using ITC.Services.User;
 using ITC.Services.WalletService;
 using ITC.Services.WithdrawalService;
 
@@ -20,6 +21,7 @@ namespace ITC.API.DI
     {
         public void InstallService(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -47,6 +49,7 @@ namespace ITC.API.DI
 			services.AddScoped<INotificationService, NotificationService>();
 			services.AddScoped<IWithdrawalRequestRepository, WithdrawalRequestRepository>();
 			services.AddScoped<IWithdrawalRequestService, WithdrawalRequestService>();
+			services.AddScoped<IUserService, UserService>();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
+using ITC.Core.Enum;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
 using Microsoft.AspNetCore.Identity;
@@ -44,7 +45,8 @@ namespace ITC.API.SeedData
 							FullName = fullName,
 							PhoneNumber = phone,
 							PhoneNumberConfirmed = true,
-							Address = address
+							Address = address,
+							ApprovalStatus = UserApprovalStatus.Approved,
 						};
 
 						var result = await userManager.CreateAsync(newUser, "Test@123");

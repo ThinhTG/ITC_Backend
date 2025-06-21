@@ -52,11 +52,12 @@ namespace ITC.Services.Email
 		//         var message = $"Vui lòng nhấp vào link để xác thực email: <a href='{confirmationLink}'>Xác nhận</a>";
 		//         await SendEmailAsync(user.Email, "Xác thực email", message);
 		//     }
+	//	https://thinhdb.felixtien.dev/api/auth/confirm-email
 
 		public async Task SendConfirmationEmailAsync(ApplicationUser user, string token)
 		{
 			var encodedToken = Uri.EscapeDataString(token);
-			var confirmationLink = $"http://localhost:5000/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
+			var confirmationLink = $"http://localhost:5000/api/auth?userId={user.Id}&token={encodedToken}";
 
 			var message = $@"
     <!DOCTYPE html>
