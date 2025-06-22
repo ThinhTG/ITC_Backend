@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Identity;
+using ITC.Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -36,6 +37,12 @@ namespace ITC.BusinessObject.Entities
 		public string? CertificateFileUrl { get; set; }
 
 		public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-		public DateTimeOffset? UpdatedAt { get; set; } 
+		public DateTimeOffset? UpdatedAt { get; set; }
+
+		// Trạng thái duyệt certificate
+		public CertificateStatus Status { get; set; } = CertificateStatus.Pending;
+		public string? RejectReason { get; set; } // Lý do từ chối nếu có
+		public DateTimeOffset? ApprovedAt { get; set; } // Thời gian duyệt
+		public Guid? ApprovedBy { get; set; } // Admin duyệt
 	}
 }

@@ -14,5 +14,6 @@ namespace ITC.Repositories.Interface
 		Task<TranslatorCertificate> AddAsync(TranslatorCertificate certificate);
 		Task UpdateAsync(TranslatorCertificate certificate);
 		Task DeleteAsync(Guid id);
+		Task<List<TranslatorCertificate>> GetPendingCertificatesAsync();
 	}
 }

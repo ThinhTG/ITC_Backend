@@ -1,5 +1,6 @@
 using ITC.BusinessObject.Request;
 using ITC.Services.User;
+using ITC.Services.Certificate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,10 +15,14 @@ namespace ITC.API.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ITranslatorCertificateService _certificateService;
 
-        public AdminController(IUserService userService)
+        public AdminController(
+            IUserService userService,
+            ITranslatorCertificateService certificateService)
         {
             _userService = userService;
+            _certificateService = certificateService;
         }
 
         [HttpGet("pending-approvals")]
@@ -59,6 +64,36 @@ namespace ITC.API.Controllers
                 return NotFound(new { Message = "User not found." });
             }
             return Ok(user);
+        }
+
+        // Certificate management
+        [HttpGet("pending-certificates")]
+        public async Task<IActionResult> GetPendingCertificates()
+        {
+            var certificates = await _certificateService.GetPendingCertificatesAsync();
+            return Ok(certificates);
+        }
+
+        [HttpPost("approve-certificate/{certificateId}")]
+        public async Task<IActionResult> ApproveCertificate(Guid certificateId)
+        {
+            var result = await _certificateService.ApproveCertificateAsync(certificateId);
+            if (!result)
+            {
+                return NotFound(new { Message = "Certificate not found or approval failed." });
+            }
+            return Ok(new { Message = "Certificate approved successfully." });
+        }
+
+        [HttpPost("reject-certificate/{certificateId}")]
+        public async Task<IActionResult> RejectCertificate(Guid certificateId, [FromBody] RejectUserRequest request)
+        {
+            var result = await _certificateService.RejectCertificateAsync(certificateId, request.Reason);
+            if (!result)
+            {
+                return NotFound(new { Message = "Certificate not found or rejection failed." });
+            }
+            return Ok(new { Message = "Certificate rejected successfully." });
         }
     }
 } 

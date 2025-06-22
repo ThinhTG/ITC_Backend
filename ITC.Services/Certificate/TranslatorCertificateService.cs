@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ITC.BusinessObject.Entities;
 using ITC.Core.Contracts;
+using ITC.Core.Enum;
 using ITC.Repositories.Interface;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,44 @@ namespace ITC.Services.Certificate
 		public async Task DeleteAsync(Guid id)
 		{
 			await _repo.DeleteAsync(id);
+		}
+
+		public async Task<List<TranslatorCertificateDto>> GetCertificatesByUserIdAsync(Guid userId)
+		{
+			var entities = await _repo.GetByUserIdAsync(userId);
+			return _mapper.Map<List<TranslatorCertificateDto>>(entities);
+		}
+
+		public async Task<List<TranslatorCertificateDto>> GetPendingCertificatesAsync()
+		{
+			var entities = await _repo.GetPendingCertificatesAsync();
+			return _mapper.Map<List<TranslatorCertificateDto>>(entities);
+		}
+
+		public async Task<bool> ApproveCertificateAsync(Guid certificateId)
+		{
+			var certificate = await _repo.GetByIdAsync(certificateId);
+			if (certificate == null) return false;
+
+			certificate.Status = CertificateStatus.Approved;
+			certificate.ApprovedAt = DateTimeOffset.UtcNow;
+			// TODO: Set ApprovedBy to current admin ID
+			
+			await _repo.UpdateAsync(certificate);
+			return true;
+		}
+
+		public async Task<bool> RejectCertificateAsync(Guid certificateId, string reason)
+		{
+			var certificate = await _repo.GetByIdAsync(certificateId);
+			if (certificate == null) return false;
+
+			certificate.Status = CertificateStatus.Rejected;
+			certificate.RejectReason = reason;
+			certificate.UpdatedAt = DateTimeOffset.UtcNow;
+			
+			await _repo.UpdateAsync(certificate);
+			return true;
 		}
 	}
 }
