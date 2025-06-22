@@ -1,4 +1,4 @@
-using ITC.BusinessObject.Request;
+﻿using ITC.BusinessObject.Request;
 using ITC.Services.User;
 using ITC.Services.Certificate;
 using Microsoft.AspNetCore.Authorization;
@@ -25,14 +25,24 @@ namespace ITC.API.Controllers
             _certificateService = certificateService;
         }
 
-        [HttpGet("pending-approvals")]
+		/// <summary>
+		/// Lấy tất cẩ cácBPDV (Translator) đang chờ phê duyệt.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet("pending-approvals")]
         public async Task<IActionResult> GetPendingApprovalUsers()
         {
             var users = await _userService.GetPendingApprovalUsersAsync();
             return Ok(users);
         }
 
-        [HttpPost("approve-user/{userId}")]
+
+		/// <summary>
+		/// Phê duyệt cho 1 BPDV (Translator).
+		/// </summary>
+		/// <param name="userId"></param>
+		/// <returns></returns>
+		[HttpPost("approve-user/{userId}")]
         public async Task<IActionResult> ApproveUser(Guid userId)
         {
             var result = await _userService.ApproveUserAsync(userId);
@@ -43,7 +53,13 @@ namespace ITC.API.Controllers
             return Ok(new { Message = "User approved successfully." });
         }
 
-        [HttpPost("reject-user/{userId}")]
+		/// <summary>
+		/// Từ chối phê duyệt cho 1 BPDV (Translator).
+		/// </summary>
+		/// <param name="userId"></param>
+		/// <param name="request"></param>
+		/// <returns></returns>
+		[HttpPost("reject-user/{userId}")]
         public async Task<IActionResult> RejectUser(Guid userId, [FromBody] RejectUserRequest request)
         {
             var result = await _userService.RejectUserAsync(userId, request);
