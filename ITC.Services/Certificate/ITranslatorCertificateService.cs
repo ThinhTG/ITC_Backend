@@ -14,5 +14,9 @@ namespace ITC.Services.Certificate
 		Task<TranslatorCertificateDto> AddAsync(Guid userId, TranslatorCertificateCreateUpdateDto dto);
 		Task UpdateAsync(Guid id, TranslatorCertificateCreateUpdateDto dto);
 		Task DeleteAsync(Guid id);
+		Task<List<TranslatorCertificateDto>> GetCertificatesByUserIdAsync(Guid userId);
+		Task<List<TranslatorCertificateDto>> GetPendingCertificatesAsync();
+		Task<bool> ApproveCertificateAsync(Guid certificateId);
+		Task<bool> RejectCertificateAsync(Guid certificateId, string reason);
 	}
 }

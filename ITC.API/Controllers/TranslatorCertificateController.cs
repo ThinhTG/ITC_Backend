@@ -48,6 +48,13 @@ namespace ITC.API.Controllers
 			}
 		}
 
+
+		/// <summary>
+		/// Cập nhật thông tin chứng chỉ cho BPDV (Translator) sau khi cập nhật thì đợi Admin Approve
+		/// </summary>
+		/// <param name="userId"></param>
+		/// <param name="dto"></param>
+		/// <returns></returns>
 		[HttpPost("user/{userId}")]
 		public async Task<IActionResult> Add(Guid userId, [FromBody] TranslatorCertificateCreateUpdateDto dto)
 		{

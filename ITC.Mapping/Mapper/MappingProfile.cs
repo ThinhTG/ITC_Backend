@@ -19,7 +19,7 @@ namespace ITC.Mapping.Mapper
 			CreateMap<CreateJobRequest, Job>();
 			//	CreateMap<List<Job>, List<JobDTO>>();
 			//	CreateMap<PaginatedList<JobDTO>, PaginatedList<Job>>().ReverseMap();
-			CreateMap<TranslatorCertificate, TranslatorCertificateDto>();
+			CreateMap<TranslatorCertificate, TranslatorCertificateDto>().ReverseMap();
 			CreateMap<TranslatorCertificateCreateUpdateDto, TranslatorCertificate>();
 
 			CreateMap<SubscriptionPlan, SubscriptionPlanDto>().ReverseMap();

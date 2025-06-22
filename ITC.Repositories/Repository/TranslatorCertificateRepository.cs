@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.Core.Enum;
 using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,13 @@ namespace ITC.Repositories.Repository
 				_context.TranslatorCertificates.Remove(existing);
 				await _context.SaveChangesAsync();
 			}
+		}
+
+		public async Task<List<TranslatorCertificate>> GetPendingCertificatesAsync()
+		{
+			return await _context.TranslatorCertificates
+				.Where(t => t.Status == CertificateStatus.Pending)
+				.ToListAsync();
 		}
 	}
 }

@@ -34,9 +34,9 @@ namespace ITC.Services.DTOs.Auth
         [Required]
         public string Role { get; set; }
 
-        // Talent only
-        public List<string>? CertificateFiles { get; set; } // Danh sách file chứng chỉ
-        public string? Experience { get; set; } // Kinh nghiệm
-        public string? PortraitUrl { get; set; } // Ảnh chân dung
+        //// Talent only
+        //public List<string>? CertificateFiles { get; set; } // Danh sách file chứng chỉ
+        //public string? Experience { get; set; } // Kinh nghiệm
+        //public string? PortraitUrl { get; set; } // Ảnh chân dung
     }
 }

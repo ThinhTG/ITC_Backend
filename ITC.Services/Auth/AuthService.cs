@@ -75,24 +75,6 @@ namespace ITC.Services.Auth
 				Gender = registerDto.Gender ?? "Not Specified"
 			};
 
-			// Validate và lưu thông tin Talent
-			if (registerDto.Role.Equals("Talent"))
-			{
-				if (registerDto.CertificateFiles == null || !registerDto.CertificateFiles.Any() ||
-					string.IsNullOrWhiteSpace(registerDto.Experience) ||
-					string.IsNullOrWhiteSpace(registerDto.PortraitUrl))
-				{
-					return new AuthResponseDto
-					{
-						Success = false,
-						Message = "Talent must provide certificates, experience, and portrait."
-					};
-				}
-				user.CertificateFiles = string.Join(";", registerDto.CertificateFiles);
-				user.Experience = registerDto.Experience;
-				user.PortraitUrl = registerDto.PortraitUrl;
-			}
-
 			var result = await _userManager.CreateAsync(user, registerDto.Password);
 
 			if (!result.Succeeded)
@@ -106,10 +88,10 @@ namespace ITC.Services.Auth
 				};
 			}
 
+			// Tất cả Role đều được Approved ngay
 			if (registerDto.Role.Equals("Customer"))
 			{
 				await _userManager.AddToRoleAsync(user, "Customer");
-				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
 			else if (registerDto.Role.Equals("Talent"))
 			{
@@ -118,8 +100,9 @@ namespace ITC.Services.Auth
 			else
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
-				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
+			user.ApprovalStatus = UserApprovalStatus.Approved;
+			await _userManager.UpdateAsync(user);
 
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -176,24 +159,6 @@ namespace ITC.Services.Auth
 				Gender = registerDto.Gender ?? "Not Specified"
 			};
 
-			// Validate và lưu thông tin Talent
-			if (registerDto.Role.Equals("Talent"))
-			{
-				if (registerDto.CertificateFiles == null || !registerDto.CertificateFiles.Any() ||
-					string.IsNullOrWhiteSpace(registerDto.Experience) ||
-					string.IsNullOrWhiteSpace(registerDto.PortraitUrl))
-				{
-					return new AuthResponseDto
-					{
-						Success = false,
-						Message = "Talent must provide certificates, experience, and portrait."
-					};
-				}
-				user.CertificateFiles = string.Join(";", registerDto.CertificateFiles);
-				user.Experience = registerDto.Experience;
-				user.PortraitUrl = registerDto.PortraitUrl;
-			}
-
 			var result = await _userManager.CreateAsync(user, registerDto.Password);
 
 			if (!result.Succeeded)
@@ -207,10 +172,10 @@ namespace ITC.Services.Auth
 				};
 			}
 
+			// Tất cả Role đều được Approved ngay
 			if (registerDto.Role.Equals("Customer"))
 			{
 				await _userManager.AddToRoleAsync(user, "Customer");
-				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
 			else if (registerDto.Role.Equals("Talent"))
 			{
@@ -219,8 +184,9 @@ namespace ITC.Services.Auth
 			else
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
-				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
+			user.ApprovalStatus = UserApprovalStatus.Approved;
+			await _userManager.UpdateAsync(user);
 
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
