@@ -134,7 +134,8 @@ namespace ITC.Services.JobService
 				CreatedAt = DateTimeOffset.UtcNow,
 				Deadline = dto.Deadline,
 				RequiredHires = dto.RequiredHires,
-				CurrentHires = 0
+				CurrentHires = 0,
+				WorkingTime = dto.WorkingTime
 			};
 
 			await _jobRepo.AddAsync(job);
