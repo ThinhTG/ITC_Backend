@@ -4,6 +4,7 @@ using ITC.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITC.Repositories.Migrations
 {
     [DbContext(typeof(ITCDbContext))]
-    partial class ITCDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250623062124_RecreateReviewTableWithGuids")]
+    partial class RecreateReviewTableWithGuids
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -772,8 +775,8 @@ namespace ITC.Repositories.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("JobId")
                         .HasColumnType("uniqueidentifier");
@@ -784,8 +787,16 @@ namespace ITC.Repositories.Migrations
                     b.Property<Guid>("RevieweeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("RevieweeRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("ReviewerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReviewerRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
