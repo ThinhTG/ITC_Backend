@@ -44,6 +44,7 @@
 
 		public virtual DbSet<WithdrawalRequest> WithdrawalRequests => Set<WithdrawalRequest>();
 
+		public virtual DbSet<Review> Reviews => Set<Review>();
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 			{

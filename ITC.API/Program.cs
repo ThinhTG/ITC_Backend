@@ -51,21 +51,21 @@ namespace ITC.API
 				builder.Configuration.GetSection("UploadSettings"));
 			builder.Services.AddScoped<IUserService, UserService>();
 
-			// ? Add CORS
 			builder.Services.AddCors(options =>
 			{
-				options.AddPolicy("AllowAll", policy =>
+				options.AddPolicy("AllowFrontend", policy =>
 				{
-					policy.AllowAnyOrigin()
+					policy.WithOrigins("http://localhost:3000")
 						  .AllowAnyHeader()
-						  .AllowAnyMethod();
+						  .AllowAnyMethod()
+						  .AllowCredentials();
 				});
 			});
 
 			var app = builder.Build();
 
 			// ? Enable CORS - ph?i ??t TR??C Authentication & Authorization
-			app.UseCors("AllowAll");
+			app.UseCors("AllowFrontend");
 
 			// Swagger
 			if (app.Environment.IsDevelopment())

@@ -50,6 +50,8 @@ namespace ITC.API.DI
 			services.AddScoped<IWithdrawalRequestRepository, WithdrawalRequestRepository>();
 			services.AddScoped<IWithdrawalRequestService, WithdrawalRequestService>();
 			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IReviewRepository, ReviewRepository>();
+			services.AddScoped<IReviewService, ReviewService>();
 		}
 	}
 }
