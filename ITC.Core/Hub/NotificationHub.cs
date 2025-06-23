@@ -1,5 +1,6 @@
 ﻿// File: Hubs/NotificationHub.cs
 using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 
 namespace ITC.Core.Hubs
 {
@@ -7,7 +8,7 @@ namespace ITC.Core.Hubs
 	{
 		public override async Task OnConnectedAsync()
 		{
-			var userId = Context.User?.FindFirst("sub")?.Value;
+			var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 			if (!string.IsNullOrEmpty(userId))
 			{
 				await Groups.AddToGroupAsync(Context.ConnectionId, userId);
@@ -17,7 +18,7 @@ namespace ITC.Core.Hubs
 
 		public override async Task OnDisconnectedAsync(Exception? exception)
 		{
-			var userId = Context.User?.FindFirst("sub")?.Value;
+			var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 			if (!string.IsNullOrEmpty(userId))
 			{
 				await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId);
