@@ -14,6 +14,8 @@ using ITC.Services.TokenService;
 using ITC.Services.User;
 using ITC.Services.WalletService;
 using ITC.Services.WithdrawalService;
+using ITC.Services.Subscription;
+using Microsoft.AspNetCore.Http;
 
 namespace ITC.API.DI
 {
@@ -52,6 +54,10 @@ namespace ITC.API.DI
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IReviewRepository, ReviewRepository>();
 			services.AddScoped<IReviewService, ReviewService>();
+			services.AddScoped<IRevenueDashboardService, RevenueDashboardService>();
+			services.AddScoped<ISubscriptionDashboardService, SubscriptionDashboardService>();
+			services.AddScoped<ITC.Services.Privilege.IPrivilegeService, ITC.Services.Privilege.PrivilegeService>();
+			services.AddScoped<ITC.Services.Notification.INotificationService, ITC.Services.Notification.NotificationService>();
 		}
 	}
 }

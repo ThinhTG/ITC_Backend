@@ -1,15 +1,14 @@
 ﻿using ITC.BusinessObject.Request;
-using ITC.Services.User;
 using ITC.Services.Certificate;
+using ITC.Services.Revenue;
+using ITC.Services.Subscription;
+using ITC.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ITC.API.Controllers
 {
-    [Route("api/admin")]
+	[Route("api/admin")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
@@ -110,6 +109,27 @@ namespace ITC.API.Controllers
                 return NotFound(new { Message = "Certificate not found or rejection failed." });
             }
             return Ok(new { Message = "Certificate rejected successfully." });
+        }
+
+        [HttpGet("user-approval-stats")]
+        public async Task<IActionResult> GetUserApprovalStatusStats()
+        {
+            var stats = await _userService.GetUserApprovalStatusStatsAsync();
+            return Ok(stats);
+        }
+
+        [HttpGet("revenue-dashboard")]
+        public async Task<IActionResult> GetRevenueDashboard([FromServices] IRevenueDashboardService service, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        {
+            var data = await service.GetDashboardAsync(from, to);
+            return Ok(data);
+        }
+
+        [HttpGet("subscription-dashboard")]
+        public async Task<IActionResult> GetSubscriptionDashboard([FromServices] ISubscriptionDashboardService service, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        {
+            var data = await service.GetDashboardAsync(from, to);
+            return Ok(data);
         }
     }
 } 

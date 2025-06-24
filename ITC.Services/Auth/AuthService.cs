@@ -92,16 +92,18 @@ namespace ITC.Services.Auth
 			if (registerDto.Role.Equals("Customer"))
 			{
 				await _userManager.AddToRoleAsync(user, "Customer");
+				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
 			else if (registerDto.Role.Equals("Talent"))
 			{
 				await _userManager.AddToRoleAsync(user, "Talent");
+				user.ApprovalStatus = UserApprovalStatus.NoCertificate;
 			}
 			else
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
+				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
-			user.ApprovalStatus = UserApprovalStatus.Approved;
 			await _userManager.UpdateAsync(user);
 
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -176,16 +178,18 @@ namespace ITC.Services.Auth
 			if (registerDto.Role.Equals("Customer"))
 			{
 				await _userManager.AddToRoleAsync(user, "Customer");
+				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
 			else if (registerDto.Role.Equals("Talent"))
 			{
 				await _userManager.AddToRoleAsync(user, "Talent");
+				user.ApprovalStatus = UserApprovalStatus.NoCertificate;
 			}
 			else
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
+				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
-			user.ApprovalStatus = UserApprovalStatus.Approved;
 			await _userManager.UpdateAsync(user);
 
 			var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);

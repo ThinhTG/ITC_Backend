@@ -61,6 +61,11 @@ namespace ITC.Repositories.Repository
 				PlanName = subscription.SubscriptionPlan.Name
 			};
 		}
+
+		public async Task<IEnumerable<UserSubscription>> GetAllAsync()
+		{
+			return await _context.UserSubscriptions.Include(x => x.SubscriptionPlan).Include(x => x.User).ToListAsync();
+		}
 	}
 
 

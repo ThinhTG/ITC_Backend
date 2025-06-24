@@ -40,7 +40,7 @@
 
 		public virtual DbSet<UserSubscription> UserSubscriptions => Set<UserSubscription>();
 
-		public virtual DbSet<Notification> Notifications => Set<Notification>();
+		public virtual DbSet<Notifications> Notifications => Set<Notifications>();
 
 		public virtual DbSet<WithdrawalRequest> WithdrawalRequests => Set<WithdrawalRequest>();
 
@@ -109,7 +109,7 @@
 				.HasForeignKey(us => us.SubscriptionPlanId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			modelBuilder.Entity<Notification>(entity =>
+			modelBuilder.Entity<Notifications>(entity =>
 			{
 				entity.HasKey(x => x.Id);
 				entity.HasOne<ApplicationUser>()

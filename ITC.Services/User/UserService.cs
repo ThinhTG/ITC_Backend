@@ -75,5 +75,17 @@ namespace ITC.Services.User
 
             return result.Succeeded;
         }
+
+        public async Task<UserApprovalStatusStatsDto> GetUserApprovalStatusStatsAsync()
+        {
+            var users = _userManager.Users;
+            return new UserApprovalStatusStatsDto
+            {
+                NoCertificate = await users.CountAsync(u => u.ApprovalStatus == UserApprovalStatus.NoCertificate),
+                PendingApproval = await users.CountAsync(u => u.ApprovalStatus == UserApprovalStatus.PendingApproval),
+                Approved = await users.CountAsync(u => u.ApprovalStatus == UserApprovalStatus.Approved),
+                Rejected = await users.CountAsync(u => u.ApprovalStatus == UserApprovalStatus.Rejected)
+            };
+        }
     }
 } 

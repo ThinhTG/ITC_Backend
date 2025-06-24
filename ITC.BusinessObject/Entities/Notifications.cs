@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ITC.BusinessObject.Entities
 {
-	public class Notification
+	public class Notifications
 	{
 		public Guid Id { get; set; } = Guid.NewGuid();
 		public Guid? ReceiverUserId { get; set; } // Ai nhận thông báo
