@@ -20,6 +20,6 @@ namespace ITC.Services.DTOs.JobApply
 		public decimal? HourlyRate { get; set; }
 		public ApplicationUser? Interpreter { get; set; }
 		public int? WorkStatus { get; set; }
-		public bool IsBoosted { get; set; }
+		public int SubscriptionPriority { get; set; } // 0: No, 1: PartnerShip, 2: Premium, 3: Advance
 	}
 }

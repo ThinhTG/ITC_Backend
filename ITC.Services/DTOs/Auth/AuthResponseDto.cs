@@ -15,5 +15,6 @@ namespace ITC.Services.DTOs.Auth
         public string RefreshToken { get; set; }
 
         public UserResponse User { get; set; }
+        public int Priority { get; set; } // 0: No, 1: PartnerShip, 2: Premium, 3: Advance
     }
 }

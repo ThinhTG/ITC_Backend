@@ -28,6 +28,7 @@ namespace ITC.Services.Auth
 		private readonly IMapper _mapper;
 		private readonly IWalletRepository _walletRepository;
 		private readonly IEmailService _emailService;
+		private readonly IServiceProvider _serviceProvider;
 
 		public AuthService(
 			UserManager<ApplicationUser> userManager,
@@ -36,13 +37,15 @@ namespace ITC.Services.Auth
 			ILogger<AuthService> logger,
 			IConfiguration configuration,
 			IEmailService emailService,
-			IMapper mapper)
+			IMapper mapper,
+			IServiceProvider serviceProvider)
 		{
 			_userManager = userManager;
 			_tokenService = tokenService;
 			_logger = logger;
 			_walletRepository = walletRepository;
 			_emailService = emailService;
+			_serviceProvider = serviceProvider;
 
 			var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
 			_refreshTokenExpiryDays = jwtSettings?.RefreshTokenExpirationDays ?? 7;
@@ -243,13 +246,31 @@ namespace ITC.Services.Auth
 			await _userManager.UpdateAsync(user);
 			var userRes = _mapper.Map<ApplicationUser, UserResponse>(user);
 
+			// Lấy priority subscription
+			int priority = 0;
+			var subRepo = _serviceProvider.GetService(typeof(ITC.Repositories.Interface.IUserSubscriptionRepository)) as ITC.Repositories.Interface.IUserSubscriptionRepository;
+			if (subRepo != null)
+			{
+				var activeSub = await subRepo.GetActiveSubscriptionAsync(user.Id);
+				if (activeSub != null && activeSub.SubscriptionPlan != null)
+				{
+					switch (activeSub.SubscriptionPlan.Name.ToLower())
+					{
+						case "partnership": priority = 1; break;
+						case "premium": priority = 2; break;
+						case "advance": priority = 3; break;
+					}
+				}
+			}
+
 			return new AuthResponseDto
 			{
 				Success = true,
 				AccessToken = accessToken,
 				RefreshToken = refreshToken,
 				Message = "Login successful",
-				User = userRes
+				User = userRes,
+				Priority = priority
 			};
 		}
 
