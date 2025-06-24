@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Identity;
 using ITC.BusinessObject.Identity;
 using System.Security.Claims;
 using System.IO;
+using ITC.Core.Base;
+using ITC.Core.Constants;
+using Humanizer;
+using System.Numerics;
 
 namespace ITC.API.Controllers
 {
@@ -62,13 +66,19 @@ namespace ITC.API.Controllers
 					
 					if (!certificates.Any())
 					{
-						return BadRequest(new { Message = "Hãy cập nhật certificate trước khi apply job." });
+						return Ok(new BaseResponse<string>(
+						StatusCodeHelper.NotFound,
+						ResponseCodeConstants.NOT_FOUND,
+						"Update your certifications before applying for jobs."));
 					}
-					
+
 					var approvedCertificate = certificates.FirstOrDefault(c => c.Status == Core.Enum.CertificateStatus.Approved);
 					if (approvedCertificate == null)
 					{
-						return BadRequest(new { Message = "Hãy đợi trong vòng 24 tiếng để certificate được duyệt." });
+						return Ok(new BaseResponse<string>(
+						StatusCodeHelper.NotFound,
+						ResponseCodeConstants.NOT_FOUND,
+						"Please wait 24 hours for the certificate to be approved."));
 					}
 				}
 
