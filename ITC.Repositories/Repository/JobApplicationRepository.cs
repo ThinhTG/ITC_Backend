@@ -52,6 +52,12 @@ namespace ITC.Repositories.Repository
 				.ToListAsync();
 		}
 
+		public IQueryable<JobApplication> GetJobApplicationsByInterpreterIdQueryable(Guid interpreterId)
+		{
+			return _context.JobApplications
+				.Where(app => app.InterpreterId == interpreterId)
+				.AsQueryable();
+		}
 
 	}
 

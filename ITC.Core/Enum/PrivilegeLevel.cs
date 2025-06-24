@@ -1,7 +1,7 @@
 public enum PrivilegeLevel
 {
     NoSubscription, // 0 - Không có gói, đặc quyền thấp nhất
-    Basic,          // 1 - Gói 1
-    Premium,        // 2 - Gói 2
-    Vip             // 3 - Gói 3
+	PartnerShip,          // 1 - Gói 1
+	Advance,        // 2 - Gói 2
+	Premium             // 3 - Gói 3
 } 

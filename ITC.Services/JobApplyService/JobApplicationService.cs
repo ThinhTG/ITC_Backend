@@ -7,6 +7,7 @@ using ITC.Repositories.Base;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.JobApply;
 using ITC.Services.Notification;
+using ITC.Services.Privilege;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -24,15 +25,19 @@ namespace ITC.Services.JobApplyService
 		private readonly IHubContext<NotificationHub> _hubContext;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly INotificationService _notificationService;
+		private readonly IPrivilegeService _privilegeService;
+		private readonly IUserSubscriptionRepository _userSubscriptionRepo;
 
 
-		public JobApplicationService(IJobApplicationRepository repository, INotificationService notificationService, IJobRepository jobRepository,UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext)
+		public JobApplicationService(IJobApplicationRepository repository, INotificationService notificationService, IJobRepository jobRepository,UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext, IPrivilegeService privilegeService, IUserSubscriptionRepository userSubscriptionRepo)
 		{
 			_ApplyRepository = repository;
 			_jobRepository = jobRepository;
 			_hubContext = hubContext;
 			_userManager = userManager;
 			_notificationService = notificationService;
+			_privilegeService = privilegeService;
+			_userSubscriptionRepo = userSubscriptionRepo;
 
 		}
 
@@ -111,16 +116,33 @@ namespace ITC.Services.JobApplyService
 		public async Task<List<JobApplicationViewDto>> GetApplicationsForJobWithDetailsAsync(Guid jobId)
 		{
 			var applications = await _ApplyRepository.GetByJobIdAsync(jobId);
-			
-			return applications.Select(app => new JobApplicationViewDto
+			if (!applications.Any())
+			{
+				return new List<JobApplicationViewDto>();
+			}
+
+			// Lấy danh sách ID của tất cả người ứng tuyển
+			var interpreterIds = applications.Select(a => a.InterpreterId).Distinct().ToList();
+
+			// Lấy trạng thái boosted cho tất cả user trong 1 query
+			var boostedUserIds = new HashSet<Guid>();
+			if (interpreterIds.Any())
+			{
+				var activeSubscriptions = await _userSubscriptionRepo.GetActiveSubscriptionsForUsersAsync(interpreterIds);
+				boostedUserIds = activeSubscriptions
+					.Where(s => s.SubscriptionPlan?.IsBoosted == true)
+					.Select(s => s.UserId)
+					.ToHashSet();
+			}
+
+			var applicationDtos = applications.Select(app => new JobApplicationViewDto
 			{
 				ApplicationId = app.Id,
 				JobTitle = app.Job?.JobTitle ?? "Unknown",
 				Message = app.Message,
 				Status = app.ApplicationStatus,
-				CreatedAt = app.CreatedAt.DateTime,
-				LastUpdatedAt = app.LastUpdatedAt.DateTime,
-				// Thêm thông tin file upload và chi tiết job để talent có thể tải file về làm
+				CreatedAt = app.CreatedAt,
+				LastUpdatedAt = app.LastUpdatedAt,
 				UploadFileUrl = app.Job?.UploadFileUrl,
 				Description = app.Job?.Description,
 				TranslationType = app.Job?.TranslationType ?? string.Empty,
@@ -128,9 +150,14 @@ namespace ITC.Services.JobApplyService
 				TargetLanguage = app.Job?.TargetLanguage ?? string.Empty,
 				Deadline = app.Job?.Deadline,
 				HourlyRate = app.Job?.HourlyRate,
-				Interpreter = app.Interpreter, // Thông tin người ứng tuyển,
-				WorkStatus = app.WorkStatus
+				Interpreter = app.Interpreter,
+				WorkStatus = app.WorkStatus,
+				IsBoosted = boostedUserIds.Contains(app.InterpreterId)
 			}).ToList();
+
+
+			// Sắp xếp: người được boost lên đầu, sau đó theo ngày ứng tuyển
+			return applicationDtos.OrderByDescending(a => a.IsBoosted).ThenByDescending(a => a.CreatedAt).ToList();
 		}
 
 		public async Task SelectInterpreterAsync(SelectInterRequest selectInterRequest)
