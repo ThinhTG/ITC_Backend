@@ -1,4 +1,6 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.Core.Base;
+using ITC.Core.Constants;
 using ITC.Core.Contracts;
 using ITC.Repositories.Interface;
 using ITC.Repositories.Repository;
@@ -29,15 +31,89 @@ namespace ITC.Services.SubscriptionPlan
 			_walletTransactionRepo = walletTransactionRepo;
 		}
 
-		public async Task<SubscriptionResponseDto> SubscribeAsync(Guid userId, Guid planId)
+		//public async Task<SubscriptionResponseDto> SubscribeAsync(Guid userId, Guid planId)
+		//{
+		//	var plan = await _planRepo.GetByIdAsync(planId);
+		//	if (plan == null) throw new Exception("Gói không tồn tại");
+
+		//	// Kiểm tra số dư ví
+		//	var wallet = await _walletRepo.GetWalletByAccountIdAsync(userId);
+		//	if (wallet == null) throw new Exception("Ví không tồn tại");
+		//	if (wallet.Balance < plan.Price) throw new Exception("Số dư không đủ để đăng ký gói này");
+
+		//	var existing = await _subscriptionRepo.GetActiveSubscriptionAsync(userId);
+		//	if (existing != null)
+		//	{
+		//		existing.IsActive = false;
+		//	}
+
+		//	var newSub = new UserSubscription
+		//	{
+		//		Id = Guid.NewGuid(),
+		//		UserId = userId,
+		//		SubscriptionPlanId = planId,
+		//		SubscribedAt = DateTime.UtcNow,
+		//		ExpiredAt = DateTime.UtcNow.AddDays(plan.DurationInDays),
+		//		IsActive = true
+		//	};
+
+		//	// Trừ tiền từ ví
+		//	wallet.Balance -= plan.Price;
+		//	await _walletRepo.UpdateWalletAsync(wallet);
+
+		//	// Tạo transaction record
+		//	var transaction = new WalletTransaction
+		//	{
+		//		WalletId = wallet.WalletId,
+		//		Amount = -plan.Price, // Số âm vì là chi tiêu
+		//		TransactionType = "Subscription",
+		//		TransactionStatus = "Completed",
+		//		TransactionBalance = wallet.Balance, // Số dư sau khi trừ
+		//		Description = $"Đăng ký gói {plan.Name}",
+		//		TransactionDate = DateTimeOffset.UtcNow
+		//	};
+		//	await _walletTransactionRepo.AddWalletTransactionAsync(transaction);
+
+		//	await _subscriptionRepo.AddAsync(newSub);
+		//	await _subscriptionRepo.SaveChangesAsync();
+
+		//	return new SubscriptionResponseDto
+		//	{
+		//		PlanName = plan.Name,
+		//		SubscribedAt = newSub.SubscribedAt,
+		//		ExpiredAt = newSub.ExpiredAt,
+		//		IsActive = newSub.IsActive
+		//	};
+		//}
+
+
+		public async Task<BaseResponse<SubscriptionResponseDto>> SubscribeAsync(Guid userId, Guid planId)
 		{
 			var plan = await _planRepo.GetByIdAsync(planId);
-			if (plan == null) throw new Exception("Gói không tồn tại");
+			if (plan == null)
+			{
+				return new BaseResponse<SubscriptionResponseDto>(
+					StatusCodeHelper.BadRequest,
+					ResponseCodeConstants.NOT_FOUND,
+					"Gói không tồn tại");
+			}
 
-			// Kiểm tra số dư ví
 			var wallet = await _walletRepo.GetWalletByAccountIdAsync(userId);
-			if (wallet == null) throw new Exception("Ví không tồn tại");
-			if (wallet.Balance < plan.Price) throw new Exception("Số dư không đủ để đăng ký gói này");
+			if (wallet == null)
+			{
+				return new BaseResponse<SubscriptionResponseDto>(
+					StatusCodeHelper.BadRequest,
+					ResponseCodeConstants.NOT_FOUND,
+					"Ví không tồn tại");
+			}
+
+			if (wallet.Balance < plan.Price)
+			{
+				return new BaseResponse<SubscriptionResponseDto>(
+					StatusCodeHelper.BadRequest,
+					ResponseCodeConstants.BALANCE_NOT_ENOUGH,
+					"Số dư không đủ để đăng ký gói này");
+			}
 
 			var existing = await _subscriptionRepo.GetActiveSubscriptionAsync(userId);
 			if (existing != null)
@@ -55,18 +131,16 @@ namespace ITC.Services.SubscriptionPlan
 				IsActive = true
 			};
 
-			// Trừ tiền từ ví
 			wallet.Balance -= plan.Price;
 			await _walletRepo.UpdateWalletAsync(wallet);
 
-			// Tạo transaction record
 			var transaction = new WalletTransaction
 			{
 				WalletId = wallet.WalletId,
-				Amount = -plan.Price, // Số âm vì là chi tiêu
+				Amount = -plan.Price,
 				TransactionType = "Subscription",
 				TransactionStatus = "Completed",
-				TransactionBalance = wallet.Balance, // Số dư sau khi trừ
+				TransactionBalance = wallet.Balance,
 				Description = $"Đăng ký gói {plan.Name}",
 				TransactionDate = DateTimeOffset.UtcNow
 			};
@@ -75,13 +149,15 @@ namespace ITC.Services.SubscriptionPlan
 			await _subscriptionRepo.AddAsync(newSub);
 			await _subscriptionRepo.SaveChangesAsync();
 
-			return new SubscriptionResponseDto
+			var responseDto = new SubscriptionResponseDto
 			{
 				PlanName = plan.Name,
 				SubscribedAt = newSub.SubscribedAt,
 				ExpiredAt = newSub.ExpiredAt,
 				IsActive = newSub.IsActive
 			};
+
+			return BaseResponse<SubscriptionResponseDto>.OkResponse(responseDto);
 		}
 
 		public async Task<SubscriptionResponseDto?> GetCurrentSubscriptionAsync(Guid userId)

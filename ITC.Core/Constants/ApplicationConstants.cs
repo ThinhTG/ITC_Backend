@@ -21,5 +21,6 @@
         public const string UNAUTHORIZED = "Unauthorized!";
         public const string FORBIDDEN = "Forbidden!";
         public const string BADREQUEST = "Bad request!";
-    }
+		public const string BALANCE_NOT_ENOUGH = "BALANCE NOT ENOUGH!";
+	}
 }
