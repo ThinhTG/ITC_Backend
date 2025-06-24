@@ -1,4 +1,5 @@
-﻿using ITC.Core.Contracts;
+﻿using ITC.Core.Base;
+using ITC.Core.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,8 @@ namespace ITC.Services.SubscriptionPlan
 {
 	public interface IUserSubscriptionService
 	{
-		Task<SubscriptionResponseDto> SubscribeAsync(Guid userId, Guid planId);
+		Task<BaseResponse<SubscriptionResponseDto>> SubscribeAsync(Guid userId, Guid planId);
+
 		Task<SubscriptionResponseDto?> GetCurrentSubscriptionAsync(Guid userId);
 
 		Task<SubscriptionStatusDto> CheckUserSubscriptionStatusAsync(Guid userId);
