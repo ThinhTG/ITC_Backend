@@ -12,6 +12,7 @@ using ITC.Services.DTOs.Job;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ITC.Core.Enum;
+using ITC.Services.Privilege;
 
 namespace ITC.Services.JobService
 {
@@ -20,12 +21,14 @@ namespace ITC.Services.JobService
 		private readonly IJobRepository _jobRepo;
 		private readonly UploadSettings _uploadSettings;
 		private readonly IMapper _mapper;
+		private readonly IPrivilegeService _privilegeService;
 
-		public JobService(IJobRepository jobRepo, IOptions<UploadSettings> uploadSettings, IMapper mapper)
+		public JobService(IJobRepository jobRepo, IOptions<UploadSettings> uploadSettings, IMapper mapper, IPrivilegeService privilegeService)
 		{
 			_jobRepo = jobRepo;
 			_uploadSettings = uploadSettings.Value;
 			_mapper = mapper;
+			_privilegeService = privilegeService;
 		}
 
 
@@ -108,6 +111,12 @@ namespace ITC.Services.JobService
 
 		public async Task<Guid> CreateJobAsync(CreateJobPostDto dto)
 		{
+			if (!await _privilegeService.CanPostJobAsync(dto.CustomerId))
+			{
+				int remaining = await _privilegeService.GetRemainingJobPostsAsync(dto.CustomerId);
+				throw new Exception($"You have reached your job posting limit for the current subscription period or have not subscribed to any plan. Remaining posts: {remaining}.");
+			}
+
 			var job = new Job
 			{
 				Id = Guid.NewGuid(),

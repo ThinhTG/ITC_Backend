@@ -26,8 +26,15 @@ namespace ITC.API.Controllers
 		[HttpPost]
 		public async Task<IActionResult> PostJob([FromBody] CreateJobPostDto dto)
 		{
-			var jobId = await _jobService.CreateJobAsync(dto);
-			return Ok(new { JobId = jobId });
+			try
+			{
+				var jobId = await _jobService.CreateJobAsync(dto);
+				return Ok(new { JobId = jobId });
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(new { message = ex.Message });
+			}
 		}
 
 		/// <summary>

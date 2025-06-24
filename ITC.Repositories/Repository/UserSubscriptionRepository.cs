@@ -66,6 +66,15 @@ namespace ITC.Repositories.Repository
 		{
 			return await _context.UserSubscriptions.Include(x => x.SubscriptionPlan).Include(x => x.User).ToListAsync();
 		}
+
+		public async Task<List<UserSubscription>> GetActiveSubscriptionsForUsersAsync(IEnumerable<Guid> userIds)
+		{
+			var now = DateTime.UtcNow;
+			return await _context.UserSubscriptions
+				.Include(us => us.SubscriptionPlan)
+				.Where(us => userIds.Contains(us.UserId) && us.IsActive && us.ExpiredAt > now)
+				.ToListAsync();
+		}
 	}
 
 

@@ -17,6 +17,7 @@ namespace ITC.Repositories.Interface
 		Task<SubscriptionStatusDto> GetUserSubscriptionStatusAsync(Guid userId);
 
 		Task<IEnumerable<UserSubscription>> GetAllAsync();
+		Task<List<UserSubscription>> GetActiveSubscriptionsForUsersAsync(IEnumerable<Guid> userIds);
 	}
 
 

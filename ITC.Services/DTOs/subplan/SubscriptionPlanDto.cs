@@ -13,6 +13,15 @@ namespace ITC.Services.DTOs.subplan
 		public decimal Price { get; set; }
 		public string Description { get; set; } = string.Empty;
 		public int DurationInDays { get; set; }
+		public bool IsBoosted { get; set; }
+        
+        // Quyền lợi cho Customer
+        public int? JobPostLimit { get; set; } 
+        public decimal ServiceFeePercentage { get; set; }
+
+        // Quyền lợi cho Talent
+        public int? ApplicationLimit { get; set; }
+        public decimal CommissionFeePercentage { get; set; }
 	}
 
 }
