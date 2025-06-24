@@ -8,6 +8,7 @@ using ITC.Services.User;
 using Microsoft.AspNetCore.Identity;
 using Net.payOS;
 using System.IdentityModel.Tokens.Jwt;
+using Newtonsoft.Json;
 
 namespace ITC.API
 {
@@ -27,10 +28,10 @@ namespace ITC.API
 
 			// Add services to the container.
 			builder.Services.AddControllers()
-				.AddJsonOptions(options =>
+				.AddNewtonsoftJson(options =>
 				{
-					options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-					options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+					options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+					options.SerializerSettings.DateParseHandling = DateParseHandling.DateTimeOffset;
 				});
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
@@ -91,6 +92,7 @@ namespace ITC.API
 				{
 					var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 					var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+					await SubscriptionPlanSeeder.SeedAsync(services);
 					await User.Initialize(services, userManager, roleManager);
 					Console.WriteLine("? Seed data initialized successfully.");
 				}

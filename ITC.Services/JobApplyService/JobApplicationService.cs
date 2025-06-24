@@ -121,18 +121,24 @@ namespace ITC.Services.JobApplyService
 				return new List<JobApplicationViewDto>();
 			}
 
-			// Lấy danh sách ID của tất cả người ứng tuyển
-			var interpreterIds = applications.Select(a => a.InterpreterId).Distinct().ToList();
-
-			// Lấy trạng thái boosted cho tất cả user trong 1 query
-			var boostedUserIds = new HashSet<Guid>();
-			if (interpreterIds.Any())
+			var subscriptionDict = new Dictionary<Guid, int>(); // InterpreterId -> Priority
+			if (applications.Any())
 			{
-				var activeSubscriptions = await _userSubscriptionRepo.GetActiveSubscriptionsForUsersAsync(interpreterIds);
-				boostedUserIds = activeSubscriptions
-					.Where(s => s.SubscriptionPlan?.IsBoosted == true)
-					.Select(s => s.UserId)
-					.ToHashSet();
+				var activeSubscriptions = await _userSubscriptionRepo.GetActiveSubscriptionsForUsersAsync(applications.Select(a => a.InterpreterId).Distinct().ToList());
+				foreach (var sub in activeSubscriptions)
+				{
+					int priority = 0;
+					if (sub.SubscriptionPlan != null)
+					{
+						switch (sub.SubscriptionPlan.Name.ToLower())
+						{
+							case "partnership": priority = 1; break;
+							case "premium": priority = 2; break;
+							case "advance": priority = 3; break;
+						}
+					}
+					subscriptionDict[sub.UserId] = priority;
+				}
 			}
 
 			var applicationDtos = applications.Select(app => new JobApplicationViewDto
@@ -152,12 +158,11 @@ namespace ITC.Services.JobApplyService
 				HourlyRate = app.Job?.HourlyRate,
 				Interpreter = app.Interpreter,
 				WorkStatus = app.WorkStatus,
-				IsBoosted = boostedUserIds.Contains(app.InterpreterId)
+				SubscriptionPriority = subscriptionDict.TryGetValue(app.InterpreterId, out var p) ? p : 0
 			}).ToList();
 
-
-			// Sắp xếp: người được boost lên đầu, sau đó theo ngày ứng tuyển
-			return applicationDtos.OrderByDescending(a => a.IsBoosted).ThenByDescending(a => a.CreatedAt).ToList();
+			// Sắp xếp: ưu tiên theo SubscriptionPriority giảm dần, sau đó theo ngày ứng tuyển
+			return applicationDtos.OrderByDescending(a => a.SubscriptionPriority).ThenByDescending(a => a.CreatedAt).ToList();
 		}
 
 		public async Task SelectInterpreterAsync(SelectInterRequest selectInterRequest)

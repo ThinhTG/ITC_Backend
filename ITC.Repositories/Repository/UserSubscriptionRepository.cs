@@ -24,7 +24,7 @@ namespace ITC.Repositories.Repository
 		{
 			return await _context.UserSubscriptions
 				.Include(us => us.SubscriptionPlan)
-				.FirstOrDefaultAsync(us => us.UserId == userId && us.IsActive && us.ExpiredAt > DateTime.UtcNow);
+				.FirstOrDefaultAsync(us => us.UserId == userId && us.IsActive && us.ExpiredAt > DateTimeOffset.UtcNow);
 		}
 
 		public async Task AddAsync(UserSubscription subscription)

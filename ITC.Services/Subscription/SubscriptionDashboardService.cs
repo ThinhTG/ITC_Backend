@@ -55,8 +55,8 @@ namespace ITC.Services.Subscription
                 {
                     Customer = s.User?.FullName ?? s.UserId.ToString(),
                     Plan = s.SubscriptionPlan?.Name ?? "Unknown",
-                    StartDate = s.SubscribedAt,
-                    EndDate = s.ExpiredAt,
+                    StartDate = s.SubscribedAt.DateTime,
+                    EndDate = s.ExpiredAt.DateTime,
                     Amount = s.SubscriptionPlan?.Price ?? 0,
                     Status = "Active",
                     Payment = "Online" // Giả sử

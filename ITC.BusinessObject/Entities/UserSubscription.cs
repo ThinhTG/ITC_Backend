@@ -13,8 +13,8 @@ namespace ITC.BusinessObject.Entities
 		public Guid UserId { get; set; }
 		public Guid SubscriptionPlanId { get; set; }
 
-		public DateTime SubscribedAt { get; set; } = DateTime.UtcNow;
-		public DateTime ExpiredAt { get; set; }
+		public DateTimeOffset SubscribedAt { get; set; } = DateTime.UtcNow;
+		public DateTimeOffset ExpiredAt { get; set; }
 		public bool IsActive { get; set; } = true;
 
 		public ApplicationUser User { get; set; } = default!;
