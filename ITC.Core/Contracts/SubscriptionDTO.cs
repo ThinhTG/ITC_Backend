@@ -13,8 +13,8 @@ namespace ITC.Core.Contracts
 	public class SubscriptionResponseDto
 	{
 		public string PlanName { get; set; }
-		public DateTime SubscribedAt { get; set; }
-		public DateTime ExpiredAt { get; set; }
+		public DateTimeOffset SubscribedAt { get; set; }
+		public DateTimeOffset ExpiredAt { get; set; }
 		public bool IsActive { get; set; }
 	}
 

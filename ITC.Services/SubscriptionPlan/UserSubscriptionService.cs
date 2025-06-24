@@ -4,6 +4,7 @@ using ITC.Core.Constants;
 using ITC.Core.Contracts;
 using ITC.Repositories.Interface;
 using ITC.Repositories.Repository;
+using ITC.Services.Privilege;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,17 +19,20 @@ namespace ITC.Services.SubscriptionPlan
 		private readonly ISubscriptionPlanRepository _planRepo;
 		private readonly IWalletRepository _walletRepo;
 		private readonly IWalletTransactionRepository _walletTransactionRepo;
+		private readonly IPrivilegeService _privilegeService;
 
 		public UserSubscriptionService(
 			IUserSubscriptionRepository subscriptionRepo, 
 			ISubscriptionPlanRepository planRepo,
 			IWalletRepository walletRepo,
-			IWalletTransactionRepository walletTransactionRepo)
+			IWalletTransactionRepository walletTransactionRepo,
+			IPrivilegeService privilegeService)
 		{
 			_subscriptionRepo = subscriptionRepo;
 			_planRepo = planRepo;
 			_walletRepo = walletRepo;
 			_walletTransactionRepo = walletTransactionRepo;
+			_privilegeService = privilegeService;
 		}
 
 		//public async Task<SubscriptionResponseDto> SubscribeAsync(Guid userId, Guid planId)
@@ -160,17 +164,32 @@ namespace ITC.Services.SubscriptionPlan
 			return BaseResponse<SubscriptionResponseDto>.OkResponse(responseDto);
 		}
 
-		public async Task<SubscriptionResponseDto?> GetCurrentSubscriptionAsync(Guid userId)
+		public async Task<SubscriptionStatusDto?> GetCurrentSubscriptionAsync(Guid userId)
 		{
 			var sub = await _subscriptionRepo.GetActiveSubscriptionAsync(userId);
-			if (sub == null) return null;
+			if (sub == null || sub.SubscriptionPlan == null)
+			{
+				return new SubscriptionStatusDto
+				{
+					IsActive = false,
+					PlanName = "No active subscription"
+				};
+			}
 
-			return new SubscriptionResponseDto
+			var remainingPosts = await _privilegeService.GetRemainingJobPostsAsync(userId);
+			var remainingApplications = await _privilegeService.GetRemainingApplicationsAsync(userId);
+			var remainingTime = sub.ExpiredAt - DateTimeOffset.UtcNow;
+			if (remainingTime < TimeSpan.Zero) remainingTime = TimeSpan.Zero;
+
+			return new SubscriptionStatusDto
 			{
 				PlanName = sub.SubscriptionPlan.Name,
 				SubscribedAt = sub.SubscribedAt,
 				ExpiredAt = sub.ExpiredAt,
-				IsActive = sub.IsActive
+				IsActive = sub.IsActive,
+				RemainingPosts = remainingPosts == int.MaxValue ? null : remainingPosts,
+				RemainingApplications = remainingApplications == int.MaxValue ? null : remainingApplications,
+				RemainingTime = remainingTime
 			};
 		}
 

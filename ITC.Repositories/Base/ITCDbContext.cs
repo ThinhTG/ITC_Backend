@@ -128,10 +128,17 @@
 					  .OnDelete(DeleteBehavior.Cascade);
 			});
 
-
-
-
-
+			// Convert all DateTimeOffset properties to datetimeoffset in SQL Server
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				foreach (var property in entityType.GetProperties())
+				{
+					if (property.ClrType == typeof(DateTimeOffset) || property.ClrType == typeof(DateTimeOffset?))
+					{
+						property.SetColumnType("datetimeoffset");
+					}
+				}
+			}
 
 		}
 	}
