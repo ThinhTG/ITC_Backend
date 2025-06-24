@@ -36,5 +36,19 @@ namespace ITC.Repositories.Repository
 				.Where(wt => wt.WalletId == walletId)
 				.ToListAsync();
 		}
+
+		public async Task<int> GetTotalTransactionsAsync()
+		{
+			return await _context.WalletTransaction
+				.Where(t => t.TransactionStatus == "success")
+				.CountAsync();
+		}
+
+		public async Task<decimal> GetMonthlyRevenueAsync(int month, int year)
+		{
+			return await _context.WalletTransaction
+				.Where(t => t.TransactionStatus == "success" && t.TransactionDate.Month == month && t.TransactionDate.Year == year)
+				.SumAsync(t => t.Amount);
+		}
 	}
 }

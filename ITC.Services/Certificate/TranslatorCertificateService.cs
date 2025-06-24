@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Identity;
 using ITC.Core.Contracts;
 using ITC.Core.Enum;
 using ITC.Repositories.Interface;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +16,16 @@ namespace ITC.Services.Certificate
 	public class TranslatorCertificateService : ITranslatorCertificateService
 	{
 		private readonly ITranslatorCertificateRepository _repo;
+		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly IMapper _mapper;
 
 		public TranslatorCertificateService(
 			ITranslatorCertificateRepository repo,
-			IMapper mapper)
+			IMapper mapper, UserManager<ApplicationUser>  userManager)
 		{
 			_repo = repo;
 			_mapper = mapper;
+			_userManager = userManager;
 		}
 
 		public async Task<List<TranslatorCertificateDto>> GetByUserIdAsync(Guid userId)
@@ -43,6 +47,9 @@ namespace ITC.Services.Certificate
 			var entity = _mapper.Map<TranslatorCertificate>(dto);
 			entity.ApplicationUserId = userId;
 			var result = await _repo.AddAsync(entity);
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			user.ApprovalStatus = UserApprovalStatus.PendingApproval;
+			await _userManager.UpdateAsync(user);
 			return _mapper.Map<TranslatorCertificateDto>(result);
 		}
 

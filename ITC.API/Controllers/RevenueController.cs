@@ -21,5 +21,12 @@ namespace ITC.API.Controllers
 			var report = await _revenueService.GetRevenueReportAsync();
 			return Ok(report);
 		}
+
+		[HttpGet("dashboard")]
+		public async Task<IActionResult> GetDashboard()
+		{
+			var dashboard = await _revenueService.GetDashboardAsync();
+			return Ok(dashboard);
+		}
 	}
 }
