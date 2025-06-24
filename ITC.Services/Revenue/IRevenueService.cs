@@ -10,6 +10,7 @@ namespace ITC.Services.Revenue
 	public interface IRevenueService
 	{
 		Task<RevenueReportDto> GetRevenueReportAsync();
+		Task<DashboardDto> GetDashboardAsync();
 	}
 
 }

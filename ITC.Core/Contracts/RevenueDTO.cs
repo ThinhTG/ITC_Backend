@@ -30,4 +30,10 @@ namespace ITC.Core.Contracts
 		public int BookedCount { get; set; }
 	}
 
+	public class DashboardDto
+	{
+		public decimal TotalRevenue { get; set; }
+		public decimal MonthlyRevenue { get; set; }
+		public int TotalTransactions { get; set; }
+	}
 }

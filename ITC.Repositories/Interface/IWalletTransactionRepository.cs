@@ -13,5 +13,7 @@ namespace ITC.Repositories.Interface
 		Task<IEnumerable<WalletTransaction>> GetWalletTransactionByWalletIdAsync(Guid walletId);
 		Task<IEnumerable<WalletTransaction>> GetAllAsync();
 		IQueryable<WalletTransaction> GetAll();
+		Task<int> GetTotalTransactionsAsync();
+		Task<decimal> GetMonthlyRevenueAsync(int month, int year);
 	}
 }

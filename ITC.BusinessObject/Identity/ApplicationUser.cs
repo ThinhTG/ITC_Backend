@@ -56,7 +56,7 @@ namespace ITC.BusinessObject.Identity
         {
             CreatedTime = CoreHelper.SystemTimeNow;
             LastUpdatedTime = CreatedTime;
-            ApprovalStatus = UserApprovalStatus.PendingApproval;
+            ApprovalStatus = UserApprovalStatus.NoCertificate;
         }
 
 		// Bank Account
