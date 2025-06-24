@@ -12,5 +12,6 @@ namespace ITC.Services.User
         Task<IEnumerable<UserResponse>> GetPendingApprovalUsersAsync();
         Task<bool> ApproveUserAsync(Guid userId);
         Task<bool> RejectUserAsync(Guid userId, RejectUserRequest request);
+        Task<UserApprovalStatusStatsDto> GetUserApprovalStatusStatsAsync();
     }
 } 

@@ -15,6 +15,8 @@ namespace ITC.Repositories.Interface
 		Task SaveChangesAsync();
 
 		Task<SubscriptionStatusDto> GetUserSubscriptionStatusAsync(Guid userId);
+
+		Task<IEnumerable<UserSubscription>> GetAllAsync();
 	}
 
 

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ITC.Repositories.Interface
 {
-	public interface INotificationRepository
+	public interface INotificationRepository : IGenericRepository<Notifications>
 	{
-		Task AddAsync(Notification notification);
-		Task<IEnumerable<Notification>> GetUnreadByUserIdAsync(Guid userId);
+		Task<IEnumerable<Notifications>> GetUnreadByUserIdAsync(Guid userId);
 		Task MarkAsReadAsync(Guid notificationId);
+		Task<IEnumerable<Notifications>> GetByUserIdAsync(Guid userId);
 	}
 
 }

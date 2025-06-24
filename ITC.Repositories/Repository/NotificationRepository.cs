@@ -10,22 +10,22 @@ using System.Threading.Tasks;
 
 namespace ITC.Repositories.Repository
 {
-	public class NotificationRepository : INotificationRepository
+	public class NotificationRepository : GenericRepository<Notifications>, INotificationRepository
 	{
 		private readonly ITCDbContext _context;
 
-		public NotificationRepository(ITCDbContext context)
+		public NotificationRepository(ITCDbContext context) : base(context)
 		{
 			_context = context;
 		}
 
-		public async Task AddAsync(Notification notification)
+		public async Task AddAsync(Notifications notification)
 		{
 			await _context.Notifications.AddAsync(notification);
 			await _context.SaveChangesAsync();
 		}
 
-		public async Task<IEnumerable<Notification>> GetUnreadByUserIdAsync(Guid userId)
+		public async Task<IEnumerable<Notifications>> GetUnreadByUserIdAsync(Guid userId)
 		{
 			return await _context.Notifications
 				.Where(n => n.ReceiverUserId == userId && !n.IsRead)
@@ -33,7 +33,7 @@ namespace ITC.Repositories.Repository
 				.ToListAsync();
 		}
 
-		public async Task<IEnumerable<Notification>> GetAllByUserIdAsync(Guid userId)
+		public async Task<IEnumerable<Notifications>> GetAllByUserIdAsync(Guid userId)
 		{
 			return await _context.Notifications
 				.Where(n => n.ReceiverUserId == userId)
@@ -47,8 +47,16 @@ namespace ITC.Repositories.Repository
 			if (notification != null)
 			{
 				notification.IsRead = true;
-				await _context.SaveChangesAsync();
+				Update(notification);
 			}
+		}
+
+		public async Task<IEnumerable<Notifications>> GetByUserIdAsync(Guid userId)
+		{
+			return await _context.Notifications
+				.Where(n => n.ReceiverUserId == userId)
+				.OrderByDescending(n => n.CreatedAt)
+				.ToListAsync();
 		}
 	}
 
