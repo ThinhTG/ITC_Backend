@@ -8,8 +8,8 @@ namespace ITC.BusinessObject.Identity
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
-        public UserApprovalStatus ApprovalStatus { get; set; }
-        public string? RejectReason { get; set; }
+        public UserApprovalStatus ApprovalStatus { get; set; } = UserApprovalStatus.NoCertificate;
+		public string? RejectReason { get; set; }
         /// <summary>
         /// Tên người dùng
         /// </summary>

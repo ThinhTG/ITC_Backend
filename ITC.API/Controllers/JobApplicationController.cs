@@ -62,13 +62,13 @@ namespace ITC.API.Controllers
 					
 					if (!certificates.Any())
 					{
-						return BadRequest(new { Message = "Hãy cập nhật certificate trước khi apply job." });
+						return Ok(new { Message = "Hãy cập nhật certificate trước khi apply job." });
 					}
 					
 					var approvedCertificate = certificates.FirstOrDefault(c => c.Status == Core.Enum.CertificateStatus.Approved);
 					if (approvedCertificate == null)
 					{
-						return BadRequest(new { Message = "Hãy đợi trong vòng 24 tiếng để certificate được duyệt." });
+						return Ok(new { Message = "Hãy đợi trong vòng 24 tiếng để certificate được duyệt." });
 					}
 				}
 
