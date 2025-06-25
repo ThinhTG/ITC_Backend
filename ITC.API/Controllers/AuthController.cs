@@ -108,13 +108,51 @@ namespace ITC.API.Controllers
 		public async Task<IActionResult> GetById(string id)
 		{
 			var user = await _userManager.FindByIdAsync(id);
-			var userWithCert = await _userManager.Users
-			 .Include(u => u.TranslatorCertificates)
-			.FirstOrDefaultAsync(u => u.Id == user.Id);
 			if (user == null)
 				return NotFound(new { Message = "User not found" });
 
-			return Ok(userWithCert);
+			// Get active subscription and determine priority
+			var userIdGuid = Guid.Parse(user.Id.ToString());
+			var subRepo = HttpContext.RequestServices.GetService(typeof(ITC.Repositories.Interface.IUserSubscriptionRepository)) as ITC.Repositories.Interface.IUserSubscriptionRepository;
+			var activeSub = await subRepo.GetActiveSubscriptionAsync(userIdGuid);
+			int priority = 0;
+			if (activeSub != null && activeSub.SubscriptionPlan != null)
+			{
+				switch (activeSub.SubscriptionPlan.Name.ToLower())
+				{
+					case "partnership": priority = 1; break;
+					case "premium": priority = 2; break;
+					case "advance": priority = 3; break;
+				}
+			}
+
+			var userWithCert = await _userManager.Users
+				.Include(u => u.TranslatorCertificates)
+				.FirstOrDefaultAsync(u => u.Id == user.Id);
+
+			var response = new ITC.BusinessObject.Response.UserResponse
+			{
+				Id = userWithCert.Id,
+				FullName = userWithCert.FullName,
+				Email = userWithCert.Email,
+				Gender = userWithCert.Gender,
+				AvatarURL = userWithCert.AvatarUrl,
+				PhoneNumber = userWithCert.PhoneNumber,
+				CreateAt = userWithCert.CreatedTime.UtcDateTime,
+				UpdateAt = userWithCert.LastUpdatedTime.UtcDateTime,
+				AccessToken = null,
+				RefreshToken = userWithCert.RefreshToken,
+				Address = userWithCert.Address,
+				CertificateFiles = userWithCert.CertificateFiles,
+				Experience = userWithCert.Experience,
+				PortraitUrl = userWithCert.PortraitUrl,
+				ApprovalStatus = userWithCert.ApprovalStatus.ToString(),
+				RejectReason = userWithCert.RejectReason,
+				IsBoosted = false, // You can add logic to get this if needed
+				Priority = priority
+			};
+
+			return Ok(response);
 		}
 
 		[HttpPost("refresh-token")]
