@@ -425,7 +425,7 @@ namespace ITC.Services.Auth
 		//}
 
 
-		public async Task<UserResponse> LoginGoogle(GoogleLoginRequest request)
+		public async Task<AuthResponseDto> LoginGoogle(GoogleLoginRequest request)
 		{
 			var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token)
 						  ?? throw new Exception("Invalid Google token.");
@@ -435,37 +435,10 @@ namespace ITC.Services.Auth
 			string googleId = payload.Subject;
 
 			var user = await _userManager.FindByEmailAsync(email);
-			if (user != null)
-			{
-				// Email đã tồn tại
-				var roles = await _userManager.GetRolesAsync(user);
-				var token = await _tokenService.GenerateToken(user);
-				var refreshToken = _tokenService.GenerateRefreshToken();
-
-				using var sha256 = SHA256.Create();
-				var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
-				user.RefreshToken = Convert.ToBase64String(refreshTokenHash);
-				user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
-
-				var updateResult = await _userManager.UpdateAsync(user);
-				if (!updateResult.Succeeded)
-				{
-					var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-					_logger.LogError("Failed to update user: {errors}", errors);
-					throw new Exception($"Failed to update user: {errors}");
-				}
-
-				var userResponse = _mapper.Map<ApplicationUser, UserResponse>(user);
-				userResponse.AccessToken = token;
-				userResponse.RefreshToken = refreshToken;
-				userResponse.Address = user.Address;
-
-				return userResponse;
-			}
-			else
+			if (user == null)
 			{
 				// Email chưa tồn tại, tạo mới user với Role = null
-				var newUser = new ApplicationUser
+				user = new ApplicationUser
 				{
 					UserName = googleId,
 					Email = email,
@@ -475,36 +448,60 @@ namespace ITC.Services.Auth
 					RefreshTokenExpiryTime = null,
 				};
 
-				var createResult = await _userManager.CreateAsync(newUser);
+				var createResult = await _userManager.CreateAsync(user);
 				if (!createResult.Succeeded)
 				{
 					var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
 					_logger.LogError("Failed to create user: {errors}", errors);
 					throw new Exception($"Failed to create user: {errors}");
 				}
-
-				await CreateWalletForUserAsync(newUser.Id);
-
-				// Generate token + refresh token for newly created user
-				var token = await _tokenService.GenerateToken(newUser);
-				var refreshToken = _tokenService.GenerateRefreshToken();
-
-				using var sha256 = SHA256.Create();
-				var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
-				newUser.RefreshToken = Convert.ToBase64String(refreshTokenHash);
-				newUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(2);
-				await _userManager.UpdateAsync(newUser);
-
-				var userResponse = _mapper.Map<ApplicationUser, UserResponse>(newUser);
-				userResponse.AccessToken = token;
-				userResponse.RefreshToken = refreshToken;
-				userResponse.Address = newUser.Address;
-				userResponse.Message = "Google account authenticated and user created.";
-
-				return userResponse;
+				await CreateWalletForUserAsync(user.Id);
 			}
-		}
 
+			// Generate tokens
+			var accessToken = await _tokenService.GenerateToken(user);
+			var refreshToken = _tokenService.GenerateRefreshToken();
+
+			// Save refresh token
+			user.RefreshToken = refreshToken;
+			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			await _userManager.UpdateAsync(user);
+
+			var userRes = _mapper.Map<ApplicationUser, UserResponse>(user);
+
+			// Lấy priority subscription
+			int priority = 0;
+			var subRepo = _serviceProvider.GetService(typeof(IUserSubscriptionRepository)) as IUserSubscriptionRepository;
+			if (subRepo != null)
+			{
+				var activeSub = await subRepo.GetActiveSubscriptionAsync(user.Id);
+				if (activeSub != null && activeSub.SubscriptionPlan != null)
+				{
+					switch (activeSub.SubscriptionPlan.Name.ToLower())
+					{
+						case "partnership":
+							priority = 1;
+							break;
+						case "premium":
+							priority = 2;
+							break;
+						case "advance":
+							priority = 3;
+							break;
+					}
+				}
+			}
+
+			return new AuthResponseDto
+			{
+				Success = true,
+				AccessToken = accessToken,
+				RefreshToken = refreshToken,
+				Message = "Login successful",
+				User = userRes,
+				Priority = priority
+			};
+		}
 
 
 		public async Task<AuthResponseDto> AssignRoleToGoogleUserAsync(string email, string role)

@@ -29,5 +29,6 @@ namespace ITC.BusinessObject.Response
 		public string? ApprovalStatus { get; set; }
 		public string? RejectReason { get; set; }
 		public bool IsBoosted { get; set; }
+
 	}
 }
