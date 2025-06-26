@@ -121,8 +121,8 @@ namespace ITC.API.Controllers
 				switch (activeSub.SubscriptionPlan.Name.ToLower())
 				{
 					case "partnership": priority = 1; break;
-					case "premium": priority = 2; break;
-					case "advance": priority = 3; break;
+					case "premium": priority = 3; break;
+					case "advance": priority = 2; break;
 				}
 			}
 

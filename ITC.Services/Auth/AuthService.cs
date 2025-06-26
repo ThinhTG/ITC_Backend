@@ -257,8 +257,8 @@ namespace ITC.Services.Auth
 					switch (activeSub.SubscriptionPlan.Name.ToLower())
 					{
 						case "partnership": priority = 1; break;
-						case "premium": priority = 2; break;
-						case "advance": priority = 3; break;
+						case "premium": priority = 3; break;
+						case "advance": priority = 2; break;
 					}
 				}
 			}
@@ -483,10 +483,10 @@ namespace ITC.Services.Auth
 							priority = 1;
 							break;
 						case "premium":
-							priority = 2;
+							priority = 3;
 							break;
 						case "advance":
-							priority = 3;
+							priority = 2;
 							break;
 					}
 				}
