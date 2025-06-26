@@ -1,13 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
+using ITC.Services.JobApplyService;
+using ITC.BusinessObject.Identity;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ReviewController : ControllerBase
 {
     private readonly IReviewService _reviewService;
-    public ReviewController(IReviewService reviewService)
+    private readonly IJobApplicationService _jobApplicationService;
+    public ReviewController(IReviewService reviewService, IJobApplicationService jobApplicationService)
     {
         _reviewService = reviewService;
+        _jobApplicationService = jobApplicationService;
     }
 
     /// <summary>
@@ -67,6 +71,18 @@ public class ReviewController : ControllerBase
     public async Task<IActionResult> GetReviewSummary(Guid revieweeId)
     {
         var result = await _reviewService.GetReviewSummaryForUserAsync(revieweeId);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Lấy danh sách BPDV đã hoàn thành job để customer review
+    /// </summary>
+    /// <param name="jobId">Id của job</param>
+    /// <returns>Danh sách BPDV đã hoàn thành job</returns>
+    [HttpGet("job/{jobId}/reviewable-bpdv")]
+    public async Task<IActionResult> GetReviewableBPDVForJob(Guid jobId)
+    {
+        var result = await _jobApplicationService.GetReviewableBPDVForJobAsync(jobId);
         return Ok(result);
     }
 } 

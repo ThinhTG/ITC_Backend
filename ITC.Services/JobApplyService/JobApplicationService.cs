@@ -283,6 +283,17 @@ namespace ITC.Services.JobApplyService
 			await _ApplyRepository.SaveChangesAsync();
 		}
 
+		public async Task<List<ApplicationUser>> GetReviewableBPDVForJobAsync(Guid jobId)
+		{
+			var applications = await _ApplyRepository.GetByJobIdAsync(jobId);
+			// Lọc các ứng viên đã hoàn thành job
+			var completedApps = applications.Where(a => a.WorkStatus == (int)InterpreterWorkStatus.Completed && a.Interpreter != null)
+				.Select(a => a.Interpreter!)
+				.Distinct()
+				.ToList();
+			return completedApps;
+		}
+
 	}
 
 }
