@@ -13,6 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using ITC.Core.Enum;
 using ITC.Services.Privilege;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using ITC.Core.Utils;
 
 namespace ITC.Services.JobService
 {
@@ -140,7 +143,7 @@ namespace ITC.Services.JobService
 				WorkPostalCode = dto.WorkPostalCode,
 				WorkCountry = dto.WorkCountry,
 				CustomerId = dto.CustomerId,
-				CreatedAt = DateTimeOffset.UtcNow,
+				CreatedAt = TimeHelper.GetVietnameseTime(),
 				Deadline = dto.Deadline,
 				RequiredHires = dto.RequiredHires,
 				CurrentHires = 0,

@@ -23,7 +23,7 @@ namespace ITC.BusinessObject.Entities
         public WithdrawalStatus Status { get; set; } = WithdrawalStatus.Pending;
 
         [Required]
-        public DateTimeOffset RequestDate { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset RequestDate { get; set; }
 
         public DateTimeOffset? ProcessedDate { get; set; }
 

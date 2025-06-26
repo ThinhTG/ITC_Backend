@@ -2,6 +2,7 @@
 using ITC.Repositories.Repository;
 using ITC.Services.Auth;
 using ITC.Services.Certificate;
+using ITC.Services.Complaint;
 using ITC.Services.Email;
 using ITC.Services.JobApplyService;
 using ITC.Services.JobService;
@@ -9,13 +10,12 @@ using ITC.Services.JobWork;
 using ITC.Services.Notification;
 using ITC.Services.PaymentService;
 using ITC.Services.Revenue;
+using ITC.Services.Subscription;
 using ITC.Services.SubscriptionPlan;
 using ITC.Services.TokenService;
 using ITC.Services.User;
 using ITC.Services.WalletService;
 using ITC.Services.WithdrawalService;
-using ITC.Services.Subscription;
-using Microsoft.AspNetCore.Http;
 
 namespace ITC.API.DI
 {
@@ -58,6 +58,10 @@ namespace ITC.API.DI
 			services.AddScoped<ISubscriptionDashboardService, SubscriptionDashboardService>();
 			services.AddScoped<ITC.Services.Privilege.IPrivilegeService, ITC.Services.Privilege.PrivilegeService>();
 			services.AddScoped<ITC.Services.Notification.INotificationService, ITC.Services.Notification.NotificationService>();
+			services.AddScoped<IComplaintRepository, ComplaintRepository>();
+			services.AddScoped<IComplaintMessageRepository, ComplaintMessageRepository>();
+			services.AddScoped<IComplaintService, ComplaintService>();
+
 		}
 	}
 }

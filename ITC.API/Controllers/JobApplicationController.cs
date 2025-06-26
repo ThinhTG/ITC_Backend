@@ -1,22 +1,18 @@
-﻿using ITC.Services.DTOs.JobApply;
+using ITC.Services.DTOs.JobApply;
 using ITC.Services.JobApplyService;
 using ITC.Services.Certificate;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using ITC.BusinessObject.Identity;
 using System.Security.Claims;
-using System.IO;
 using ITC.Core.Base;
 using ITC.Core.Constants;
-using Humanizer;
-using System.Numerics;
 
 namespace ITC.API.Controllers
 {
 	[ApiController]
-	[Route("api/[controller]")]
+    [Route("api/applications")]
 	public class JobApplicationController : ControllerBase
 	{
 		private readonly IJobApplicationService _service;
@@ -33,7 +29,6 @@ namespace ITC.API.Controllers
 			_userManager = userManager;
 		}
 
-
 		/// <summary>
 		/// Apply to a Job
 		/// </summary>
@@ -45,25 +40,25 @@ namespace ITC.API.Controllers
 		{
 			try
 			{
-				// Lấy thông tin user hiện tại
+				// L?y th�ng tin user hi?n t?i
 				var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 				if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
 				{
 					return Unauthorized("Invalid user identifier.");
 				}
-				
+
 				var user = await _userManager.FindByIdAsync(userId.ToString());
 				if (user == null)
 				{
 					return Unauthorized("User not found.");
 				}
-				
-				// Kiểm tra nếu là Talent thì phải có certificate được duyệt
+
+				// Ki?m tra n?u l� Talent th� ph?i c� certificate ???c duy?t
 				var userRoles = await _userManager.GetRolesAsync(user);
 				if (userRoles.Contains("Talent"))
 				{
 					var certificates = await _certificateService.GetCertificatesByUserIdAsync(userId);
-					
+
 					if (!certificates.Any())
 					{
 						return Ok(new BaseResponse<string>(
@@ -91,26 +86,14 @@ namespace ITC.API.Controllers
 			}
 		}
 
-		/// <summary>
-		/// Lay Toan Bo Apply cua 1 Job (bao gồm thông tin file upload của customer)
-		/// </summary>
-		/// <param name="jobId"></param>
-		/// <returns></returns>
-		[HttpGet("{jobId}/applications")]
+		[HttpGet("job/{jobId}")]
 		public async Task<IActionResult> GetApplications(Guid jobId)
 		{
 			var result = await _service.GetApplicationsForJobWithDetailsAsync(jobId);
 			return Ok(result);
 		}
 
-
-		/// <summary>
-		/// Chon BPD cho 1 Job
-		/// </summary>
-		/// <param name="jobId">Nhap JobID</param>
-		/// <param name="intrepreterId">Nhap ID của BPDV</param>
-		/// <returns></returns>
-		[HttpPost("/select")]
+        [HttpPost("select")]
 		public async Task<IActionResult> SelectInterpreter([FromBody]SelectInterRequest selectInterRequest)
 		{
 			try
@@ -124,12 +107,7 @@ namespace ITC.API.Controllers
 			}
 		}
 
-		/// <summary>
-		/// Từ chối BPDV cho 1 Job
-		/// </summary>
-		/// <param name="rejectRequest">Chứa JobId và InterpreterId</param>
-		/// <returns></returns>
-		[HttpPost("/reject")]
+        [HttpPost("reject")]
 		public async Task<IActionResult> RejectInterpreter([FromBody]SelectInterRequest rejectRequest)
 		{
 			try
@@ -143,18 +121,11 @@ namespace ITC.API.Controllers
 			}
 		}
 
-		/// <summary>
-		/// get all Apply cua 1 interpreter 
-		/// </summary>
-		/// <param name="interpreterId"></param>
-		/// <returns></returns>
 		[HttpGet("interpreter/{interpreterId}")]
 		public async Task<IActionResult> GetApplicationsByInterpreter(Guid interpreterId)
 		{
 			var result = await _service.GetApplicationsByInterpreterId(interpreterId);
 			return Ok(result);
 		}
-
 	}
-
 }

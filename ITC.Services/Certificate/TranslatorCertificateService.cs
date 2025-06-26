@@ -3,6 +3,7 @@ using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
 using ITC.Core.Contracts;
 using ITC.Core.Enum;
+using ITC.Core.Utils;
 using ITC.Repositories.Interface;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -21,7 +22,7 @@ namespace ITC.Services.Certificate
 
 		public TranslatorCertificateService(
 			ITranslatorCertificateRepository repo,
-			IMapper mapper, UserManager<ApplicationUser>  userManager)
+			IMapper mapper, UserManager<ApplicationUser> userManager)
 		{
 			_repo = repo;
 			_mapper = mapper;
@@ -60,7 +61,7 @@ namespace ITC.Services.Certificate
 				throw new KeyNotFoundException($"Certificate with ID {id} not found.");
 
 			_mapper.Map(dto, existing);
-			existing.UpdatedAt = DateTimeOffset.UtcNow;
+			existing.UpdatedAt = TimeHelper.GetVietnameseTime();
 			await _repo.UpdateAsync(existing);
 		}
 
@@ -87,9 +88,9 @@ namespace ITC.Services.Certificate
 			if (certificate == null) return false;
 
 			certificate.Status = CertificateStatus.Approved;
-			certificate.ApprovedAt = DateTimeOffset.UtcNow;
+			certificate.ApprovedAt = TimeHelper.GetVietnameseTime();
 			// TODO: Set ApprovedBy to current admin ID
-			
+
 			await _repo.UpdateAsync(certificate);
 			return true;
 		}
@@ -101,8 +102,8 @@ namespace ITC.Services.Certificate
 
 			certificate.Status = CertificateStatus.Rejected;
 			certificate.RejectReason = reason;
-			certificate.UpdatedAt = DateTimeOffset.UtcNow;
-			
+			certificate.UpdatedAt = TimeHelper.GetVietnameseTime();
+
 			await _repo.UpdateAsync(certificate);
 			return true;
 		}

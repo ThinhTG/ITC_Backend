@@ -1,13 +1,8 @@
 ﻿using ITC.BusinessObject.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ITC.Repositories.Interface
 {
-    public interface IJobApplicationRepository
+	public interface IJobApplicationRepository
     {
 		Task<bool> AlreadyAppliedAsync(Guid jobId, Guid interpreterId);
 		Task AddAsync(JobApplication application);
@@ -18,5 +13,7 @@ namespace ITC.Repositories.Interface
 
 		IQueryable<JobApplication> GetJobApplicationsByInterpreterIdQueryable(Guid interpreterId);
 
+		Task<JobApplication> GetByIdAsync(Guid id);
+		Task Apply(JobApplication jobApplication);
 	}
 }

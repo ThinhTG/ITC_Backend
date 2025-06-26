@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
+using ITC.Core.Utils;
 
 namespace ITC.API.Controllers
 {
@@ -244,7 +246,7 @@ namespace ITC.API.Controllers
 			user.AvatarUrl = updateDto.AvatarUrl ?? user.AvatarUrl;
 			user.Gender = updateDto.Gender ?? user.Gender;
 			user.Address = updateDto.Address ?? user.Address;
-			user.LastUpdatedTime = DateTimeOffset.UtcNow;
+			user.LastUpdatedTime = TimeHelper.GetVietnameseTime();
 
 			var result = await _userManager.UpdateAsync(user);
 			if (!result.Succeeded)

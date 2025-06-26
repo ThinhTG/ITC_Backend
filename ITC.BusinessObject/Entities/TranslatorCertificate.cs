@@ -36,7 +36,7 @@ namespace ITC.BusinessObject.Entities
 		public string? CertificateNames { get; set; }
 		public string? CertificateFileUrl { get; set; }
 
-		public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+		public DateTimeOffset CreatedAt { get; set; }
 		public DateTimeOffset? UpdatedAt { get; set; }
 
 		// Trạng thái duyệt certificate

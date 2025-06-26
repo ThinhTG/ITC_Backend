@@ -2,6 +2,7 @@
 using ITC.Core.Base;
 using ITC.Core.Constants;
 using ITC.Core.Enum;
+using ITC.Core.Utils;
 using ITC.Services.JobApplyService;
 using ITC.Services.JobService;
 using ITC.Services.PaymentService;
@@ -157,8 +158,8 @@ namespace ITC.API.Controllers
 				application.WorkStatus = (int)InterpreterWorkStatus.Paid;
 				application.IsPaid = true;
 				application.IndividualFee = request.Amount;
-				application.PaidAt = DateTimeOffset.UtcNow;
-				application.LastUpdatedAt = DateTimeOffset.UtcNow;
+				application.PaidAt = TimeHelper.GetVietnameseTime();
+				application.LastUpdatedAt = TimeHelper.GetVietnameseTime();
 
 				// Save changes to database
 				await _jobApplicationService.SaveChangesAsync();

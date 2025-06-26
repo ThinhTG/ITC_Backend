@@ -29,7 +29,7 @@ namespace ITC.Services.JobApplyService
 		private readonly IUserSubscriptionRepository _userSubscriptionRepo;
 
 
-		public JobApplicationService(IJobApplicationRepository repository, INotificationService notificationService, IJobRepository jobRepository,UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext, IPrivilegeService privilegeService, IUserSubscriptionRepository userSubscriptionRepo)
+		public JobApplicationService(IJobApplicationRepository repository, INotificationService notificationService, IJobRepository jobRepository, UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext, IPrivilegeService privilegeService, IUserSubscriptionRepository userSubscriptionRepo)
 		{
 			_ApplyRepository = repository;
 			_jobRepository = jobRepository;
@@ -99,9 +99,9 @@ namespace ITC.Services.JobApplyService
 			};
 
 			await _notificationService.SendNotificationAsync(
-	            job.CustomerId,
-	           "Có người ứng tuyển",
-	           $"Biên dịch viên {interpreter.FullName} đã ứng tuyển công việc {job.JobTitle}."
+				job.CustomerId,
+			   "Có người ứng tuyển",
+			   $"Biên dịch viên {interpreter.FullName} đã ứng tuyển công việc {job.JobTitle}."
 );
 
 

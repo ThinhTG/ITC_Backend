@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using ITC.Core.Utils;
 
 namespace ITC.API.Controllers
 {
@@ -104,8 +105,8 @@ namespace ITC.API.Controllers
 				application.WorkStatus = (int)InterpreterWorkStatus.Paid;
 				application.IsPaid = true;
 				application.IndividualFee = 100000; // Default amount for testing
-				application.PaidAt = DateTimeOffset.UtcNow;
-				application.LastUpdatedAt = DateTimeOffset.UtcNow;
+				application.PaidAt = TimeHelper.GetVietnameseTime();
+				application.LastUpdatedAt = TimeHelper.GetVietnameseTime();
 
 				// Save changes
 				await _jobApplicationService.SaveChangesAsync();

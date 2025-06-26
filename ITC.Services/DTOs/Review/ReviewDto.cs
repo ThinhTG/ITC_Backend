@@ -1,3 +1,5 @@
+using ITC.Core.Utils;
+
 public class ReviewDto
 {
     public Guid Id { get; set; }
@@ -6,5 +8,5 @@ public class ReviewDto
     public Guid JobId { get; set; }
     public int Rating { get; set; }
     public string Comment { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } =  TimeHelper.GetVietnameseTime();
 } 

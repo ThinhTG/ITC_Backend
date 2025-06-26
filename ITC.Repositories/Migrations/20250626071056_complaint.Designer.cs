@@ -4,6 +4,7 @@ using ITC.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITC.Repositories.Migrations
 {
     [DbContext(typeof(ITCDbContext))]
-    partial class ITCDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250626071056_complaint")]
+    partial class complaint
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,30 +34,17 @@ namespace ITC.Repositories.Migrations
                     b.Property<Guid?>("AdminId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("AmountToPayTalent")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("AmountToRefundCustomer")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("ComplaintType")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("RelatedJobApplicationId")
+                    b.Property<Guid?>("RelatedJobId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("RelatedUserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ResolutionNotes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ResolvedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -90,8 +80,8 @@ namespace ITC.Repositories.Migrations
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("SentAt")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
