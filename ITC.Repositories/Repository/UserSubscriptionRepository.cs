@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ITC.Core.Utils;
 
 namespace ITC.Repositories.Repository
 {
@@ -24,7 +25,7 @@ namespace ITC.Repositories.Repository
 		{
 			return await _context.UserSubscriptions
 				.Include(us => us.SubscriptionPlan)
-				.FirstOrDefaultAsync(us => us.UserId == userId && us.IsActive && us.ExpiredAt > DateTimeOffset.UtcNow);
+				.FirstOrDefaultAsync(us => us.UserId == userId && us.IsActive && us.ExpiredAt > TimeHelper.GetVietnameseTime());
 		}
 
 		public async Task AddAsync(UserSubscription subscription)
@@ -42,7 +43,7 @@ namespace ITC.Repositories.Repository
 		{
 			var subscription = await _context.UserSubscriptions
 				.Include(x => x.SubscriptionPlan)
-				.Where(x => x.UserId == userId && x.IsActive && x.ExpiredAt > DateTime.UtcNow)
+				.Where(x => x.UserId == userId && x.IsActive && x.ExpiredAt > TimeHelper.GetVietnameseTime())
 				.OrderByDescending(x => x.SubscribedAt)
 				.FirstOrDefaultAsync();
 
@@ -69,11 +70,17 @@ namespace ITC.Repositories.Repository
 
 		public async Task<List<UserSubscription>> GetActiveSubscriptionsForUsersAsync(IEnumerable<Guid> userIds)
 		{
-			var now = DateTime.UtcNow;
+			var now = TimeHelper.GetVietnameseTime();
 			return await _context.UserSubscriptions
 				.Include(us => us.SubscriptionPlan)
 				.Where(us => userIds.Contains(us.UserId) && us.IsActive && us.ExpiredAt > now)
 				.ToListAsync();
+		}
+
+		public async Task<UserSubscription> GetCurrentActiveSubscription(Guid userId)
+		{
+			return await _context.UserSubscriptions
+				.FirstOrDefaultAsync(us => us.UserId == userId && us.IsActive && us.ExpiredAt > TimeHelper.GetVietnameseTime());
 		}
 	}
 

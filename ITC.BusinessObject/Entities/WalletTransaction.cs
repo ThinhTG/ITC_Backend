@@ -32,7 +32,7 @@ namespace ITC.BusinessObject.Entities
 
 		public string? Description { get; set; } = string.Empty;
 		public int? OrderId { get; set; }
-		public DateTimeOffset CreateAt { get; set; } = DateTimeOffset.UtcNow;
+		public DateTimeOffset CreateAt { get; set; }
 
 		[JsonIgnore]
 		public virtual Wallet? Wallet { get; set; }

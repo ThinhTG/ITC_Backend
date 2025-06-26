@@ -59,6 +59,19 @@ namespace ITC.Repositories.Repository
 				.AsQueryable();
 		}
 
+		public async Task<JobApplication> GetByIdAsync(Guid id)
+		{
+			return await _context.JobApplications
+				.Include(ja => ja.Job)
+				.FirstOrDefaultAsync(ja => ja.Id == id);
+		}
+
+		public async Task Apply(JobApplication jobApplication)
+		{
+			await _context.JobApplications.AddAsync(jobApplication);
+			await _context.SaveChangesAsync();
+		}
+
 	}
 
 }

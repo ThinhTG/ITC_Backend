@@ -118,6 +118,5 @@ namespace ITC.Services.PaymentService
 			return PaymentResult.Success();
 		}
 
-		
 	}
 }

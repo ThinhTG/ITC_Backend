@@ -9,6 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using ITC.Core.Utils;
 
 namespace ITC.Services.JobWork
 {
@@ -57,8 +60,8 @@ namespace ITC.Services.JobWork
 
 			// Chuyển trạng thái sang InProgress cho BPDV này
 			application.WorkStatus = (int)InterpreterWorkStatus.InProgress;
-			application.StartedAt = DateTimeOffset.UtcNow;
-			application.LastUpdatedAt = DateTimeOffset.UtcNow;
+			application.StartedAt = TimeHelper.GetVietnameseTime();
+			application.LastUpdatedAt = TimeHelper.GetVietnameseTime();
 
 			// Cập nhật trạng thái Job nếu đây là BPDV đầu tiên bắt đầu làm việc
 			if (job.Status == (int)JobStatus.Recruiting || job.Status == (int)JobStatus.FullyRecruited)
@@ -75,7 +78,7 @@ namespace ITC.Services.JobWork
 					JobId = job.Id,
 					JobTitle = job.JobTitle,
 					InterpreterId = interpreterId,
-					StartedAt = DateTime.UtcNow
+					StartedAt = TimeHelper.GetVietnameseTime()
 				});
 		}
 
@@ -109,9 +112,9 @@ namespace ITC.Services.JobWork
 				application.IndividualResultFileUrl = resultFileUrl;
 			}
 
-			application.CompletedAt = DateTimeOffset.UtcNow;
+			application.CompletedAt = TimeHelper.GetVietnameseTime();
 			application.WorkStatus = (int)InterpreterWorkStatus.Submitted;
-			application.LastUpdatedAt = DateTimeOffset.UtcNow;
+			application.LastUpdatedAt = TimeHelper.GetVietnameseTime();
 
 			await _jobRepo.SaveChangesAsync();
 
@@ -122,7 +125,7 @@ namespace ITC.Services.JobWork
 					JobId = job.Id,
 					JobTitle = job.JobTitle,
 					InterpreterId = interpreterId,
-					SubmittedAt = application.CompletedAt
+					SubmittedAt = TimeHelper.GetVietnameseTime()
 				});
 		}
 
@@ -145,7 +148,7 @@ namespace ITC.Services.JobWork
 			foreach (var application in submittedApplications)
 			{
 				application.WorkStatus = (int)InterpreterWorkStatus.Completed;
-				application.LastUpdatedAt = DateTimeOffset.UtcNow;
+				application.LastUpdatedAt = TimeHelper.GetVietnameseTime();
 
 				// Tính chênh lệch Deadline 
 				if (job.Deadline.HasValue && application.CompletedAt.HasValue)
@@ -164,9 +167,9 @@ namespace ITC.Services.JobWork
 							Amount = application.IndividualFee.Value,
 							TransactionBalance = wallet.Balance + application.IndividualFee.Value,
 							TransactionStatus = "Completed",
-							TransactionDate = DateTimeOffset.UtcNow, 
+							TransactionDate = TimeHelper.GetVietnameseTime(), 
 							TransactionType = "Job Payment",
-							CreateAt = DateTime.UtcNow,
+							CreateAt = TimeHelper.GetVietnameseTime(),
 							Description = $"Thanh toán job \"{job.JobTitle}\" cho BPDV {application.InterpreterId}"
 						};
 

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ITC.Core.Utils;
 
 namespace ITC.Services.SubscriptionPlan
 {
@@ -130,8 +131,8 @@ namespace ITC.Services.SubscriptionPlan
 				Id = Guid.NewGuid(),
 				UserId = userId,
 				SubscriptionPlanId = planId,
-				SubscribedAt = DateTime.UtcNow,
-				ExpiredAt = DateTime.UtcNow.AddDays(plan.DurationInDays),
+				SubscribedAt = TimeHelper.GetVietnameseTime(),
+				ExpiredAt = TimeHelper.GetVietnameseTime().AddDays(plan.DurationInDays),
 				IsActive = true
 			};
 
@@ -146,7 +147,7 @@ namespace ITC.Services.SubscriptionPlan
 				TransactionStatus = "Completed",
 				TransactionBalance = wallet.Balance,
 				Description = $"Đăng ký gói {plan.Name}",
-				TransactionDate = DateTimeOffset.UtcNow
+				TransactionDate = TimeHelper.GetVietnameseTime()
 			};
 			await _walletTransactionRepo.AddWalletTransactionAsync(transaction);
 
@@ -178,7 +179,7 @@ namespace ITC.Services.SubscriptionPlan
 
 			var remainingPosts = await _privilegeService.GetRemainingJobPostsAsync(userId);
 			var remainingApplications = await _privilegeService.GetRemainingApplicationsAsync(userId);
-			var remainingTime = sub.ExpiredAt - DateTimeOffset.UtcNow;
+			var remainingTime = sub.ExpiredAt - TimeHelper.GetVietnameseTime();
 			if (remainingTime < TimeSpan.Zero) remainingTime = TimeSpan.Zero;
 
 			return new SubscriptionStatusDto

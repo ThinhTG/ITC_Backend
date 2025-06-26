@@ -9,6 +9,7 @@ namespace ITC.Services.DTOs.JobApply
 	public class JobApplicationCreateDto
 	{
 		public Guid JobId { get; set; }
+		public Guid InterpreterId { get; set; }
 		public string? Message { get; set; }
 	}
 }

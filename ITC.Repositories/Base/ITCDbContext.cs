@@ -46,6 +46,9 @@
 
 		public virtual DbSet<Review> Reviews => Set<Review>();
 
+		public virtual DbSet<Complaint> Complaints => Set<Complaint>();
+		public virtual DbSet<ComplaintMessage> ComplaintMessages => Set<ComplaintMessage>();
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 			{
 				base.OnModelCreating(modelBuilder);
