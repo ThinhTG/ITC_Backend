@@ -1,4 +1,5 @@
 ﻿using ITC.BusinessObject.Entities;
+using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
 using ITC.Services.DTOs.JobApply;
 using System;
@@ -20,5 +21,7 @@ namespace ITC.Services.JobApplyService
 		Task<List<JobApplicationCardDto>> GetApplicationsByInterpreterId(Guid interpreterId);
 
 		Task SaveChangesAsync();
+
+		Task<List<ApplicationUser>> GetReviewableBPDVForJobAsync(Guid jobId);
 	}
 }
