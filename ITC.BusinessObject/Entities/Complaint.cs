@@ -1,5 +1,6 @@
 using System;
 using ITC.Core.Enum;
+using ITC.Core.Utils;
 
 namespace ITC.BusinessObject.Entities
 {
@@ -12,8 +13,8 @@ namespace ITC.BusinessObject.Entities
         public Guid? RelatedJobApplicationId { get; set; }
         public Guid? RelatedUserId { get; set; }
         public ComplaintStatus Status { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; } = TimeHelper.GetVietnameseTime();
+        public DateTimeOffset UpdatedAt { get; set; } = TimeHelper.GetVietnameseTime();
         public decimal AmountToPayTalent { get; set; } = 0;
         public decimal AmountToRefundCustomer { get; set; } = 0;
         public string ResolutionNotes { get; set; } = string.Empty;

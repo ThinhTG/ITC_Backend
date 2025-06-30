@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ITC.Services.Complaint;
 using ITC.Services.DTOs.Complaint;
 using System.Security.Claims;
+using ITC.Core.Base;
 
 namespace ITC.API.Controllers
 {
@@ -28,7 +29,7 @@ namespace ITC.API.Controllers
         [Authorize]
         public async Task<IActionResult> CreateComplaint([FromBody] ComplaintCreateDto dto)
         {
-            // Lấy userId từ token (giả sử claim name là "sub")
+            // Lấy userId của người khiếu nại
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 			var result = await _complaintService.CreateComplaintAsync(userId, dto);
             return Ok(result);
@@ -117,7 +118,7 @@ namespace ITC.API.Controllers
         public async Task<IActionResult> ResolveComplaint(Guid id, [FromBody] ComplaintResolutionDto dto)
         {
             await _complaintService.ResolveComplaintAsync(id, dto);
-            return NoContent();
+            return Ok("The financial complaint has been successfully processed.");
         }
     }
 } 
