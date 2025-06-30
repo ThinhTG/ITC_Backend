@@ -34,21 +34,22 @@ namespace ITC.Services.Complaint
 
         public async Task<ComplaintDto> CreateComplaintAsync(Guid userId, ComplaintCreateDto dto)
         {
-            if (dto.RelatedJobApplicationId.HasValue)
+			var jobApplication = await _jobApplicationRepository.GetByIdAsync(dto.RelatedJobApplicationId.Value);
+
+			if (dto.RelatedJobApplicationId.HasValue)
             {
-                var jobApplication = await _jobApplicationRepository.GetByIdAsync(dto.RelatedJobApplicationId.Value);
                 if (jobApplication == null)
                 {
                     throw new Exception($"JobApplication with id {dto.RelatedJobApplicationId} not found");
                 }
             }
 
-            if (dto.RelatedUserId.HasValue)
+            if (jobApplication.InterpreterId != null)
             {
-                var relatedUser = await _userManager.FindByIdAsync(dto.RelatedUserId.Value.ToString());
+                var relatedUser = await _userManager.FindByIdAsync(jobApplication.InterpreterId.ToString());
                 if (relatedUser == null)
                 {
-                    throw new Exception($"RelatedUser with id {dto.RelatedUserId} not found");
+                    throw new Exception($"RelatedUser not found");
                 }
             }
 
@@ -58,7 +59,7 @@ namespace ITC.Services.Complaint
                 UserId = userId,
                 ComplaintType = dto.ComplaintType,
                 RelatedJobApplicationId = dto.RelatedJobApplicationId,
-                RelatedUserId = dto.RelatedUserId,
+                RelatedUserId = jobApplication.InterpreterId,
                 Status = ComplaintStatus.Processing,
                 CreatedAt = TimeHelper.GetVietnameseTime(),
                 UpdatedAt = TimeHelper.GetVietnameseTime(),
