@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Identity;
 using ITC.Core.Enum;
+using ITC.Core.Hubs;
 using ITC.Core.Utils;
 using ITC.Repositories.Interface;
 using ITC.Services.DTOs.Complaint;
 using ITC.Services.WalletService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ITC.Services.Complaint
 {
@@ -21,8 +23,9 @@ namespace ITC.Services.Complaint
         private readonly IJobRepository _jobRepository;
         private readonly IJobApplicationRepository _jobApplicationRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
-        public ComplaintService(IComplaintRepository complaintRepo, IComplaintMessageRepository messageRepo, IWalletService walletService, IJobRepository jobRepository, IJobApplicationRepository jobApplicationRepository, UserManager<ApplicationUser> userManager)
+        public ComplaintService(IComplaintRepository complaintRepo, IComplaintMessageRepository messageRepo, IWalletService walletService, IJobRepository jobRepository, IJobApplicationRepository jobApplicationRepository, UserManager<ApplicationUser> userManager, IHubContext<NotificationHub> hubContext)
         {
             _complaintRepo = complaintRepo;
             _messageRepo = messageRepo;
@@ -30,13 +33,14 @@ namespace ITC.Services.Complaint
             _jobRepository = jobRepository;
             _jobApplicationRepository = jobApplicationRepository;
             _userManager = userManager;
+            _hubContext = hubContext;
         }
 
         public async Task<ComplaintDto> CreateComplaintAsync(Guid userId, ComplaintCreateDto dto)
         {
-			var jobApplication = await _jobApplicationRepository.GetByIdAsync(dto.RelatedJobApplicationId.Value);
+            var jobApplication = await _jobApplicationRepository.GetByIdAsync(dto.RelatedJobApplicationId.Value);
 
-			if (dto.RelatedJobApplicationId.HasValue)
+            if (dto.RelatedJobApplicationId.HasValue)
             {
                 if (jobApplication == null)
                 {
@@ -80,6 +84,26 @@ namespace ITC.Services.Complaint
                     SentAt = TimeHelper.GetVietnameseTime()
                 };
                 await _messageRepo.AddAsync(message);
+
+                var messageDto = ToMessageDto(message);
+                // Notify related user
+                if (complaint.RelatedUserId.HasValue)
+                {
+                    await _hubContext.Clients.Group(complaint.RelatedUserId.Value.ToString()).SendAsync("ReceiveComplaintMessage", messageDto);
+                }
+
+                // Notify admins/staff
+                var staffUsers = await _userManager.GetUsersInRoleAsync("Staff");
+                var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+                var adminAndStaffIds = staffUsers.Concat(adminUsers).Select(u => u.Id).ToList();
+
+                foreach (var adminId in adminAndStaffIds)
+                {
+                    if (adminId != userId) // Don't send notification to self
+                    {
+                        await _hubContext.Clients.Group(adminId.ToString()).SendAsync("ReceiveComplaintMessage", messageDto);
+                    }
+                }
             }
 
             return ToComplaintDto(complaint);
@@ -124,6 +148,47 @@ namespace ITC.Services.Complaint
                 SentAt = TimeHelper.GetVietnameseTime()
             };
             await _messageRepo.AddAsync(message);
+
+            var complaint = await _complaintRepo.GetByIdAsync(complaintId);
+            if (complaint == null) throw new Exception("Complaint not found");
+
+            var messageDto = ToMessageDto(message);
+
+            var recipients = new List<Guid>();
+            if (complaint.UserId != senderId)
+            {
+                recipients.Add(complaint.UserId);
+            }
+            if (complaint.RelatedUserId.HasValue && complaint.RelatedUserId.Value != senderId)
+            {
+                recipients.Add(complaint.RelatedUserId.Value);
+            }
+
+            if (complaint.AdminId.HasValue && complaint.AdminId.Value != senderId)
+            {
+                recipients.Add(complaint.AdminId.Value);
+            }
+            else if (!complaint.AdminId.HasValue)
+            {
+                // Notify all staff and admins if no specific admin is assigned
+                var staffUsers = await _userManager.GetUsersInRoleAsync("Staff");
+                var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+                var allAdminStaff = staffUsers.Concat(adminUsers).ToList();
+                foreach (var user in allAdminStaff)
+                {
+                    if (user.Id != senderId)
+                    {
+                        recipients.Add(user.Id);
+                    }
+                }
+            }
+
+
+            foreach (var recipientId in recipients.Distinct())
+            {
+                await _hubContext.Clients.Group(recipientId.ToString()).SendAsync("ReceiveComplaintMessage", messageDto);
+            }
+
             return ToMessageDto(message);
         }
 
