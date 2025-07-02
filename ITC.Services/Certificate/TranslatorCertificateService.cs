@@ -76,10 +76,21 @@ namespace ITC.Services.Certificate
 			return _mapper.Map<List<TranslatorCertificateDto>>(entities);
 		}
 
-		public async Task<List<TranslatorCertificateDto>> GetPendingCertificatesAsync()
+		public async Task<List<object>> GetPendingCertificatesWithTalentAsync()
 		{
 			var entities = await _repo.GetPendingCertificatesAsync();
-			return _mapper.Map<List<TranslatorCertificateDto>>(entities);
+			var result = new List<object>();
+			foreach (var cert in entities)
+			{
+				var certDto = _mapper.Map<TranslatorCertificateDto>(cert);
+				var user = await _userManager.FindByIdAsync(cert.ApplicationUserId.ToString());
+				var userDto = _mapper.Map<ApplicationUser, ITC.BusinessObject.Response.UserResponse>(user);
+				result.Add(new {
+					Certificate = certDto,
+					Talent = userDto
+				});
+			}
+			return result;
 		}
 
 		public async Task<bool> ApproveCertificateAsync(Guid certificateId)
@@ -106,6 +117,12 @@ namespace ITC.Services.Certificate
 
 			await _repo.UpdateAsync(certificate);
 			return true;
+		}
+
+		public async Task<List<TranslatorCertificateDto>> GetPendingCertificatesAsync()
+		{
+			var entities = await _repo.GetPendingCertificatesAsync();
+			return _mapper.Map<List<TranslatorCertificateDto>>(entities);
 		}
 	}
 }

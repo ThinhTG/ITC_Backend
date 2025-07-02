@@ -18,5 +18,6 @@ namespace ITC.Services.Certificate
 		Task<List<TranslatorCertificateDto>> GetPendingCertificatesAsync();
 		Task<bool> ApproveCertificateAsync(Guid certificateId);
 		Task<bool> RejectCertificateAsync(Guid certificateId, string reason);
+		Task<List<object>> GetPendingCertificatesWithTalentAsync();
 	}
 }
