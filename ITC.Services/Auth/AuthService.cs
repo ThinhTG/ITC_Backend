@@ -102,6 +102,11 @@ namespace ITC.Services.Auth
 				await _userManager.AddToRoleAsync(user, "Talent");
 				user.ApprovalStatus = UserApprovalStatus.NoCertificate;
 			}
+			else if (registerDto.Role.Equals("Staff"))
+			{
+				await _userManager.AddToRoleAsync(user, "Staff");
+				user.ApprovalStatus = UserApprovalStatus.Approved;
+			}
 			else
 			{
 				await _userManager.AddToRoleAsync(user, "Admin");
@@ -187,6 +192,11 @@ namespace ITC.Services.Auth
 			{
 				await _userManager.AddToRoleAsync(user, "Talent");
 				user.ApprovalStatus = UserApprovalStatus.NoCertificate;
+			}
+			else if (registerDto.Role.Equals("Staff"))
+			{
+				await _userManager.AddToRoleAsync(user, "Staff");
+				user.ApprovalStatus = UserApprovalStatus.Approved;
 			}
 			else
 			{

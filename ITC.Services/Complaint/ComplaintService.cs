@@ -164,25 +164,17 @@ namespace ITC.Services.Complaint
                 recipients.Add(complaint.RelatedUserId.Value);
             }
 
-            if (complaint.AdminId.HasValue && complaint.AdminId.Value != senderId)
+            // Luôn gửi cho tất cả admin và staff (trừ sender)
+            var staffUsers = await _userManager.GetUsersInRoleAsync("Staff");
+            var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+            var allAdminStaff = staffUsers.Concat(adminUsers).ToList();
+            foreach (var user in allAdminStaff)
             {
-                recipients.Add(complaint.AdminId.Value);
-            }
-            else if (!complaint.AdminId.HasValue)
-            {
-                // Notify all staff and admins if no specific admin is assigned
-                var staffUsers = await _userManager.GetUsersInRoleAsync("Staff");
-                var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
-                var allAdminStaff = staffUsers.Concat(adminUsers).ToList();
-                foreach (var user in allAdminStaff)
+                if (user.Id != senderId)
                 {
-                    if (user.Id != senderId)
-                    {
-                        recipients.Add(user.Id);
-                    }
+                    recipients.Add(user.Id);
                 }
             }
-
 
             foreach (var recipientId in recipients.Distinct())
             {
