@@ -2,7 +2,6 @@ using ITC.Core.Utils;
 
 public class ReviewDto
 {
-    public Guid Id { get; set; }
     public Guid ReviewerId { get; set; }
     public Guid RevieweeId { get; set; }
     public Guid JobId { get; set; }

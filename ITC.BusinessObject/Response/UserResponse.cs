@@ -32,5 +32,9 @@ namespace ITC.BusinessObject.Response
 
 		public int Priority { get; set; } // 0: No, 1: PartnerShip, 2: Premium, 3: Advance
 
+		// Bank Account
+		public string? BankAccountNumber { get; set; } // So tài khoản ngân hàng
+		public string? BankName { get; set; } // Tên ngân hàng
+		public string? BankAccountHolderName { get; set; } // Tên người nhận trong ngân hàng
 	}
 }

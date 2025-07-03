@@ -6,11 +6,67 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ITC.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class Thinhg : Migration
+    public partial class reviewGuid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "ComplaintMessages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ComplaintId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Attachment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SentAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ComplaintMessages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Complaints",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AdminId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ComplaintType = table.Column<int>(type: "int", nullable: false),
+                    RelatedJobApplicationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RelatedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    AmountToPayTalent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AmountToRefundCustomer = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ResolutionNotes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResolvedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Complaints", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reviews",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RevieweeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JobId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
@@ -27,6 +83,27 @@ namespace ITC.Repositories.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubscriptionPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DurationInDays = table.Column<int>(type: "int", nullable: false),
+                    IsBoosted = table.Column<bool>(type: "bit", nullable: false),
+                    JobPostLimit = table.Column<int>(type: "int", nullable: true),
+                    ServiceFeePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ApplicationLimit = table.Column<int>(type: "int", nullable: true),
+                    CommissionFeePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionPlans", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,7 +148,12 @@ namespace ITC.Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApprovalStatus = table.Column<int>(type: "int", nullable: false),
+                    RejectReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CertificateFiles = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Experience = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PortraitUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AvatarUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -81,6 +163,9 @@ namespace ITC.Repositories.Migrations
                     orderCode = table.Column<int>(type: "int", nullable: true),
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BankAccountHolderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -116,9 +201,11 @@ namespace ITC.Repositories.Migrations
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TransactionStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TransactionDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TransactionBalance = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: true)
+                    TransactionDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    TransactionBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrderId = table.Column<int>(type: "int", nullable: true),
+                    CreateAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -143,21 +230,28 @@ namespace ITC.Repositories.Migrations
                     TargetLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UploadFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkingTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    WorkAddressLine = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkPostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Deadline = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    ResultFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CompletionOffsetMinutes = table.Column<int>(type: "int", nullable: true),
                     HourlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     PlatformServiceFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    TotalFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    TotalFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyLogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContactEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContactPhone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContactAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkAddressLine = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkPostalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    RequiredHires = table.Column<int>(type: "int", nullable: false),
+                    CurrentHires = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -168,6 +262,63 @@ namespace ITC.Repositories.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReceiverUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Users_ReceiverUserId",
+                        column: x => x.ReceiverUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TranslatorCertificates",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApplicationUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Experience = table.Column<int>(type: "int", nullable: true),
+                    Education = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Website = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CvFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TranslationForm = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TranslationLanguage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CertificateNames = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CertificateFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    RejectReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApprovedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    ApprovedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TranslatorCertificates", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TranslatorCertificates_Users_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -244,6 +395,34 @@ namespace ITC.Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserSubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SubscriptionPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SubscribedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ExpiredAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSubscriptions_SubscriptionPlans_SubscriptionPlanId",
+                        column: x => x.SubscriptionPlanId,
+                        principalTable: "SubscriptionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserSubscriptions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserTokens",
                 columns: table => new
                 {
@@ -267,6 +446,39 @@ namespace ITC.Repositories.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WithdrawalRequest",
+                columns: table => new
+                {
+                    WithdrawalRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    RequestDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ProcessedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BankAccountHolderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProcessedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ProcessedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WithdrawalRequest", x => x.WithdrawalRequestId);
+                    table.ForeignKey(
+                        name: "FK_WithdrawalRequest_Users_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WithdrawalRequest_Users_ProcessedByUserId",
+                        column: x => x.ProcessedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "JobApplications",
                 columns: table => new
                 {
@@ -274,9 +486,17 @@ namespace ITC.Repositories.Migrations
                     JobId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     InterpreterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastUpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastUpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ApplicationStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WorkStatus = table.Column<int>(type: "int", nullable: false),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
+                    IndividualFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    PaidAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IndividualResultFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CompletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CompletionOffsetMinutes = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -295,49 +515,6 @@ namespace ITC.Repositories.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    OrderId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    JobId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InterpreterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ServicePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PlatformFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    OrderCode = table.Column<int>(type: "int", nullable: true),
-                    PaymentConfirmed = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.OrderId);
-                    table.ForeignKey(
-                        name: "FK_Orders_Jobs_JobId",
-                        column: x => x.JobId,
-                        principalTable: "Jobs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_Users_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_Users_InterpreterId",
-                        column: x => x.InterpreterId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_JobApplications_InterpreterId",
                 table: "JobApplications",
@@ -354,19 +531,9 @@ namespace ITC.Repositories.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_CustomerId",
-                table: "Orders",
-                column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_InterpreterId",
-                table: "Orders",
-                column: "InterpreterId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_JobId",
-                table: "Orders",
-                column: "JobId");
+                name: "IX_Notifications_ReceiverUserId",
+                table: "Notifications",
+                column: "ReceiverUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
@@ -379,6 +546,11 @@ namespace ITC.Repositories.Migrations
                 column: "NormalizedName",
                 unique: true,
                 filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TranslatorCertificates_ApplicationUserId",
+                table: "TranslatorCertificates",
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
@@ -413,22 +585,54 @@ namespace ITC.Repositories.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_SubscriptionPlanId",
+                table: "UserSubscriptions",
+                column: "SubscriptionPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_UserId",
+                table: "UserSubscriptions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WalletTransaction_WalletId",
                 table: "WalletTransaction",
                 column: "WalletId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WithdrawalRequest_AccountId",
+                table: "WithdrawalRequest",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WithdrawalRequest_ProcessedByUserId",
+                table: "WithdrawalRequest",
+                column: "ProcessedByUserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ComplaintMessages");
+
+            migrationBuilder.DropTable(
+                name: "Complaints");
+
+            migrationBuilder.DropTable(
                 name: "JobApplications");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "TranslatorCertificates");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");
@@ -440,16 +644,25 @@ namespace ITC.Repositories.Migrations
                 name: "UserRoles");
 
             migrationBuilder.DropTable(
+                name: "UserSubscriptions");
+
+            migrationBuilder.DropTable(
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
                 name: "WalletTransaction");
 
             migrationBuilder.DropTable(
+                name: "WithdrawalRequest");
+
+            migrationBuilder.DropTable(
                 name: "Jobs");
 
             migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "SubscriptionPlans");
 
             migrationBuilder.DropTable(
                 name: "Users");
