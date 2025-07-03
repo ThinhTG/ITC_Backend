@@ -294,6 +294,11 @@ namespace ITC.Services.JobApplyService
 			return completedApps;
 		}
 
+		public async Task<JobApplication> GetByIdAsync(Guid id)
+		{
+			return await _ApplyRepository.GetByIdAsync(id);
+		}
+
 	}
 
 }
