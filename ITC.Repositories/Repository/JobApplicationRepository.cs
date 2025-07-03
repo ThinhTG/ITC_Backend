@@ -72,6 +72,17 @@ namespace ITC.Repositories.Repository
 			await _context.SaveChangesAsync();
 		}
 
+		public async Task<JobApplication> GetByJobAndInterpreterAsync(Guid jobId, Guid interpreterId)
+		{
+			return await _context.JobApplications.FirstOrDefaultAsync(x => x.JobId == jobId && x.InterpreterId == interpreterId);
+		}
+
+		public async Task UpdateAsync(JobApplication jobApplication)
+		{
+			_context.JobApplications.Update(jobApplication);
+			await _context.SaveChangesAsync();
+		}
+
 	}
 
 }

@@ -15,5 +15,9 @@ namespace ITC.Repositories.Interface
 
 		Task<JobApplication> GetByIdAsync(Guid id);
 		Task Apply(JobApplication jobApplication);
+
+		Task<JobApplication> GetByJobAndInterpreterAsync(Guid jobId, Guid interpreterId);
+
+		Task UpdateAsync(JobApplication jobApplication);
 	}
 }
