@@ -1,3 +1,4 @@
+using ITC.Core.Base;
 using ITC.Core.Enum;
 using ITC.Repositories.Interface;
 
@@ -13,16 +14,18 @@ public class ReviewService : IReviewService
 		_jobApplicationRepository = jobApplicationRepository;
 	}
 
-	public async Task<ReviewDto> AddReviewAsync(ReviewDto reviewDto)
+	public async Task<BaseResponse<ReviewDto>> AddReviewAsync(ReviewDto reviewDto)
 	{
 		// Kiểm tra đã review chưa
 		bool hasReviewed = await _reviewRepository.HasUserReviewedJobAsync(reviewDto.ReviewerId, reviewDto.RevieweeId, reviewDto.JobId);
 		if (hasReviewed)
-			throw new Exception("Bạn đã review cho job này rồi!");
-		// Kiểm tra trạng thái job
-		var job = await _jobRepository.GetJobByIdAsync(reviewDto.JobId);
-		if (job == null || job.Status != (int)JobStatus.Completed)
-			throw new Exception("Chỉ có thể review khi job đã hoàn thành!");
+			return BaseResponse<ReviewDto>.OkResponse("You have already reviewed this job.");
+		// Kiểm tra trạng thái job apply
+		var jobApp = await _jobApplicationRepository.GetByJobAndInterpreterAsync(reviewDto.JobId, reviewDto.RevieweeId);
+		if (jobApp == null)
+			return BaseResponse<ReviewDto>.OkResponse("Job application not found.");
+		if (jobApp.WorkStatus != (int)InterpreterWorkStatus.Completed)
+			return BaseResponse<ReviewDto>.OkResponse("You can only review when the job is completed.");
 		var review = new Review
 		{
 			ReviewerId = reviewDto.ReviewerId,
@@ -34,14 +37,10 @@ public class ReviewService : IReviewService
 		};
 		var result = await _reviewRepository.AddReviewAsync(review);
 		// Cập nhật IsReviewed cho JobApplication
-		var jobApp = await _jobApplicationRepository.GetByJobAndInterpreterAsync(reviewDto.JobId, reviewDto.RevieweeId);
-		if (jobApp != null)
-		{
-			jobApp.IsReviewed = true;
-			await _jobApplicationRepository.UpdateAsync(jobApp);
-		}
+		jobApp.IsReviewed = true;
+		await _jobApplicationRepository.UpdateAsync(jobApp);
 		reviewDto.CreatedAt = result.CreatedAt;
-		return reviewDto;
+		return BaseResponse<ReviewDto>.OkResponse(reviewDto);
 	}
 
 	public async Task<List<ReviewDto>> GetReviewsByUserAsync(Guid userId)

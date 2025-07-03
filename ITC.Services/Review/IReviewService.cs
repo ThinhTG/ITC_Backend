@@ -1,6 +1,8 @@
+using ITC.Core.Base;
+
 public interface IReviewService
 {
-    Task<ReviewDto> AddReviewAsync(ReviewDto reviewDto);
+    Task<BaseResponse<ReviewDto>> AddReviewAsync(ReviewDto reviewDto);
     Task<List<ReviewDto>> GetReviewsByUserAsync(Guid userId);
     Task<List<ReviewDto>> GetReviewsByJobAsync(Guid jobId);
     Task<List<ReviewDto>> GetReviewsByRevieweeAsync(Guid revieweeId);
