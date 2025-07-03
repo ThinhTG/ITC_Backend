@@ -23,5 +23,7 @@ namespace ITC.Services.JobApplyService
 		Task SaveChangesAsync();
 
 		Task<List<ApplicationUser>> GetReviewableBPDVForJobAsync(Guid jobId);
+
+		Task<JobApplication> GetByIdAsync(Guid id);
 	}
 }

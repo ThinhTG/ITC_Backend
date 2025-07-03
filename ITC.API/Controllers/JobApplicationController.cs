@@ -40,7 +40,7 @@ namespace ITC.API.Controllers
 		{
 			try
 			{
-				// L?y thông tin user hi?n t?i
+				// L?y thï¿½ng tin user hi?n t?i
 				var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 				if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
 				{
@@ -53,7 +53,7 @@ namespace ITC.API.Controllers
 					return Unauthorized("User not found.");
 				}
 
-				// Ki?m tra n?u là Talent thì ph?i có certificate ???c duy?t
+				// Ki?m tra n?u lï¿½ Talent thï¿½ ph?i cï¿½ certificate ???c duy?t
 				var userRoles = await _userManager.GetRolesAsync(user);
 				if (userRoles.Contains("Talent"))
 				{
@@ -125,6 +125,14 @@ namespace ITC.API.Controllers
 		public async Task<IActionResult> GetApplicationsByInterpreter(Guid interpreterId)
 		{
 			var result = await _service.GetApplicationsByInterpreterId(interpreterId);
+			return Ok(result);
+		}
+
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetById(Guid id)
+		{
+			var result = await _service.GetByIdAsync(id);
+			if (result == null) return NotFound();
 			return Ok(result);
 		}
 	}
