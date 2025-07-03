@@ -140,7 +140,10 @@ namespace ITC.API.Controllers
 				ApprovalStatus = userWithCert.ApprovalStatus.ToString(),
 				RejectReason = userWithCert.RejectReason,
 				IsBoosted = false, // You can add logic to get this if needed
-				Priority = priority
+				Priority = priority,
+				BankAccountNumber = userWithCert.BankAccountNumber,
+				BankName = userWithCert.BankName,
+				BankAccountHolderName = userWithCert.BankAccountHolderName
 			};
 
 			return Ok(response);

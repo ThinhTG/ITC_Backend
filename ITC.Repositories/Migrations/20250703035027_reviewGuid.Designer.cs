@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITC.Repositories.Migrations
 {
     [DbContext(typeof(ITCDbContext))]
-    [Migration("20250622093933_newres")]
-    partial class newres
+    [Migration("20250703035027_reviewGuid")]
+    partial class reviewGuid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,82 @@ namespace ITC.Repositories.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Complaint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AdminId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AmountToPayTalent")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("AmountToRefundCustomer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ComplaintType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("RelatedJobApplicationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RelatedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ResolutionNotes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("ResolvedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Complaints");
+                });
+
+            modelBuilder.Entity("ITC.BusinessObject.Entities.ComplaintMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Attachment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ComplaintId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ComplaintMessages");
+                });
 
             modelBuilder.Entity("ITC.BusinessObject.Entities.Job", b =>
                 {
@@ -188,7 +264,7 @@ namespace ITC.Repositories.Migrations
                     b.ToTable("JobApplications");
                 });
 
-            modelBuilder.Entity("ITC.BusinessObject.Entities.Notification", b =>
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Notifications", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -224,6 +300,12 @@ namespace ITC.Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("ApplicationLimit")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CommissionFeePercentage")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -233,11 +315,20 @@ namespace ITC.Repositories.Migrations
                     b.Property<int>("DurationInDays")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsBoosted")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("JobPostLimit")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ServiceFeePercentage")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -318,14 +409,14 @@ namespace ITC.Repositories.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("ExpiredAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("ExpiredAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("SubscribedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("SubscribedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("SubscriptionPlanId")
                         .HasColumnType("uniqueidentifier");
@@ -765,6 +856,36 @@ namespace ITC.Repositories.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Review", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("RevieweeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReviewerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("ITC.BusinessObject.Entities.Job", b =>
                 {
                     b.HasOne("ITC.BusinessObject.Identity.ApplicationUser", "Customer")
@@ -795,7 +916,7 @@ namespace ITC.Repositories.Migrations
                     b.Navigation("Job");
                 });
 
-            modelBuilder.Entity("ITC.BusinessObject.Entities.Notification", b =>
+            modelBuilder.Entity("ITC.BusinessObject.Entities.Notifications", b =>
                 {
                     b.HasOne("ITC.BusinessObject.Identity.ApplicationUser", null)
                         .WithMany()

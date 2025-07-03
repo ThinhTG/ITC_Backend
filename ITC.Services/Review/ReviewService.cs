@@ -31,7 +31,6 @@ public class ReviewService : IReviewService
 			CreatedAt = DateTimeOffset.UtcNow
 		};
 		var result = await _reviewRepository.AddReviewAsync(review);
-		reviewDto.Id = result.Id;
 		reviewDto.CreatedAt = result.CreatedAt;
 		return reviewDto;
 	}
@@ -41,7 +40,6 @@ public class ReviewService : IReviewService
 		var reviews = await _reviewRepository.GetReviewsByUserAsync(userId);
 		return reviews.ConvertAll(r => new ReviewDto
 		{
-			Id = r.Id,
 			ReviewerId = r.ReviewerId,
 			RevieweeId = r.RevieweeId,
 			JobId = r.JobId,
@@ -56,7 +54,6 @@ public class ReviewService : IReviewService
 		var reviews = await _reviewRepository.GetReviewsByJobAsync(jobId);
 		return reviews.ConvertAll(r => new ReviewDto
 		{
-			Id = r.Id,
 			ReviewerId = r.ReviewerId,
 			RevieweeId = r.RevieweeId,
 			JobId = r.JobId,
@@ -71,7 +68,6 @@ public class ReviewService : IReviewService
 		var reviews = await _reviewRepository.GetReviewsByRevieweeAsync(revieweeId);
 		return reviews.ConvertAll(r => new ReviewDto
 		{
-			Id = r.Id,
 			ReviewerId = r.ReviewerId,
 			RevieweeId = r.RevieweeId,
 			JobId = r.JobId,
