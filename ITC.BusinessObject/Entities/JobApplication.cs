@@ -38,6 +38,8 @@ namespace ITC.BusinessObject.Entities
 		public DateTimeOffset? StartedAt { get; set; }
 		public DateTimeOffset? CompletedAt { get; set; }
 		public int? CompletionOffsetMinutes { get; set; } // Độ trễ hoàn thành của BPDV này
+
+		public bool IsReviewed { get; set; } = false;
 	}
 
 }

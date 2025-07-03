@@ -5,10 +5,12 @@ public class ReviewService : IReviewService
 {
 	private readonly IReviewRepository _reviewRepository;
 	private readonly IJobRepository _jobRepository;
-	public ReviewService(IReviewRepository reviewRepository, IJobRepository jobRepository)
+	private readonly IJobApplicationRepository _jobApplicationRepository;
+	public ReviewService(IReviewRepository reviewRepository, IJobRepository jobRepository, IJobApplicationRepository jobApplicationRepository)
 	{
 		_reviewRepository = reviewRepository;
 		_jobRepository = jobRepository;
+		_jobApplicationRepository = jobApplicationRepository;
 	}
 
 	public async Task<ReviewDto> AddReviewAsync(ReviewDto reviewDto)
@@ -31,6 +33,13 @@ public class ReviewService : IReviewService
 			CreatedAt = DateTimeOffset.UtcNow
 		};
 		var result = await _reviewRepository.AddReviewAsync(review);
+		// Cập nhật IsReviewed cho JobApplication
+		var jobApp = await _jobApplicationRepository.GetByJobAndInterpreterAsync(reviewDto.JobId, reviewDto.RevieweeId);
+		if (jobApp != null)
+		{
+			jobApp.IsReviewed = true;
+			await _jobApplicationRepository.UpdateAsync(jobApp);
+		}
 		reviewDto.CreatedAt = result.CreatedAt;
 		return reviewDto;
 	}
