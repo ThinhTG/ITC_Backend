@@ -41,7 +41,19 @@ namespace ITC.API
 			builder.Services.AddSignalR();
 
 
-
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowFrontend", policy =>
+				{
+					policy.WithOrigins(
+						"http://localhost:3000",
+						"https://inter-trans-connect.web.app"
+					)
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials();
+				});
+			});
 
 
 			// Dependency Injection
