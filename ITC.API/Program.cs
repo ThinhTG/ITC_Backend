@@ -64,17 +64,6 @@ namespace ITC.API
 				builder.Configuration.GetSection("UploadSettings"));
 			builder.Services.AddScoped<IUserService, UserService>();
 
-			builder.Services.AddCors(options =>
-			{
-				options.AddPolicy("AllowFrontend", policy =>
-				{
-					policy.WithOrigins("http://localhost:3000")
-						  .AllowAnyHeader()
-						  .AllowAnyMethod()
-						  .AllowCredentials();
-				});
-			});
-
 			var app = builder.Build();
 
 			// ? Enable CORS - ph?i ??t TR??C Authentication & Authorization

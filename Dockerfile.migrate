@@ -1,0 +1,27 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+# Install dotnet-ef tool
+RUN dotnet tool install --global dotnet-ef
+
+# Set PATH to include dotnet tools
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Copy project files
+COPY ["ITC.API/ITC.API.csproj", "ITC.API/"]
+COPY ["ITC.Mapping/ITC.Mapping.csproj", "ITC.Mapping/"]
+COPY ["ITC.BusinessObject/ITC.BusinessObject.csproj", "ITC.BusinessObject/"]
+COPY ["ITC.Core/ITC.Core.csproj", "ITC.Core/"]
+COPY ["ITC.Services/ITC.Services.csproj", "ITC.Services/"]
+COPY ["ITC.Repositories/ITC.Repositories.csproj", "ITC.Repositories/"]
+
+# Restore dependencies
+RUN dotnet restore "./ITC.API/ITC.API.csproj"
+
+# Copy source code
+COPY . .
+
+# Set working directory
+WORKDIR "/src/ITC.API"
+
+# Default command
+CMD ["dotnet", "ef", "database", "update", "--no-build"] 

@@ -22,20 +22,6 @@ namespace ITC.API.DI
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
 
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll",
-                    builder =>
-                    {
-                        builder.WithOrigins("*")
-                               .AllowAnyHeader()
-                               .AllowAnyMethod();
-                    });
-            });
-
-
-
             // Identity Configuration
             services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
@@ -44,8 +30,6 @@ namespace ITC.API.DI
             .AddEntityFrameworkStores<ITCDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
-
-
 
             // ✅ Đọc cấu hình JwtSettings đúng cách
             var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
@@ -152,9 +136,6 @@ namespace ITC.API.DI
 			});
 
 			services.AddControllers();
-
-
-		}
+        }
     }
-
 }

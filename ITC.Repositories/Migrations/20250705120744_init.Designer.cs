@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ITC.Repositories.Migrations
 {
     [DbContext(typeof(ITCDbContext))]
-    [Migration("20250703035027_reviewGuid")]
-    partial class reviewGuid
+    [Migration("20250705120744_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,9 +35,11 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("AmountToPayTalent")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("AmountToRefundCustomer")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ComplaintType")
@@ -147,6 +149,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("HourlyRate")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("JobTitle")
@@ -154,6 +157,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("PlatformServiceFee")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RequiredHires")
@@ -174,6 +178,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalFee")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TranslationType")
@@ -225,6 +230,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal?>("IndividualFee")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("IndividualResultFileUrl")
@@ -234,6 +240,9 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsReviewed")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("JobId")
@@ -304,6 +313,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("CommissionFeePercentage")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -326,9 +336,11 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("ServiceFeePercentage")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
@@ -443,6 +455,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Balance")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("WalletId");
@@ -457,6 +470,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("CreateAt")
@@ -469,6 +483,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TransactionBalance")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTimeOffset>("TransactionDate")
@@ -502,6 +517,7 @@ namespace ITC.Repositories.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("BankAccountHolderName")
