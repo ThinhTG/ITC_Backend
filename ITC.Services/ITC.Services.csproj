@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ITC.Repositories\ITC.Repositories.csproj" />
+    <ProjectReference Include="..\ITC.Core\ITC.Core.csproj" />
   </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Google.Apis.Auth" Version="1.69.0" />

@@ -63,6 +63,9 @@ namespace ITC.API
 			builder.Services.Configure<UploadSettings>(
 				builder.Configuration.GetSection("UploadSettings"));
 			builder.Services.AddScoped<IUserService, UserService>();
+			
+			// Register Gemini Service
+			builder.Services.AddHttpClient<ITC.Services.GeminiService.IGeminiService, ITC.Services.GeminiService.GeminiService>();
 
 			var app = builder.Build();
 
