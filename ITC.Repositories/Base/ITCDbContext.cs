@@ -17,7 +17,7 @@
 			 ApplicationUserTokens>
 		{
 			public ITCDbContext(DbContextOptions<ITCDbContext> options) : base(options) {
-			this.Database.Migrate();
+			// Removed Database.Migrate() from constructor to avoid migration conflicts
 		}
 
 			// user
@@ -139,6 +139,12 @@
 					if (property.ClrType == typeof(DateTimeOffset) || property.ClrType == typeof(DateTimeOffset?))
 					{
 						property.SetColumnType("datetimeoffset");
+					}
+					// Configure decimal properties with precision and scale
+					else if (property.ClrType == typeof(decimal) || property.ClrType == typeof(decimal?))
+					{
+						property.SetPrecision(18);
+						property.SetScale(2);
 					}
 				}
 			}

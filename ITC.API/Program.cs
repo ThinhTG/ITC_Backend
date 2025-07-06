@@ -63,17 +63,9 @@ namespace ITC.API
 			builder.Services.Configure<UploadSettings>(
 				builder.Configuration.GetSection("UploadSettings"));
 			builder.Services.AddScoped<IUserService, UserService>();
-
-			builder.Services.AddCors(options =>
-			{
-				options.AddPolicy("AllowFrontend", policy =>
-				{
-					policy.WithOrigins("http://localhost:3000")
-						  .AllowAnyHeader()
-						  .AllowAnyMethod()
-						  .AllowCredentials();
-				});
-			});
+			
+			// Register Gemini Service
+			builder.Services.AddHttpClient<ITC.Services.GeminiService.IGeminiService, ITC.Services.GeminiService.GeminiService>();
 
 			var app = builder.Build();
 

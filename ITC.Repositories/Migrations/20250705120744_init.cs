@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ITC.Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class reviewGuid : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,8 +40,8 @@ namespace ITC.Repositories.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    AmountToPayTalent = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AmountToRefundCustomer = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AmountToPayTalent = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    AmountToRefundCustomer = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ResolutionNotes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ResolvedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
                 },
@@ -91,14 +91,14 @@ namespace ITC.Repositories.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DurationInDays = table.Column<int>(type: "int", nullable: false),
                     IsBoosted = table.Column<bool>(type: "bit", nullable: false),
                     JobPostLimit = table.Column<int>(type: "int", nullable: true),
-                    ServiceFeePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ServiceFeePercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ApplicationLimit = table.Column<int>(type: "int", nullable: true),
-                    CommissionFeePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CommissionFeePercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -112,7 +112,7 @@ namespace ITC.Repositories.Migrations
                 {
                     WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -198,11 +198,11 @@ namespace ITC.Repositories.Migrations
                 {
                     WalletTransactionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     WalletId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TransactionStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TransactionDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    TransactionBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TransactionBalance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrderId = table.Column<int>(type: "int", nullable: true),
                     CreateAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
@@ -239,9 +239,9 @@ namespace ITC.Repositories.Migrations
                     ResultFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     CompletionOffsetMinutes = table.Column<int>(type: "int", nullable: true),
-                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    PlatformServiceFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    TotalFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    HourlyRate = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    PlatformServiceFee = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    TotalFee = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanyLogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -451,7 +451,7 @@ namespace ITC.Repositories.Migrations
                 {
                     WithdrawalRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     RequestDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     ProcessedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -491,12 +491,13 @@ namespace ITC.Repositories.Migrations
                     ApplicationStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     WorkStatus = table.Column<int>(type: "int", nullable: false),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false),
-                    IndividualFee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    IndividualFee = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     PaidAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     IndividualResultFileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     CompletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    CompletionOffsetMinutes = table.Column<int>(type: "int", nullable: true)
+                    CompletionOffsetMinutes = table.Column<int>(type: "int", nullable: true),
+                    IsReviewed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
