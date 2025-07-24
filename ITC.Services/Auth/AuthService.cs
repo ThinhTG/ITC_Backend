@@ -216,7 +216,7 @@ namespace ITC.Services.Auth
 			return new AuthResponseDto
 			{
 				Success = true,
-				Message = "Registration successful. Please check your email to confirm your account."
+				Message = "Registration successful"
 			};
 		}
 
