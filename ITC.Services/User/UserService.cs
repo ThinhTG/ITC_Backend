@@ -76,7 +76,21 @@ namespace ITC.Services.User
             return result.Succeeded;
         }
 
-        public async Task<UserApprovalStatusStatsDto> GetUserApprovalStatusStatsAsync()
+        public async Task<UserResponse> GetUserDetailAsync(Guid userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user == null) return null;
+
+			return _mapper.Map<UserResponse>(user);
+		}
+
+        public async Task<IEnumerable<UserResponse>> GetAllUsersAsync()
+		{
+			var users = await _userManager.Users.ToListAsync();
+			return _mapper.Map<IEnumerable<UserResponse>>(users);
+		}
+
+		public async Task<UserApprovalStatusStatsDto> GetUserApprovalStatusStatsAsync()
         {
             var users = _userManager.Users;
             return new UserApprovalStatusStatsDto

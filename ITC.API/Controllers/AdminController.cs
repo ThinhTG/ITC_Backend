@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ITC.API.Controllers
 {
-	[Route("api/admin")]
+    [Route("api/admin")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
@@ -24,41 +24,41 @@ namespace ITC.API.Controllers
             _certificateService = certificateService;
         }
 
-		/// <summary>
-		/// Lấy tất cẩ cácBPDV (Translator) đang chờ phê duyệt.
-		/// </summary>
-		/// <returns></returns>
-		//[HttpGet("pending-approvals")]
-  //      public async Task<IActionResult> GetPendingApprovalUsers()
-  //      {
-  //          var users = await _userService.GetPendingApprovalUsersAsync();
-  //          return Ok(users);
-  //      }
+        /// <summary>
+        /// Lấy tất cẩ cácBPDV (Translator) đang chờ phê duyệt.
+        /// </summary>
+        /// <returns></returns>
+        //[HttpGet("pending-approvals")]
+        //      public async Task<IActionResult> GetPendingApprovalUsers()
+        //      {
+        //          var users = await _userService.GetPendingApprovalUsersAsync();
+        //          return Ok(users);
+        //      }
 
 
-		/// <summary>
-		/// Phê duyệt cho 1 BPDV (Translator).
-		/// </summary>
-		/// <param name="userId"></param>
-		/// <returns></returns>
-		//[HttpPost("approve-user/{userId}")]
-  //      public async Task<IActionResult> ApproveUser(Guid userId)
-  //      {
-  //          var result = await _userService.ApproveUserAsync(userId);
-  //          if (!result)
-  //          {
-  //              return NotFound(new { Message = "User not found or approval failed." });
-  //          }
-  //          return Ok(new { Message = "User approved successfully." });
-  //      }
+        /// <summary>
+        /// Phê duyệt cho 1 BPDV (Translator).
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        //[HttpPost("approve-user/{userId}")]
+        //      public async Task<IActionResult> ApproveUser(Guid userId)
+        //      {
+        //          var result = await _userService.ApproveUserAsync(userId);
+        //          if (!result)
+        //          {
+        //              return NotFound(new { Message = "User not found or approval failed." });
+        //          }
+        //          return Ok(new { Message = "User approved successfully." });
+        //      }
 
-		/// <summary>
-		/// Từ chối phê duyệt cho 1 BPDV (Translator).
-		/// </summary>
-		/// <param name="userId"></param>
-		/// <param name="request"></param>
-		/// <returns></returns>
-		[HttpPost("reject-user/{userId}")]
+        /// <summary>
+        /// Từ chối phê duyệt cho 1 BPDV (Translator).
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("reject-user/{userId}")]
         public async Task<IActionResult> RejectUser(Guid userId, [FromBody] RejectUserRequest request)
         {
             var result = await _userService.RejectUserAsync(userId, request);
@@ -81,10 +81,10 @@ namespace ITC.API.Controllers
             return Ok(user);
         }
 
-       /// <summary>
-       /// lấy ceerrtificate cần approval
-       /// </summary>
-       /// <returns></returns>
+        /// <summary>
+        /// lấy ceerrtificate cần approval
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("pending-certificates")]
         public async Task<IActionResult> GetPendingCertificates()
         {
@@ -92,12 +92,12 @@ namespace ITC.API.Controllers
             return Ok(certificates);
         }
 
-		/// <summary>
-		/// Phê duyệt chứng chỉ cho BPDV (Translator).
-		/// </summary>
-		/// <param name="certificateId"></param>
-		/// <returns></returns>
-		[HttpPost("approve-certificate/{certificateId}")]
+        /// <summary>
+        /// Phê duyệt chứng chỉ cho BPDV (Translator).
+        /// </summary>
+        /// <param name="certificateId"></param>
+        /// <returns></returns>
+        [HttpPost("approve-certificate/{certificateId}")]
         public async Task<IActionResult> ApproveCertificate(Guid certificateId)
         {
             var result = await _certificateService.ApproveCertificateAsync(certificateId);
@@ -109,13 +109,13 @@ namespace ITC.API.Controllers
         }
 
 
-		/// <summary>
-		/// từ chối phê duyệt chứng chỉ cho BPDV (Translator).
-		/// </summary>
-		/// <param name="certificateId"></param>
-		/// <param name="request"></param>
-		/// <returns></returns>
-		[HttpPost("reject-certificate/{certificateId}")]
+        /// <summary>
+        /// từ chối phê duyệt chứng chỉ cho BPDV (Translator).
+        /// </summary>
+        /// <param name="certificateId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("reject-certificate/{certificateId}")]
         public async Task<IActionResult> RejectCertificate(Guid certificateId, [FromBody] RejectUserRequest request)
         {
             var result = await _certificateService.RejectCertificateAsync(certificateId, request.Reason);
@@ -145,6 +145,13 @@ namespace ITC.API.Controllers
         {
             var data = await service.GetDashboardAsync(from, to);
             return Ok(data);
+        }
+
+        [HttpGet("all-users")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsersAsync();
+            return Ok(users);
         }
     }
 } 

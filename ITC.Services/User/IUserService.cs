@@ -13,5 +13,8 @@ namespace ITC.Services.User
         Task<bool> ApproveUserAsync(Guid userId);
         Task<bool> RejectUserAsync(Guid userId, RejectUserRequest request);
         Task<UserApprovalStatusStatsDto> GetUserApprovalStatusStatsAsync();
-    }
+
+        Task<IEnumerable<UserResponse>> GetAllUsersAsync();
+
+	}
 } 
