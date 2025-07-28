@@ -1,10 +1,15 @@
-﻿using ITC.BusinessObject.Request;
+﻿using ITC.BusinessObject.Identity;
+using ITC.BusinessObject.Request;
+using ITC.BusinessObject.Response;
+using ITC.Repositories.Interface;
 using ITC.Services.Certificate;
 using ITC.Services.Revenue;
 using ITC.Services.Subscription;
 using ITC.Services.User;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ITC.API.Controllers
 {
@@ -14,15 +19,22 @@ namespace ITC.API.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ITranslatorCertificateService _certificateService;
+		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly ITranslatorCertificateService _certificateService;
+        private readonly IUserSubscriptionRepository _userSubscriptionRepository;
 
-        public AdminController(
+		public AdminController(
             IUserService userService,
-            ITranslatorCertificateService certificateService)
+			UserManager<ApplicationUser> userManager,
+			ITranslatorCertificateService certificateService,
+			IUserSubscriptionRepository userSubscriptionRepository
+			)
         {
             _userService = userService;
             _certificateService = certificateService;
-        }
+			_userManager = userManager;
+            _userSubscriptionRepository = userSubscriptionRepository;
+		}
 
         /// <summary>
         /// Lấy tất cẩ cácBPDV (Translator) đang chờ phê duyệt.
@@ -147,11 +159,66 @@ namespace ITC.API.Controllers
             return Ok(data);
         }
 
-        [HttpGet("all-users")]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
-        }
-    }
+		//[HttpGet("all-users")]
+		//public async Task<IActionResult> GetAllUsers()
+		//{
+		//    var users = await _userService.GetAllUsersAsync();
+		//    return Ok(users);
+		//}
+
+		[HttpGet("all-users")]
+		public async Task<List<UserResponse>> GetAllUsersAsync()
+		{
+			// Lấy tất cả user kèm certificate
+			var users = await _userManager.Users
+				.Include(u => u.TranslatorCertificates)
+				.ToListAsync();
+
+			var responses = new List<UserResponse>();
+
+			foreach (var user in users)
+			{
+				var userIdGuid = Guid.Parse(user.Id.ToString());
+				var activeSub = await _userSubscriptionRepository.GetActiveSubscriptionAsync(userIdGuid);
+
+				int priority = 0;
+				if (activeSub?.SubscriptionPlan != null)
+				{
+					switch (activeSub.SubscriptionPlan.Name.ToLower())
+					{
+						case "partnership": priority = 1; break;
+						case "premium": priority = 3; break;
+						case "advance": priority = 2; break;
+					}
+				}
+
+				responses.Add(new UserResponse
+				{
+					Id = user.Id,
+					FullName = user.FullName,
+					Email = user.Email,
+					Gender = user.Gender,
+					AvatarURL = user.AvatarUrl,
+					PhoneNumber = user.PhoneNumber,
+					CreateAt = user.CreatedTime.UtcDateTime,
+					UpdateAt = user.LastUpdatedTime.UtcDateTime,
+					AccessToken = null,
+					RefreshToken = user.RefreshToken,
+					Address = user.Address,
+					CertificateFiles = user.CertificateFiles,
+					Experience = user.Experience,
+					PortraitUrl = user.PortraitUrl,
+					ApprovalStatus = user.ApprovalStatus.ToString(),
+					RejectReason = user.RejectReason,
+					IsBoosted = false,
+					Priority = priority,
+					BankAccountNumber = user.BankAccountNumber,
+					BankName = user.BankName,
+					BankAccountHolderName = user.BankAccountHolderName
+				});
+			}
+
+			return responses;
+		}
+	}
 } 
