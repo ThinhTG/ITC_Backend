@@ -138,12 +138,7 @@ namespace ITC.API.Controllers
             return Ok(new { Message = "Certificate rejected successfully." });
         }
 
-        [HttpGet("user-approval-stats")]
-        public async Task<IActionResult> GetUserApprovalStatusStats()
-        {
-            var stats = await _userService.GetUserApprovalStatusStatsAsync();
-            return Ok(stats);
-        }
+      
 
         [HttpGet("revenue-dashboard")]
         public async Task<IActionResult> GetRevenueDashboard([FromServices] IRevenueDashboardService service, [FromQuery] DateTime? from, [FromQuery] DateTime? to)

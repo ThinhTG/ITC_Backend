@@ -1,7 +1,9 @@
 ﻿using ITC.Core.Contracts;
 using ITC.Services.Certificate;
+using ITC.Services.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace ITC.API.Controllers
 {
@@ -10,10 +12,12 @@ namespace ITC.API.Controllers
 	public class TranslatorCertificateController : ControllerBase
 	{
 		private readonly ITranslatorCertificateService _service;
+		private readonly IUserService _userService;
 
-		public TranslatorCertificateController(ITranslatorCertificateService service)
+		public TranslatorCertificateController(ITranslatorCertificateService service, IUserService userService )
 		{
 			_service = service;
+			_userService = userService;
 		}
 
 		[HttpGet("user/{userId}")]
@@ -46,6 +50,21 @@ namespace ITC.API.Controllers
 					message = "Certificate not found."
 				});
 			}
+		}
+
+		[HttpGet("user-approval-stats")]
+		public async Task<IActionResult> GetUserApprovalStatusStats()
+		{
+			var stats = await _userService.GetUserApprovalStatusStatsAsync();
+			if ( stats.Approved == 0 && stats.PendingApproval == 0 && stats.Rejected == 0)
+			{
+				return Ok("No Certificate");
+			}
+			else if (stats.Approved > 0)
+			{
+				return Ok("Approved");
+			}
+			return Ok("PandingApproval");
 		}
 
 
