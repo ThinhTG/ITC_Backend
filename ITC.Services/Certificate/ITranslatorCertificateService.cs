@@ -19,5 +19,7 @@ namespace ITC.Services.Certificate
 		Task<bool> ApproveCertificateAsync(Guid certificateId);
 		Task<bool> RejectCertificateAsync(Guid certificateId, string reason);
 		Task<List<object>> GetPendingCertificatesWithTalentAsync();
+
+		Task<string> GetCertificateStatusAsync(Guid userId);
 	}
 }

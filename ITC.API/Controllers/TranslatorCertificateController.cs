@@ -124,5 +124,17 @@ namespace ITC.API.Controllers
 				});
 			}
 		}
+
+		/// <summary>
+		/// api get Status của chứng chỉ của người dùng
+		/// </summary>
+		/// <param name="userId"></param>
+		/// <returns></returns>
+		[HttpGet("status/{userId}")]
+		public async Task<IActionResult> GetCertificateStatus(Guid userId)
+		{
+			var status = await _service.GetCertificateStatusAsync(userId);
+			return Ok(status);
+		}
 	}
 }

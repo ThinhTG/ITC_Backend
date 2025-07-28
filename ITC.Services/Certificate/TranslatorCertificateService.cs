@@ -124,5 +124,19 @@ namespace ITC.Services.Certificate
 			var entities = await _repo.GetPendingCertificatesAsync();
 			return _mapper.Map<List<TranslatorCertificateDto>>(entities);
 		}
+
+
+		public async Task<string> GetCertificateStatusAsync(Guid userId)
+		{
+			var certificates = await _repo.GetCertificatesByUserIdAsync(userId);
+
+			if (certificates == null || !certificates.Any())
+				return "NoCertificate";
+
+			if (certificates.Any(c => c.Status == CertificateStatus.Approved))
+				return "Approved";
+
+			return "Pending Approval";
+		}
 	}
 }

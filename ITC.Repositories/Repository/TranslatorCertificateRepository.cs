@@ -63,5 +63,12 @@ namespace ITC.Repositories.Repository
 				.Where(t => t.Status == CertificateStatus.Pending)
 				.ToListAsync();
 		}
+
+		public async Task<List<TranslatorCertificate>> GetCertificatesByUserIdAsync(Guid userId)
+		{
+			return await _context.TranslatorCertificates
+				.Where(c => c.ApplicationUserId == userId)
+				.ToListAsync();
+		}
 	}
 }
