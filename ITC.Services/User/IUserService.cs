@@ -16,5 +16,7 @@ namespace ITC.Services.User
 
         Task<IEnumerable<UserResponse>> GetAllUsersAsync();
 
+        Task<IEnumerable<UserResponse>> GetAllTalentUsersAsync();
+
 	}
 } 

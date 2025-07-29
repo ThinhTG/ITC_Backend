@@ -90,6 +90,17 @@ namespace ITC.Services.User
 			return _mapper.Map<IEnumerable<UserResponse>>(users);
 		}
 
+		public async Task<IEnumerable<UserResponse>> GetAllTalentUsersAsync()
+		{
+			// L?y danh sách user trong role "Talent"
+			var talentUsers = await _userManager.GetUsersInRoleAsync("Talent");
+
+			return _mapper.Map<IEnumerable<UserResponse>>(talentUsers);
+		}
+
+
+
+
 		public async Task<UserApprovalStatusStatsDto> GetUserApprovalStatusStatsAsync()
         {
             var users = _userManager.Users;

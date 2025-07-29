@@ -1,4 +1,5 @@
 using ITC.BusinessObject.DTOs.User;
+using ITC.BusinessObject.Response;
 using ITC.Services.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,5 +28,14 @@ namespace ITC.API.Controllers
             var result = await _userService.GetUserCountByRoleAsync();
             return Ok(result);
         }
-    }
+
+        [HttpGet("all-talents")]
+        public async Task<ActionResult<UserResponse>> GetAllTalents()
+        {
+            var result = await _userService.GetAllTalentUsersAsync();
+            return Ok(result);
+
+        }
+
+	}
 } 
