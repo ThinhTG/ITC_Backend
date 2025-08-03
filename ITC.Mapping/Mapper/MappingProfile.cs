@@ -16,6 +16,7 @@ namespace ITC.Mapping.Mapper
         public MappingProfile()
         {
             CreateMap<ApplicationUser, UserResponse>();
+            CreateMap<ApplicationUser, TalentWithCertificatesResponse>();
 			CreateMap<Job, JobDTO>().ReverseMap();
 			CreateMap<CreateJobRequest, Job>();
 			//	CreateMap<List<Job>, List<JobDTO>>();

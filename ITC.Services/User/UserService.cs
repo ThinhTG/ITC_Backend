@@ -4,6 +4,7 @@ using ITC.BusinessObject.Identity;
 using ITC.BusinessObject.Request;
 using ITC.BusinessObject.Response;
 using ITC.Core.Enum;
+using ITC.Services.Certificate;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,15 +15,21 @@ namespace ITC.Services.User
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IMapper _mapper;
+        private readonly ITranslatorCertificateService _certificateService;
+        private readonly IReviewService _reviewService;
 
         public UserService(
             UserManager<ApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
-            IMapper mapper)
+            IMapper mapper,
+            ITranslatorCertificateService certificateService,
+            IReviewService reviewService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
+            _certificateService = certificateService;
+            _reviewService = reviewService;
         }
 
         public async Task<UserCountByRoleDto> GetUserCountByRoleAsync()
@@ -92,10 +99,36 @@ namespace ITC.Services.User
 
 		public async Task<IEnumerable<UserResponse>> GetAllTalentUsersAsync()
 		{
-			// L?y danh s�ch user trong role "Talent"
+			// Lấy danh sách user trong role "Talent"
 			var talentUsers = await _userManager.GetUsersInRoleAsync("Talent");
 
 			return _mapper.Map<IEnumerable<UserResponse>>(talentUsers);
+		}
+
+		public async Task<IEnumerable<TalentWithCertificatesResponse>> GetAllTalentUsersWithCertificatesAsync()
+		{
+			// Lấy danh sách user trong role "Talent"
+			var talentUsers = await _userManager.GetUsersInRoleAsync("Talent");
+			var result = new List<TalentWithCertificatesResponse>();
+
+			foreach (var user in talentUsers)
+			{
+				var talentResponse = _mapper.Map<TalentWithCertificatesResponse>(user);
+				
+				// Lấy certificates của user
+				var certificates = await _certificateService.GetCertificatesByUserIdAsync(user.Id);
+				talentResponse.Certificates = certificates;
+				
+				// Lấy thông tin rating của user
+				var reviewSummary = await _reviewService.GetReviewSummaryForUserAsync(user.Id);
+				talentResponse.AverageRating = reviewSummary.AverageRating;
+				talentResponse.TotalReviews = reviewSummary.TotalReviews;
+				talentResponse.StarCounts = reviewSummary.StarCounts;
+				
+				result.Add(talentResponse);
+			}
+
+			return result;
 		}
 
 

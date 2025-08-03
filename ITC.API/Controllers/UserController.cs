@@ -34,7 +34,13 @@ namespace ITC.API.Controllers
         {
             var result = await _userService.GetAllTalentUsersAsync();
             return Ok(result);
+        }
 
+        [HttpGet("all-talents-with-certificates")]
+        public async Task<ActionResult<TalentWithCertificatesResponse>> GetAllTalentsWithCertificates()
+        {
+            var result = await _userService.GetAllTalentUsersWithCertificatesAsync();
+            return Ok(result);
         }
 
 	}
