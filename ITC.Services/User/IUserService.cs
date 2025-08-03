@@ -18,6 +18,7 @@ namespace ITC.Services.User
 
         Task<IEnumerable<UserResponse>> GetAllTalentUsersAsync();
         Task<IEnumerable<TalentWithCertificatesResponse>> GetAllTalentUsersWithCertificatesAsync();
+        Task<IEnumerable<TalentWithCertificatesResponse>> GetTopRatedTalentsAsync(int count = 3);
 
 	}
 } 

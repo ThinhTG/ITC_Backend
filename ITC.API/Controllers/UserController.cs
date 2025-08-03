@@ -43,5 +43,12 @@ namespace ITC.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("top-rated-talents")]
+        public async Task<ActionResult<TalentWithCertificatesResponse>> GetTopRatedTalents([FromQuery] int count = 3)
+        {
+            var result = await _userService.GetTopRatedTalentsAsync(count);
+            return Ok(result);
+        }
+
 	}
 } 

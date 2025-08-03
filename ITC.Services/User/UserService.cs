@@ -131,6 +131,37 @@ namespace ITC.Services.User
 			return result;
 		}
 
+		public async Task<IEnumerable<TalentWithCertificatesResponse>> GetTopRatedTalentsAsync(int count = 3)
+		{
+			// Lấy danh sách user trong role "Talent"
+			var talentUsers = await _userManager.GetUsersInRoleAsync("Talent");
+			var result = new List<TalentWithCertificatesResponse>();
+
+			foreach (var user in talentUsers)
+			{
+				var talentResponse = _mapper.Map<TalentWithCertificatesResponse>(user);
+				
+				// Lấy certificates của user
+				var certificates = await _certificateService.GetCertificatesByUserIdAsync(user.Id);
+				talentResponse.Certificates = certificates;
+				
+				// Lấy thông tin rating của user
+				var reviewSummary = await _reviewService.GetReviewSummaryForUserAsync(user.Id);
+				talentResponse.AverageRating = reviewSummary.AverageRating;
+				talentResponse.TotalReviews = reviewSummary.TotalReviews;
+				talentResponse.StarCounts = reviewSummary.StarCounts;
+				
+				result.Add(talentResponse);
+			}
+
+			// Sắp xếp theo rating cao nhất và lấy top N
+			return result
+				.Where(t => t.TotalReviews > 0) // Chỉ lấy những talent có ít nhất 1 review
+				.OrderByDescending(t => t.AverageRating)
+				.ThenByDescending(t => t.TotalReviews) // Nếu rating bằng nhau thì ưu tiên người có nhiều review hơn
+				.Take(count);
+		}
+
 
 
 
