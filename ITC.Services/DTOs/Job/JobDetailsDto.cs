@@ -59,6 +59,9 @@ namespace ITC.Services.DTOs.Job
         // Applications info (simplified)
         public List<JobApplicationSummaryDto> Applications { get; set; } = new List<JobApplicationSummaryDto>();
         
+        // Submitted files info (for customer to easily view submitted work)
+        public List<SubmittedFileDto> SubmittedFiles { get; set; } = new List<SubmittedFileDto>();
+        
         // Helper properties
         public int TotalHiredInterpreters { get; set; }
         public int TotalInProgressInterpreters { get; set; }

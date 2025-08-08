@@ -51,6 +51,12 @@ namespace ITC.API.Controllers
 		[Authorize(Roles = "Talent")]
 		public async Task<IActionResult> Submit(Guid interpreterId, Guid jobId, SubmitWorkRequest body)
 		{
+			// Debug logging
+			Console.WriteLine($"Submit endpoint called:");
+			Console.WriteLine($"JobId: {jobId}");
+			Console.WriteLine($"InterpreterId: {interpreterId}");
+			Console.WriteLine($"ResultFileUrl from body: {body?.ResultFileUrl}");
+			
 			//var interpreterId = User.();       // extension lấy từ Claim
 			await _svc.SubmitWorkAsync(jobId, interpreterId, body.ResultFileUrl);
 			return Ok(new { message = "Đã nộp kết quả, chờ khách xác nhận." });
@@ -154,7 +160,8 @@ namespace ITC.API.Controllers
 						IsPaid = a.IsPaid,
 						IndividualFee = a.IndividualFee,
 						StartedAt = a.StartedAt,
-						CompletedAt = a.CompletedAt
+						CompletedAt = a.CompletedAt,
+						IndividualResultFileUrl = a.IndividualResultFileUrl // Add this to debug
 					}).ToList()
 				});
 			}

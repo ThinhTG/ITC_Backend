@@ -57,7 +57,7 @@ namespace ITC.Services.Email
 		public async Task SendConfirmationEmailAsync(ApplicationUser user, string token)
 		{
 			var encodedToken = Uri.EscapeDataString(token);
-			var confirmationLink = $"https://thinhdb.felixtien.dev/api/auth?userId={user.Id}&token={encodedToken}";
+			var confirmationLink = $"http://localhost:5000/api/auth/confirm-email?userId={user.Id}&token={encodedToken}";
 
 			var message = $@"
     <!DOCTYPE html>

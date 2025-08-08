@@ -1,13 +1,30 @@
 using ITC.Repositories.Interface;
+using ITC.BusinessObject.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ITC.Services.Revenue
 {
 	public class RevenueDashboardService : IRevenueDashboardService
     {
         private readonly IWalletTransactionRepository _transactionRepo;
-        public RevenueDashboardService(IWalletTransactionRepository transactionRepo)
+        private readonly IWalletRepository _walletRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWithdrawalRequestRepository _withdrawalRequestRepo;
+        private readonly IJobRepository _jobRepo;
+        
+        public RevenueDashboardService(
+            IWalletTransactionRepository transactionRepo, 
+            IWalletRepository walletRepo,
+            UserManager<ApplicationUser> userManager,
+            IWithdrawalRequestRepository withdrawalRequestRepo,
+            IJobRepository jobRepo)
         {
             _transactionRepo = transactionRepo;
+            _walletRepo = walletRepo;
+            _userManager = userManager;
+            _withdrawalRequestRepo = withdrawalRequestRepo;
+            _jobRepo = jobRepo;
         }
 
         public async Task<RevenueDashboardDto> GetDashboardAsync(DateTime? from, DateTime? to)
@@ -49,28 +66,135 @@ namespace ITC.Services.Revenue
                 })
                 .ToList();
 
+            // Get recent transactions with customer names
+            var recentTransactionsWithUsers = new List<RecentTransactionDto>();
             var recentTransactions = filtered
                 .OrderByDescending(t => t.TransactionDate)
                 .Take(10)
-                .Select(t => new RecentTransactionDto
-                {
-                    Customer = "N/A", // Cần join với User để lấy tên
-                    Date = t.TransactionDate.DateTime,
-                    Amount = t.Amount,
-                    Category = t.TransactionType,
-                    Source = "Online" // Giả sử
-                })
                 .ToList();
+
+            foreach (var transaction in recentTransactions)
+            {
+                // Get the wallet for this transaction
+                var wallet = await _walletRepo.GetWalletByIdAsync(transaction.WalletId);
+                string customerName = "Unknown";
+                
+                if (wallet != null)
+                {
+                    // Get the user for this wallet
+                    var user = await _userManager.FindByIdAsync(wallet.AccountId.ToString());
+                    customerName = user?.FullName ?? user?.UserName ?? "Unknown";
+                }
+
+                recentTransactionsWithUsers.Add(new RecentTransactionDto
+                {
+                    Customer = customerName,
+                    Date = transaction.TransactionDate.DateTime,
+                    Amount = transaction.Amount,
+                    Category = transaction.TransactionType,
+                    Source = "Online" // Giả sử
+                });
+            }
+
+            // --- Withdrawal statistics ---
+            var allWithdrawals = await _withdrawalRequestRepo.GetAllAsync();
+            var withdrawalQuery = allWithdrawals.AsQueryable();
+            if (from.HasValue)
+            {
+                withdrawalQuery = withdrawalQuery.Where(w => w.RequestDate >= from);
+            }
+            if (to.HasValue)
+            {
+                withdrawalQuery = withdrawalQuery.Where(w => w.RequestDate <= to);
+            }
+            var completedWithdrawals = withdrawalQuery.Where(w => w.Status == ITC.Core.Enum.WithdrawalStatus.Completed).ToList();
+            var totalWithdrawals = completedWithdrawals.Sum(w => w.Amount);
+            var monthlyWithdrawals = completedWithdrawals
+                .Where(w => w.RequestDate.Month == DateTime.UtcNow.Month && w.RequestDate.Year == DateTime.UtcNow.Year)
+                .Sum(w => w.Amount);
+            var totalWithdrawalCount = completedWithdrawals.Count;
+            var avgWithdrawalValue = totalWithdrawalCount > 0 ? totalWithdrawals / totalWithdrawalCount : 0;
+            var recentWithdrawals = completedWithdrawals
+                .OrderByDescending(w => w.RequestDate)
+                .Take(10)
+                .ToList();
+            var recentWithdrawalsWithUsers = new List<RecentWithdrawalDto>();
+            foreach (var withdrawal in recentWithdrawals)
+            {
+                string customerName = "Unknown";
+                if (withdrawal.Account != null)
+                {
+                    customerName = withdrawal.Account.FullName ?? withdrawal.Account.UserName ?? "Unknown";
+                }
+                recentWithdrawalsWithUsers.Add(new RecentWithdrawalDto
+                {
+                    Customer = customerName,
+                    Date = withdrawal.RequestDate.DateTime,
+                    Amount = withdrawal.Amount,
+                    BankName = withdrawal.BankName,
+                    Status = withdrawal.Status.ToString()
+                });
+            }
+
+            // --- Platform Service Fee statistics ---
+            var allJobs = await _jobRepo.GetAllAsync();
+            var jobQuery = allJobs.AsQueryable();
+            if (from.HasValue)
+            {
+                jobQuery = jobQuery.Where(j => j.CreatedAt >= from);
+            }
+            if (to.HasValue)
+            {
+                jobQuery = jobQuery.Where(j => j.CreatedAt <= to);
+            }
+            var jobsWithFees = jobQuery.Where(j => j.PlatformServiceFee.HasValue && j.PlatformServiceFee > 0).ToList();
+            var totalPlatformFees = jobsWithFees.Sum(j => j.PlatformServiceFee ?? 0);
+            var monthlyPlatformFees = jobsWithFees
+                .Where(j => j.CreatedAt.Month == DateTime.UtcNow.Month && j.CreatedAt.Year == DateTime.UtcNow.Year)
+                .Sum(j => j.PlatformServiceFee ?? 0);
+            var totalPlatformFeeCount = jobsWithFees.Count;
+            var avgPlatformFeeValue = totalPlatformFeeCount > 0 ? totalPlatformFees / totalPlatformFeeCount : 0;
+            var recentPlatformFees = jobsWithFees
+                .OrderByDescending(j => j.CreatedAt)
+                .Take(10)
+                .ToList();
+            var recentPlatformFeesWithDetails = new List<RecentPlatformFeeDto>();
+            foreach (var job in recentPlatformFees)
+            {
+                string customerName = "Unknown";
+                if (job.Customer != null)
+                {
+                    customerName = job.Customer.FullName ?? job.Customer.UserName ?? "Unknown";
+                }
+                recentPlatformFeesWithDetails.Add(new RecentPlatformFeeDto
+                {
+                    JobTitle = job.JobTitle,
+                    Customer = customerName,
+                    Date = job.CreatedAt.DateTime,
+                    Amount = job.PlatformServiceFee ?? 0,
+                    JobType = job.TranslationType
+                });
+            }
 
             return new RevenueDashboardDto
             {
-                TotalRevenue = totalRevenue,
-                MonthlyRevenue = monthlyRevenue,
+                TotalRevenue = totalRevenue - totalWithdrawals,
+                MonthlyRevenue = monthlyRevenue - monthlyWithdrawals,
                 TotalTransactions = totalTransactions,
                 AverageTransactionValue = avgValue,
                 RevenueOverTime = revenueOverTime,
                 RevenueByCategory = revenueByCategory,
-                RecentTransactions = recentTransactions
+                RecentTransactions = recentTransactionsWithUsers,
+                TotalWithdrawals = totalWithdrawals,
+                MonthlyWithdrawals = monthlyWithdrawals,
+                TotalWithdrawalCount = totalWithdrawalCount,
+                AverageWithdrawalValue = avgWithdrawalValue,
+                RecentWithdrawals = recentWithdrawalsWithUsers,
+                TotalPlatformFees = totalPlatformFees,
+                MonthlyPlatformFees = monthlyPlatformFees,
+                TotalPlatformFeeCount = totalPlatformFeeCount,
+                AveragePlatformFeeValue = avgPlatformFeeValue,
+                RecentPlatformFees = recentPlatformFeesWithDetails
             };
         }
     }

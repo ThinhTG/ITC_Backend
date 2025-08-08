@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ITC.Core.Utils;
+using ITC.Services.Privilege;
 
 namespace ITC.Services.JobWork
 {
@@ -21,17 +22,20 @@ namespace ITC.Services.JobWork
 		private readonly IWalletService _walletSvc;
 		private readonly IHubContext<NotificationHub> _hub;
 		private readonly IWalletTransactionRepository _walletTransactionRepo;
+		private readonly IPrivilegeService _privilegeService;
 
 		public JobWorkService(
 			IJobRepository jobRepo,
 			IWalletService walletSvc,
 			IHubContext<NotificationHub> hub,
-			IWalletTransactionRepository walletTransactionRepository)
+			IWalletTransactionRepository walletTransactionRepository,
+			IPrivilegeService privilegeService)
 		{
 			_jobRepo = jobRepo;
 			_walletSvc = walletSvc;
 			_hub = hub;
 			_walletTransactionRepo = walletTransactionRepository;
+			_privilegeService = privilegeService;
 		}
 
 		/// <summary>
@@ -105,11 +109,21 @@ namespace ITC.Services.JobWork
 			if (application.WorkStatus != (int)InterpreterWorkStatus.InProgress)
 				throw new InvalidOperationException($"Interpreter {interpreterId} chưa ở trạng thái InProgress. Current status: {application.WorkStatus}");
 
-			if (job.TranslationType == "Translation")
+			// Debug logging
+			Console.WriteLine($"SubmitWorkAsync Debug:");
+			Console.WriteLine($"JobId: {jobId}");
+			Console.WriteLine($"InterpreterId: {interpreterId}");
+			Console.WriteLine($"JobType: {job.TranslationType}");
+			Console.WriteLine($"ResultFileUrl: {resultFileUrl}");
+			Console.WriteLine($"Current IndividualResultFileUrl: {application.IndividualResultFileUrl}");
+
+			// Only save file URL for Written jobs
+			if (job.TranslationType == "Written")
 			{
 				if (string.IsNullOrWhiteSpace(resultFileUrl))
-					throw new ArgumentException("Kết quả dịch cần file");
+					throw new ArgumentException("Kết quả dịch Written cần file");
 				application.IndividualResultFileUrl = resultFileUrl;
+				Console.WriteLine($"Setting IndividualResultFileUrl to: {resultFileUrl}");
 			}
 
 			application.CompletedAt = TimeHelper.GetVietnameseTime();
@@ -117,6 +131,7 @@ namespace ITC.Services.JobWork
 			application.LastUpdatedAt = TimeHelper.GetVietnameseTime();
 
 			await _jobRepo.SaveChangesAsync();
+			Console.WriteLine($"Saved to database. Final IndividualResultFileUrl: {application.IndividualResultFileUrl}");
 
 			// Thông báo cho Customer
 			await _hub.Clients.User(job.CustomerId.ToString())
@@ -154,27 +169,34 @@ namespace ITC.Services.JobWork
 				if (job.Deadline.HasValue && application.CompletedAt.HasValue)
 					application.CompletionOffsetMinutes = (int)(application.CompletedAt.Value - job.Deadline.Value).TotalMinutes;
 
-				// Ghi nhận giao dịch ví (WalletTransaction) + cộng tiền cho BPDV này
+				// Ghi nhận giao dịch ví (WalletTransaction) + cộng tiền cho BPDV này (đã trừ phí dịch vụ)
 				if (application.IndividualFee > 0)
 				{
 					var wallet = await _walletSvc.GetWalletByAccountId(application.InterpreterId);
 					if (wallet != null)
 					{
+						// Lấy phần trăm phí dịch vụ cho BPDV này
+						var commissionPercent = (decimal)0.3;
+						var serviceFee = application.IndividualFee.Value * commissionPercent;
+						var netAmount = application.IndividualFee.Value - serviceFee;
+
 						var tx = new WalletTransaction
 						{
 							WalletId = wallet.WalletId,
 							WalletTransactionId = Guid.NewGuid(),
-							Amount = application.IndividualFee.Value,
-							TransactionBalance = wallet.Balance + application.IndividualFee.Value,
+							Amount = (decimal)job.HourlyRate,
+							TransactionBalance = wallet.Balance + (decimal)job.HourlyRate,
 							TransactionStatus = "Completed",
 							TransactionDate = TimeHelper.GetVietnameseTime(), 
 							TransactionType = "Job Payment",
 							CreateAt = TimeHelper.GetVietnameseTime(),
-							Description = $"Thanh toán job \"{job.JobTitle}\" cho BPDV {application.InterpreterId}"
+							Description = $"Thanh toán job \"{job.JobTitle}\" cho BPDV {application.InterpreterId} (đã trừ phí dịch vụ {serviceFee:N0}đ)"
 						};
 
-						wallet.Balance += application.IndividualFee.Value;
+						wallet.Balance += (decimal)job.HourlyRate;
 						await _walletTransactionRepo.AddWalletTransactionAsync(tx);
+
+						// TODO: Ghi nhận transaction phí dịch vụ về ví hệ thống nếu cần
 					}
 				}
 			}

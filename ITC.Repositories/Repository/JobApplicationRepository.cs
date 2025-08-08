@@ -34,6 +34,7 @@ namespace ITC.Repositories.Repository
 		{
 			return await _context.JobApplications
 				.Include(a => a.Interpreter)
+				.Include(a => a.Job)
 				.Where(a => a.JobId == jobId)
 				.ToListAsync();
 		}

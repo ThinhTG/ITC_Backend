@@ -30,6 +30,11 @@ namespace ITC.Repositories.Repository
             return await _context.Wallets.FirstOrDefaultAsync(w => w.AccountId == accountId);
         }
 
+        public async Task<Wallet?> GetWalletByIdAsync(Guid walletId)
+        {
+            return await _context.Wallets.FirstOrDefaultAsync(w => w.WalletId == walletId);
+        }
+
         public async Task UpdateWalletAsync(Wallet wallet)
         {
             _context.Wallets.Update(wallet);

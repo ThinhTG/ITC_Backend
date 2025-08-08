@@ -21,5 +21,6 @@ namespace ITC.Services.DTOs.JobApply
 		public ApplicationUser? Interpreter { get; set; }
 		public int? WorkStatus { get; set; }
 		public int SubscriptionPriority { get; set; } // 0: No, 1: PartnerShip, 2: Premium, 3: Advance
+		public string? SubmitFileUrl { get; set; } // File submitted by talent for this job application
 	}
 }

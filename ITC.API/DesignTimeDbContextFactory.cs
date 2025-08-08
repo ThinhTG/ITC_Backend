@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using ITC.Repositories.Base;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace ITC.API
 {

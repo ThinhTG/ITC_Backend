@@ -14,6 +14,9 @@ namespace ITC.BusinessObject.Request
 
 		public string? FullName { get; set; }
 
+		[RegularExpression(@"^0[0-9]{9}$", ErrorMessage = "Số điện thoại phải bắt đầu bằng 0 và có 10 chữ số")]
+		public string? PhoneNumber { get; set; }
+
 		public string? AvatarUrl { get; set; }
 
 		public string? Gender { get; set; }

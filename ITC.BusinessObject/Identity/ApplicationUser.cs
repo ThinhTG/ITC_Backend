@@ -64,6 +64,8 @@ namespace ITC.BusinessObject.Identity
 		public string? BankName { get; set; } // Tên ngân hàng
 		public string? BankAccountHolderName { get; set; } // Tên người nhận trong ngân hàng 
 
+		// Free job posts tracking
+		public int FreeJobPostsUsed { get; set; } = 0; // Số lần đã sử dụng post job free
 
 		public virtual ICollection<TranslatorCertificate>? TranslatorCertificates { get; set; }
 

@@ -5,6 +5,8 @@ using System;
 using ITC.Services.Privilege;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using ITC.BusinessObject.Identity;
 
 namespace ITC.Services.Privilege
 {
@@ -13,12 +15,18 @@ namespace ITC.Services.Privilege
         private readonly IUserSubscriptionRepository _userSubscriptionRepo;
         private readonly IJobRepository _jobRepo;
         private readonly IJobApplicationRepository _jobApplicationRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public PrivilegeService(IUserSubscriptionRepository userSubscriptionRepo, IJobRepository jobRepo, IJobApplicationRepository jobApplicationRepo)
+        public PrivilegeService(
+            IUserSubscriptionRepository userSubscriptionRepo, 
+            IJobRepository jobRepo, 
+            IJobApplicationRepository jobApplicationRepo,
+            UserManager<ApplicationUser> userManager)
         {
             _userSubscriptionRepo = userSubscriptionRepo;
             _jobRepo = jobRepo;
             _jobApplicationRepo = jobApplicationRepo;
+            _userManager = userManager;
         }
 
         public async Task<PrivilegeLevel> GetUserPrivilegeLevelAsync(Guid userId)
@@ -50,9 +58,17 @@ namespace ITC.Services.Privilege
         // Customer
         public async Task<bool> CanPostJobAsync(Guid userId)
         {
+            // Check if user has used less than 5 free job posts
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user != null && user.FreeJobPostsUsed < 5)
+            {
+                return true; // Allow free posting
+            }
+
+            // If user has used all free posts, check subscription
             var subscription = await _userSubscriptionRepo.GetActiveSubscriptionAsync(userId);
             if (subscription == null || subscription.SubscriptionPlan == null)
-                return false; // Or handle based on a free plan logic
+                return false; // No subscription and no free posts left
             var limit = subscription.SubscriptionPlan.JobPostLimit;
             if (limit == null) // Null means unlimited
                 return true;
@@ -64,9 +80,17 @@ namespace ITC.Services.Privilege
 
         public async Task<int> GetRemainingJobPostsAsync(Guid userId)
         {
+            // Check if user has free posts remaining
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user != null && user.FreeJobPostsUsed < 5)
+            {
+                return 5 - user.FreeJobPostsUsed; // Return remaining free posts
+            }
+
+            // If user has used all free posts, check subscription
             var subscription = await _userSubscriptionRepo.GetActiveSubscriptionAsync(userId);
             if (subscription == null || subscription.SubscriptionPlan == null)
-                return 0;
+                return 0; // No subscription and no free posts left
             var limit = subscription.SubscriptionPlan.JobPostLimit;
             if (limit == null)
                 return int.MaxValue; // Represents unlimited
@@ -128,6 +152,30 @@ namespace ITC.Services.Privilege
         {
             var subscription = await _userSubscriptionRepo.GetActiveSubscriptionAsync(userId);
             return subscription?.SubscriptionPlan?.IsBoosted ?? false;
+        }
+
+        // Free job posts management
+        public async Task IncrementFreeJobPostsUsedAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user != null && user.FreeJobPostsUsed < 5)
+            {
+                user.FreeJobPostsUsed++;
+                await _userManager.UpdateAsync(user);
+            }
+        }
+
+        public async Task<int> GetFreeJobPostsUsedAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            return user?.FreeJobPostsUsed ?? 0;
+        }
+
+        public async Task<int> GetFreeJobPostsRemainingAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null) return 0;
+            return Math.Max(0, 5 - user.FreeJobPostsUsed);
         }
     }
 } 

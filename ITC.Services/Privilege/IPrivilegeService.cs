@@ -18,5 +18,10 @@ namespace ITC.Services.Privilege
 
         // Boosted
         Task<bool> IsUserBoostedAsync(Guid userId);
+
+        // Free job posts management
+        Task IncrementFreeJobPostsUsedAsync(Guid userId);
+        Task<int> GetFreeJobPostsUsedAsync(Guid userId);
+        Task<int> GetFreeJobPostsRemainingAsync(Guid userId);
     }
 } 

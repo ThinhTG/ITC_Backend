@@ -235,6 +235,7 @@ namespace ITC.API.Controllers
 				return NotFound(new { Message = "User not found" });
 
 			user.FullName = updateDto.FullName ?? user.FullName;
+			user.PhoneNumber = updateDto.PhoneNumber ?? user.PhoneNumber;
 			user.AvatarUrl = updateDto.AvatarUrl ?? user.AvatarUrl;
 			user.Gender = updateDto.Gender ?? user.Gender;
 			user.Address = updateDto.Address ?? user.Address;
@@ -295,7 +296,7 @@ namespace ITC.API.Controllers
 		{
 			bool isConfirmed = await _authService.ConfirmEmailAsync(userId, token);
 			if (isConfirmed)
-				return Redirect("https://inter-trans-connect.web.app/welcome");   // deploy sửa lại
+				return Redirect("https://inter-trans-connect.web.app/welcome");   
 			return BadRequest("Xác nhận email thất bại.");
 		}
 

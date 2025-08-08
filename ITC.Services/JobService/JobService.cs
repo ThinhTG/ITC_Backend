@@ -101,6 +101,23 @@ namespace ITC.Services.JobService
 					CompletedAt = app.CompletedAt,
 					CompletionOffsetMinutes = app.CompletionOffsetMinutes
 				}).ToList() ?? new List<JobApplicationSummaryDto>(),
+				SubmittedFiles = job.Applications?
+					.Where(app => app.WorkStatus >= (int)InterpreterWorkStatus.Submitted)
+					.Select(app => new SubmittedFileDto
+					{
+						ApplicationId = app.Id,
+						InterpreterId = app.InterpreterId,
+						InterpreterName = app.Interpreter?.FullName ?? string.Empty,
+						InterpreterEmail = app.Interpreter?.Email ?? string.Empty,
+						IndividualResultFileUrl = app.IndividualResultFileUrl,
+						SubmittedAt = app.CompletedAt,
+						WorkStatus = app.WorkStatus,
+						WorkStatusText = GetWorkStatusText(app.WorkStatus),
+						IsPaid = app.IsPaid,
+						IndividualFee = app.IndividualFee
+					})
+					.OrderByDescending(f => f.SubmittedAt)
+					.ToList() ?? new List<SubmittedFileDto>(),
 				TotalHiredInterpreters = job.TotalHiredInterpreters,
 				TotalInProgressInterpreters = job.TotalInProgressInterpreters,
 				TotalCompletedInterpreters = job.TotalCompletedInterpreters,
@@ -110,6 +127,22 @@ namespace ITC.Services.JobService
 			};
 
 			return jobDetailsDto;
+		}
+
+
+
+		private string GetWorkStatusText(int workStatus)
+		{
+			return workStatus switch
+			{
+				(int)InterpreterWorkStatus.NotStarted => "Chưa bắt đầu",
+				(int)InterpreterWorkStatus.AwaitingPayment => "Chờ thanh toán",
+				(int)InterpreterWorkStatus.Paid => "Đã thanh toán",
+				(int)InterpreterWorkStatus.InProgress => "Đang làm việc",
+				(int)InterpreterWorkStatus.Submitted => "Đã nộp kết quả",
+				(int)InterpreterWorkStatus.Completed => "Đã hoàn thành",
+				_ => "Không xác định"
+			};
 		}
 
 		public async Task<Guid> CreateJobAsync(CreateJobPostDto dto)
@@ -152,6 +185,9 @@ namespace ITC.Services.JobService
 
 			await _jobRepo.AddAsync(job);
 			await _jobRepo.SaveChangesAsync();
+
+			// Increment free job posts used if applicable
+			await _privilegeService.IncrementFreeJobPostsUsedAsync(dto.CustomerId);
 
 			return job.Id;
 		}

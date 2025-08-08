@@ -3,6 +3,7 @@ using ITC.BusinessObject.Entities;
 using ITC.BusinessObject.Request;
 using ITC.Core.Contracts;
 using ITC.Services.DTOs;
+using ITC.Services.DTOs.Job;
 using ITC.Services.JobService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -69,13 +70,15 @@ namespace ITC.API.Controllers
 		/// <param name="id"></param>
 		/// <returns></returns>
 		[HttpGet("{id}")]
-		public async Task<IActionResult> GetJobById(Guid id)
+		public async Task<ActionResult<JobDetailsDto>> GetJobDetails(Guid id)
 		{
 			var job = await _jobService.GetJobDetailsDtoByIdAsync(id);
 			if (job == null)
-				return NotFound(new { message = "Job not found." });
+				return NotFound();
+
 			return Ok(job);
 		}
+
 
 
 

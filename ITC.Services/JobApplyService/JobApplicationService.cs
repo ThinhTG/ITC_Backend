@@ -158,7 +158,8 @@ namespace ITC.Services.JobApplyService
 				HourlyRate = app.Job?.HourlyRate,
 				Interpreter = app.Interpreter,
 				WorkStatus = app.WorkStatus,
-				SubscriptionPriority = subscriptionDict.TryGetValue(app.InterpreterId, out var p) ? p : 0
+				SubscriptionPriority = subscriptionDict.TryGetValue(app.InterpreterId, out var p) ? p : 0,
+				SubmitFileUrl = app.IndividualResultFileUrl
 			}).ToList();
 
 			// Sắp xếp: ưu tiên theo SubscriptionPriority giảm dần, sau đó theo ngày ứng tuyển
