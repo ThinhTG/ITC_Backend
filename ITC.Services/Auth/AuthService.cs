@@ -210,7 +210,7 @@ namespace ITC.Services.Auth
 			var refreshToken = _tokenService.GenerateRefreshToken();
 			// Save refresh token
 			user.RefreshToken = refreshToken;
-			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
 			await CreateWalletForUserAsync(user.Id);
 			return new AuthResponseDto
