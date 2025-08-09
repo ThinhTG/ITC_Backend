@@ -72,12 +72,11 @@ namespace ITC.API
 			// ? Enable CORS - ph?i ??t TR??C Authentication & Authorization
 			app.UseCors("AllowFrontend");
 
-			// Swagger
-			if (app.Environment.IsDevelopment())
-			{
+			
+		
 				app.UseSwagger();
 				app.UseSwaggerUI();
-			}
+			
 
 			//// Middlewares
 			//app.UseHttpsRedirection();
