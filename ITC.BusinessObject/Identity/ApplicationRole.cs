@@ -19,18 +19,18 @@
             /// <summary>
             /// Thời gian tạo
             /// </summary>
-            public DateTimeOffset CreatedTime { get; set; }
+            public DateTimeOffset CreatedTime { get; set; } = DateTimeOffset.UtcNow;
 
-            /// <summary>
-            /// Thời gian lần cuối cập nhật
-            /// </summary>
-            public DateTimeOffset LastUpdatedTime { get; set; }
+		/// <summary>
+		/// Thời gian lần cuối cập nhật
+		/// </summary>
+		public DateTimeOffset LastUpdatedTime { get; set; } = DateTimeOffset.UtcNow;
 
-            /// <summary>
-            /// Thời gian xóa
-            /// </summary>
-            public DateTimeOffset? DeletedTime { get; set; }
-            public ApplicationRole()
+		/// <summary>
+		/// Thời gian xóa
+		/// </summary>
+		public DateTimeOffset? DeletedTime { get; set; } = DateTimeOffset.UtcNow;
+		public ApplicationRole()
             {
                 CreatedTime = CoreHelper.SystemTimeNow;
                 LastUpdatedTime = CreatedTime;

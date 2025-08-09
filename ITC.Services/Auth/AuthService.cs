@@ -252,7 +252,7 @@ namespace ITC.Services.Auth
 
 			// Save refresh token
 			user.RefreshToken = refreshToken;
-			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
 			var userRes = _mapper.Map<ApplicationUser, UserResponse>(user);
 
@@ -317,7 +317,7 @@ namespace ITC.Services.Auth
 
 			// Update refresh token
 			user.RefreshToken = newRefreshToken;
-			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
 
 			_logger.LogInformation("Tokens refreshed successfully for user {UserName}", user.UserName);
@@ -474,7 +474,7 @@ namespace ITC.Services.Auth
 
 			// Save refresh token
 			user.RefreshToken = refreshToken;
-			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
 
 			var userRes = _mapper.Map<ApplicationUser, UserResponse>(user);
@@ -554,7 +554,7 @@ namespace ITC.Services.Auth
 
 			// Lưu refresh token
 			user.RefreshToken = refreshToken;
-			user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_refreshTokenExpiryDays);
+			user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_refreshTokenExpiryDays);
 			await _userManager.UpdateAsync(user);
 
 			// Tạo ví cho user nếu chưa có (tuỳ trường hợp bạn có thể thêm check tồn tại)

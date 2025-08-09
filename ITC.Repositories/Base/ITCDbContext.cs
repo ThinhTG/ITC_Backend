@@ -3,9 +3,10 @@
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore;
-
-	namespace ITC.Repositories.Base
-	{
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+namespace ITC.Repositories.Base
+{
 		public class ITCDbContext : IdentityDbContext<
 			 ApplicationUser,
 			 ApplicationRole,
@@ -17,7 +18,7 @@
 			 ApplicationUserTokens>
 		{
 			public ITCDbContext(DbContextOptions<ITCDbContext> options) : base(options) {
-			// Removed Database.Migrate() from constructor to avoid migration conflicts
+			//Database.Migrate();
 		}
 
 			// user
@@ -62,11 +63,12 @@
 					}
 				}
 
-				modelBuilder.Entity<ApplicationUserRole>()
-					.HasOne(ur => ur.User)
-					.WithMany(u => u.UserRoles)
-					.HasForeignKey(ur => ur.UserId)
-					.OnDelete(DeleteBehavior.Cascade);
+			modelBuilder.Entity<ApplicationUserRole>()
+				.HasOne(ur => ur.User)
+				.WithMany(u => u.UserRoles)
+				.HasForeignKey(ur => ur.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+		
 
 			modelBuilder.Entity<ApplicationUserRole>(b =>
 			{
@@ -82,6 +84,9 @@
 					.HasForeignKey(ur => ur.RoleId)
 					.OnDelete(DeleteBehavior.NoAction);
 			});
+
+
+
 
 			modelBuilder.Entity<Job>()
 	.HasOne(j => j.Customer)
@@ -131,14 +136,15 @@
 					  .OnDelete(DeleteBehavior.Cascade);
 			});
 
-			// Convert all DateTimeOffset properties to datetimeoffset in SQL Server
+			// Configure properties for PostgreSQL compatibility
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 			{
 				foreach (var property in entityType.GetProperties())
 				{
 					if (property.ClrType == typeof(DateTimeOffset) || property.ClrType == typeof(DateTimeOffset?))
 					{
-						property.SetColumnType("datetimeoffset");
+						// Use timestamp with time zone for PostgreSQL
+						property.SetColumnType("timestamp with time zone");
 					}
 					// Configure decimal properties with precision and scale
 					else if (property.ClrType == typeof(decimal) || property.ClrType == typeof(decimal?))
@@ -146,8 +152,50 @@
 						property.SetPrecision(18);
 						property.SetScale(2);
 					}
+					// Configure string properties to use text type in PostgreSQL
+					else if (property.ClrType == typeof(string) && !property.IsPrimaryKey())
+					{
+						property.SetColumnType("text");
+					}
 				}
 			}
+
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				foreach (var property in entityType.GetProperties())
+				{
+					if (property.ClrType == typeof(DateTimeOffset))
+					{
+						var converter = new ValueConverter<DateTimeOffset, DateTimeOffset>(
+							v => v.ToOffset(TimeSpan.Zero), // Khi lưu -> UTC
+							v => v                          // Khi đọc ra giữ nguyên UTC
+						);
+						property.SetColumnType("timestamp with time zone");
+						property.SetValueConverter(converter);
+					}
+					else if (property.ClrType == typeof(DateTimeOffset?))
+					{
+						var converter = new ValueConverter<DateTimeOffset?, DateTimeOffset?>(
+							v => v.HasValue ? v.Value.ToOffset(TimeSpan.Zero) : v,
+							v => v
+						);
+						property.SetColumnType("timestamp with time zone");
+						property.SetValueConverter(converter);
+					}
+					else if (property.ClrType == typeof(decimal) || property.ClrType == typeof(decimal?))
+					{
+						property.SetPrecision(18);
+						property.SetScale(2);
+					}
+					else if (property.ClrType == typeof(string) && !property.IsPrimaryKey())
+					{
+						property.SetColumnType("text");
+					}
+				}
+			}
+
+
+
 
 		}
 	}
