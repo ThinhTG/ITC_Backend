@@ -301,7 +301,7 @@ namespace ITC.Services.Auth
 			}
 
 			// Check if refresh token is expired
-			if (user.RefreshTokenExpiryTime <= DateTime.Now)
+			if (user.RefreshTokenExpiryTime <= DateTime.UtcNow)
 			{
 				_logger.LogWarning("Refresh token expired for user {UserName}", user.UserName);
 				return new AuthResponseDto
