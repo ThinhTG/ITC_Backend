@@ -8,20 +8,20 @@ namespace ITC.BusinessObject.Identity
         /// <summary>
         /// Ngày tạo
         /// </summary>
-        public DateTimeOffset CreatedTime { get; set; }
+        public DateTimeOffset CreatedTime { get; set; } = DateTimeOffset.UtcNow;
 
         /// <summary>
         /// Thời gian cập nhật cuối cùng
         /// </summary>
 
-        public DateTimeOffset LastUpdatedTime { get; set; }
+        public DateTimeOffset LastUpdatedTime { get; set; } = DateTimeOffset.UtcNow;
 
-        /// <summary>
-        /// Thời gian xóa
-        /// </summary>
-        public DateTimeOffset? DeletedTime { get; set; }
+		/// <summary>
+		/// Thời gian xóa
+		/// </summary>
+		public DateTimeOffset? DeletedTime { get; set; } = DateTimeOffset.UtcNow;
 
-        public ApplicationUserClaims()
+		public ApplicationUserClaims()
         {
             CreatedTime = CoreHelper.SystemTimeNow;
             LastUpdatedTime = CreatedTime;

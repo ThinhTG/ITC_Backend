@@ -10,12 +10,12 @@ namespace ITC.BusinessObject.Identity
 {
     public class ApplicationUserLogins : IdentityUserLogin<Guid>
     {
-        public DateTimeOffset CreatedTime { get; set; }
+        public DateTimeOffset CreatedTime { get; set; } = DateTimeOffset.UtcNow;
 
-        public DateTimeOffset LastUpdatedTime { get; set; }
+		public DateTimeOffset LastUpdatedTime { get; set; } = DateTimeOffset.UtcNow;
 
-        public DateTimeOffset? DeletedTime { get; set; }
-        public ApplicationUserLogins()
+		public DateTimeOffset? DeletedTime { get; set; } = DateTimeOffset.UtcNow;
+		public ApplicationUserLogins()
         {
             CreatedTime = CoreHelper.SystemTimeNow;
             LastUpdatedTime = CreatedTime;

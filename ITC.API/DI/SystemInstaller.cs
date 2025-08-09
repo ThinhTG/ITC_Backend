@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace ITC.API.DI
 {
@@ -19,7 +20,7 @@ namespace ITC.API.DI
             // Add DB Context
             services.AddDbContext<ITCDbContext>(options =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+				 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
             });
 
             // Identity Configuration
