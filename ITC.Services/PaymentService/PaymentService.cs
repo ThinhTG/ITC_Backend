@@ -30,7 +30,7 @@ namespace ITC.Services.PaymentService
 	
 		public async Task<CreatePaymentResult> CreatePaymentLinkDepositAsync(CreateDepositLinkRequest request)
 		{
-			int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
+			int orderCode = int.Parse(DateTimeOffset.UtcNow.ToString("ffffff"));
 
 			var account = await _accountSV.FindByIdAsync(request.accountId);
 			if (account == null)
@@ -40,7 +40,7 @@ namespace ITC.Services.PaymentService
 				// Tạo dữ liệu thanh toán
 				var item = new ItemData(request.accountId, 1, request.price);
 			string description = $"Deposit {request.price}";
-			long expiredAt = DateTimeOffset.Now.AddMinutes(15).ToUnixTimeSeconds();
+			long expiredAt = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds();
 
 			var paymentData = new PaymentData(
 				orderCode,
@@ -80,6 +80,7 @@ namespace ITC.Services.PaymentService
 			return _payOS.verifyPaymentWebhookData(webhookType);
 		}
 
+	
 
 		public async Task<PaymentResult> ProcessWalletPaymentAsync(Guid customerId, decimal amount, Guid jobId)
 		{

@@ -65,6 +65,10 @@ namespace ITC.Services.WalletService
 			{
 				wallet.Balance += amount;
 				await _walletRepository.UpdateWalletAsync(wallet);
+				await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "deposit", "success", transactionDatetime, wallet.Balance, null);
+			} else
+			{
+				await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "deposit", "fail", transactionDatetime, wallet.Balance, null);
 			}
 
 			if (!useUTC)
@@ -81,15 +85,7 @@ namespace ITC.Services.WalletService
 				}
 			}
 
-			try
-			{
-
-				await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "deposit", "success", transactionDatetime, wallet.Balance, null);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception(ex.Message);
-			}
+			
 		}
 
 		public async Task<bool> UseWalletForPurchaseAsync(Guid accountId, decimal amount, int? orderId)
