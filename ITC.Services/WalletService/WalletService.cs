@@ -48,34 +48,18 @@ namespace ITC.Services.WalletService
 
 		public async Task AddMoneyToWalletAsync(Guid accountId, decimal amount, int orderCode)
 		{
+			// Lấy cấu hình thời gian
 			var dateFormat = _configuration["TransactionSettings:DateFormat"] ?? "yyyy-MM-ddTHH:mm:ssZ";
 			bool useUTC = bool.TryParse(_configuration["TransactionSettings:UseUTC"], out bool utc) && utc;
 			var timeZoneId = _configuration["TransactionSettings:TimeZone"] ?? "UTC";
-			DateTime transactionDatetime = DateTime.UtcNow; // Default to UTC
 
-			var wallet = await _walletRepository.GetWalletByAccountIdAsync(accountId);
-			if (wallet == null)
-			{
-				throw new Exception("Wallet not found");
-			}
-
-			
-			var checkingPayment = await _paymentService.GetPaymentLinkInformationAsync(orderCode);
-			if (checkingPayment.status == "PAID")
-			{
-				wallet.Balance += amount;
-				await _walletRepository.UpdateWalletAsync(wallet);
-				await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "deposit", "success", transactionDatetime, wallet.Balance, null);
-			} else
-			{
-				await _walletTransactionService.AddWalletTransactionAsync(wallet.WalletId, amount, "deposit", "fail", transactionDatetime, wallet.Balance, null);
-			}
+			// Lấy thời gian hiện tại
+			DateTime transactionDatetime = DateTime.UtcNow;
 
 			if (!useUTC)
 			{
 				try
 				{
-					// Convert UTC time to specified TimeZone
 					TimeZoneInfo timeZone = TZConvert.GetTimeZoneInfo(timeZoneId);
 					transactionDatetime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 				}
@@ -85,8 +69,50 @@ namespace ITC.Services.WalletService
 				}
 			}
 
-			
+			// Lấy ví
+			var wallet = await _walletRepository.GetWalletByAccountIdAsync(accountId);
+			if (wallet == null)
+			{
+				throw new Exception("Wallet not found");
+			}
+
+			// Lấy thông tin thanh toán
+			var checkingPayment = await _paymentService.GetPaymentLinkInformationAsync(orderCode);
+
+			if (checkingPayment.status == "PAID")
+			{
+				decimal oldBalance = wallet.Balance;
+				wallet.Balance += amount;
+
+				// Cập nhật ví trước
+				await _walletRepository.UpdateWalletAsync(wallet);
+
+				// Thêm giao dịch thành công
+				await _walletTransactionService.AddWalletTransactionAsync(
+					wallet.WalletId,
+					amount,
+					"deposit",
+					"success",
+					transactionDatetime,
+					wallet.Balance,
+					null
+				);
+			}
+			else
+			{
+				// Thêm giao dịch thất bại (không cộng tiền)
+				await _walletTransactionService.AddWalletTransactionAsync(
+					wallet.WalletId,
+					amount,
+					"deposit",
+					"fail",
+					transactionDatetime,
+					wallet.Balance,
+					null
+				);
+			}
 		}
+
 
 		public async Task<bool> UseWalletForPurchaseAsync(Guid accountId, decimal amount, int? orderId)
 		{
