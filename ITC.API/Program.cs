@@ -73,11 +73,8 @@ namespace ITC.API
 			app.UseCors("AllowFrontend");
 
 			// Swagger
-			if (app.Environment.IsDevelopment())
-			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
-			}
 
 			//// Middlewares
 			//app.UseHttpsRedirection();
