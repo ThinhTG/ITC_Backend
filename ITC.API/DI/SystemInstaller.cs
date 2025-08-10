@@ -17,14 +17,13 @@ namespace ITC.API.DI
     {
         public void InstallService(IServiceCollection services, IConfiguration configuration)
         {
-            // Add DB Context
-            services.AddDbContext<ITCDbContext>(options =>
-            {
-				 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
-            });
+			// Add DB Context
+			services.AddDbContext<ITCDbContext>(options =>
+	        options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")),
+	        ServiceLifetime.Scoped);
 
-            // Identity Configuration
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+			// Identity Configuration
+			services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 options.SignIn.RequireConfirmedEmail = true;
             })
